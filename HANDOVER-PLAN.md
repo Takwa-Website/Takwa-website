@@ -12,118 +12,129 @@ down or stop company email.
 
 ---
 
-## Where things stand right now
+## Where you are now
 
-Already done, on this laptop:
+**Done — repository is live and pushed.**
 
 - [x] Full backup on the Backup Plus drive — 4.9 GB, verified
 - [x] Repository restructured so the editing tools travel with the site
-- [x] `.cpanel.yml` moved to the repo root and rehearsed against a test server
+- [x] `.cpanel.yml` moved to the repo root, rehearsed against a test server
 - [x] Two files that were leaking onto the live site fixed
 - [x] `README.md` written for her
-- [x] First commit made — `1f51593`, 338 files, 26 MB
+- [x] Company account created — **Takwa-Website**
+- [x] Repository created — **Takwa-Website/Takwa-website**, set to **private**
+- [x] Pushed: `dab70e4`, 339 files, in sync
+- [x] Verified `website/`, `music/` and `other/` stayed out
 
-Not done, because only you can do it: the GitHub account, the repo, adding
-her, and re-pointing cPanel. That is the rest of this document.
-
-**Nothing has been pushed. The live site is untouched.**
-
----
-
-## Phase 1 — Create the account and the repo
-
-- [ ] Create the company GitHub account
-- [ ] Sign in to it
-- [ ] Create a **new empty repository**
-
-**Do not tick "Add a README", "Add .gitignore" or "Choose a licence."** Any of
-them creates a commit on the remote that collides with yours, and the first
-push is rejected with a confusing error.
-
-- [ ] Decide private or public. **Private** is right — this repo contains the
-      admin page and the application handling code. Private repos need one
-      extra step in Phase 4; that is the only cost.
-- [ ] Copy the repository URL
+**Next: Phase 1 below — cPanel.** The live site has NOT been deployed from the
+new repository yet. Until it has, takwafoods.com is still running whatever the
+old deploy left there.
 
 ---
 
-## Phase 2 — Push
+## Why this order
 
-From `~/obsidian/George/Takwa`:
+Deploy before people. The site must be proven working from the new repository
+*before* anyone else starts committing to it — otherwise, when something looks
+wrong, you cannot tell whether it was the restructure or her first change.
 
-```bash
-git remote add origin https://github.com/COMPANY-ACCOUNT/REPO-NAME.git
-git push -u origin main
-```
-
-- [ ] Push succeeds
-- [ ] Open the repo on github.com and confirm you see `README.md`,
-      `start.py`, and the `Takwafoods web` folder
-
-If the push asks for a password: GitHub stopped accepting account passwords
-for git. Use a **personal access token** as the password
-(Settings → Developer settings → Personal access tokens), or install the
-GitHub CLI and run `gh auth login`.
+So: cPanel, then verify, then bring her in.
 
 ---
 
-## Phase 3 — Give her access
+## Phase 1 — Re-point cPanel
 
-She needs **her own free GitHub account**. Not yours.
+The repository is private, so cPanel cannot clone it over HTTPS. It needs an
+SSH deploy key. This is the fiddliest part of the whole handover; everything
+after it is easy.
 
-- [ ] She creates her account and sends you the username
-- [ ] Repo → **Settings → Collaborators and teams → Add people**
-- [ ] Add her username, permission **Write**
-- [ ] She accepts the emailed invitation
+### 1a. Make a key in cPanel
 
-This is what lets her push without ever seeing your password, and it is
-revokable in one click.
+- [ ] cPanel → **SSH Access → Manage SSH Keys → Generate a New Key**
+- [ ] Leave the **passphrase empty** — cPanel cannot type one during an
+      automated clone, and a key with a passphrase will simply fail
+- [ ] **Manage** the new key → **Authorize** it
+- [ ] **View/Download** the *public* key and copy the whole line
 
-**Do not sign your GitHub account into her VS Code.** It hands her the account
-itself, every commit appears to be yours, and the only way to undo it is
-changing your password.
+### 1b. Give that key read access
+
+- [ ] GitHub → repo → **Settings → Deploy keys → Add deploy key**
+- [ ] Paste the public key, title it `cPanel`
+- [ ] **Leave "Allow write access" unticked.** cPanel only ever reads.
+
+A deploy key is scoped to this one repository. It is not an account, and it
+cannot reach anything else you own — which is exactly why it is the right tool
+here rather than a personal token.
+
+### 1c. Remove the old entry
+
+- [ ] cPanel → **Git Version Control** → the existing `TakwaFoods-Website`
+      entry → **Remove**
+
+This deletes only cPanel's own working copy. **Your live site is untouched** —
+`public_html` is a separate directory that deploys copy *into*.
+
+### 1d. Create the new one
+
+- [ ] Git Version Control → **Create**
+- [ ] Clone URL — the **SSH** form, not HTTPS:
+
+      git@github.com:Takwa-Website/Takwa-website.git
+
+- [ ] Repository path: something like `/home/takwafood/takwa-website`
+
+**That path is cPanel's working copy, not the website.** It must NOT be
+`public_html`. The deploy script reads from the working copy and copies into
+`public_html`. Pointing it at `public_html` would put the whole repository,
+including this plan, on the public internet.
+
+- [ ] cPanel clones successfully
 
 ---
 
-## Phase 4 — Re-point cPanel
+## Phase 2 — Deploy, and check it properly
 
-cPanel is still cloned from the old repository. It must be moved to the new
-one or your deploys will keep publishing the old structure.
-
-- [ ] cPanel → **Git Version Control**
-- [ ] Note the existing repo's settings, then **remove** the old entry
-      (this only removes cPanel's clone — nothing on the live site is deleted)
-- [ ] **Create** a new one from the new repository URL
-- [ ] If the repo is private, cPanel needs credentials: generate an SSH key in
-      cPanel, then add it to the repo under
-      **Settings → Deploy keys → Add deploy key** (read access is enough)
-
-- [ ] cPanel clones the repository successfully
-
----
-
-## Phase 5 — Deploy once, before she starts
-
-Do this while the only changes are yours. If something is broken, you want to
-know it was already broken.
+This is the first time the restructured deploy runs for real. The paths
+changed: cPanel now holds the whole `Takwa` folder, and `.cpanel.yml` at its
+root reaches into the site subfolder through `$SRC`. I rehearsed this against
+a stand-in server — 16 pages, 19 product pages, 92 uploads, no leaks — but
+rehearsal is not the real thing. Check properly rather than glancing at the
+home page.
 
 - [ ] Git Version Control → **Update from Remote**
 - [ ] **Deploy HEAD Commit**
-- [ ] Open **takwafoods.com** and check:
-  - [ ] Home page loads and looks normal
-  - [ ] Arabic version loads
-  - [ ] A product page loads
-  - [ ] `takwafoods.com/apply.html` loads
-- [ ] Confirm the tooling files are **not** public — these should all fail:
-  - [ ] `takwafoods.com/_photo-index.html`
-  - [ ] `takwafoods.com/listing/_product-template.html`
-  - [ ] `takwafoods.com/uploads/share/_flavora-cafe-og.jpg.bak`
 
-If any of those three load, stop and tell me.
+### These must load
+
+- [ ] `takwafoods.com` — home page, looks normal
+- [ ] `takwafoods.com/index-ar.html` — Arabic version
+- [ ] `takwafoods.com/listings.html` — products, all aligned
+- [ ] any single product page
+- [ ] `takwafoods.com/apply.html` — the application form
+- [ ] `takwafoods.com/contact-us.html`
+
+### These must FAIL
+
+These three were being published and should not have been. This is how you
+confirm the fix actually shipped.
+
+- [ ] `takwafoods.com/_photo-index.html`
+- [ ] `takwafoods.com/listing/_product-template.html`
+- [ ] `takwafoods.com/uploads/share/_flavora-cafe-og.jpg.bak`
+
+If any of those three load, stop and say so.
+
+### And one to look at
+
+- [ ] Share `takwafoods.com` into a WhatsApp chat with yourself
+
+The preview should show the factory entrance, not the Flavora Café counter. If
+it still shows the café, that is WhatsApp's cache, not a broken deploy — the
+file is correct. It clears on its own, or we rename the image to force it.
 
 ---
 
-## Phase 6 — Set the admin password today
+## Phase 3 — Set the admin password today
 
 `/admin/` has **no password set**. The first person to open it sets it and
 owns it — including a stranger who guesses the URL.
@@ -138,7 +149,27 @@ server to bring the setup screen back.
 
 ---
 
-## Phase 7 — Her setup
+## Phase 4 — Bring her in
+
+Only now, with the site proven working from the new repository.
+
+She needs **her own free GitHub account**. Not yours.
+
+- [ ] She creates her account and sends you the username
+- [ ] Repo → **Settings → Collaborators and teams → Add people**
+- [ ] Add her username, permission **Write**
+- [ ] She accepts the emailed invitation
+
+Write, not Admin. She needs to push, not to change repository settings or add
+other people.
+
+**Do not sign your GitHub account into her VS Code.** It hands her the account
+itself, every commit appears to be yours, and the only way to undo it is
+changing your password. Collaborator access is revokable in one click.
+
+---
+
+## Phase 5 — Her setup
 
 Send her `README.md`. She needs Python 3 and Git, then:
 
@@ -153,7 +184,7 @@ pip install Pillow
 
 ---
 
-## Phase 8 — One change end to end, before you trust it
+## Phase 6 — One change end to end, before you trust it
 
 Do not consider the handover done until **she**, on her machine, has:
 
@@ -168,7 +199,7 @@ And then **you**:
 - [ ] Update from Remote → Deploy HEAD Commit
 - [ ] Confirmed the change is live on takwafoods.com
 
-That last Arabic check matters more than it looks. The `-ar.html` pages are
+That Arabic check matters more than it looks. The `-ar.html` pages are
 *generated* from the English by `build_arabic.py`. Someone editing English by
 hand without regenerating leaves the two languages saying different things,
 with no error and no warning. It is the most likely way a newcomer quietly
@@ -176,12 +207,60 @@ damages this site.
 
 ---
 
-## Phase 9 — Clean up, only after Phase 8 passes
+## Phase 7 — Clean up, only after Phase 6 passes
 
 - [ ] Delete `.git-OLD-archive/` from
       `Takwafoods web/takwaweb.designersidhost.com/`
-- [ ] Leave the old GitHub repo alone — it holds the previous 46 commits of
-      history. Archive it rather than deleting it.
+- [ ] Leave the old GitHub repo `Georgeyoussef066/TakwaFoods-Website` alone —
+      it holds the previous 46 commits of history. Archive it, do not delete it.
+- [ ] Fix your git identity if you care about tidy history — commits are
+      currently authored as `GeorgeYoueef066 / GeorgeYoueef066@gmail.com`,
+      which is a typo and does not match your real address:
+
+      git config --global user.name "George Youssef"
+      git config --global user.email "georgeyoussef055@gmail.com"
+
+---
+
+## Troubleshooting
+
+Problems actually hit while doing this, and what fixed them.
+
+**`Repository not found` on a URL you know is right**
+
+Two different causes, same message.
+
+*Wrong remote.* `git remote add` only *creates*. If `origin` already exists it
+errors and changes nothing, so pushes keep going to the old URL even after you
+think you fixed it. Check with `git remote -v`, and change it with:
+
+    git remote set-url origin <url>
+
+*Wrong account.* GitHub returns 404, never 403, for a private repo your account
+cannot see — it refuses to confirm the repo exists at all. Your machine uses
+`credential.helper store`, which keeps **one** credential for all of
+github.com, and it was authenticating as `Georgeyoussef066`. Fixed by adding
+that account as a collaborator on the new repo.
+
+To clear a stored credential and be prompted fresh:
+
+    git credential reject <<< "protocol=https
+    host=github.com
+    "
+
+Then paste a **personal access token** as the password — GitHub no longer
+accepts account passwords for git. Never put a token in the remote URL; it
+lands in plain text in `.git/config`.
+
+**Two GitHub accounts on one machine**
+
+`credential.helper store` cannot hold both. Either add one account as a
+collaborator on the other's repos, or install the GitHub CLI
+(`sudo apt install gh`, then `gh auth login`), which handles this properly.
+
+**cPanel clone fails on a private repo**
+
+HTTPS will not work. Use the SSH URL and a deploy key — Phase 1.
 
 ---
 
