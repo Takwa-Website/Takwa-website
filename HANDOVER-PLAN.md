@@ -87,24 +87,35 @@ so can cPanel.
 
 You should see one existing entry, the old `TakwaFoods-Website` repository.
 
-### 2.3 — Write down the old settings first
-
-Before removing anything, note these from the existing entry, in case you need
-to go back:
-
-- [ ] The **Repository Path** it currently uses
-- [ ] The **Clone URL**
-
-A photo on your phone is fine.
-
-### 2.4 — Remove the old entry
+### 2.3 — Read the old entry, change nothing
 
 - [ ] Click **Manage** on the old `TakwaFoods-Website` entry
-- [ ] Find the **Remove** option and confirm
+- [ ] Note its **Repository Path** and **Clone URL** — a photo on your phone is
+      fine
 
-**This does not touch your live site.** It deletes only cPanel's private
-working copy of the repository. `public_html` — the actual website — is a
-separate directory that deploys copy *into*. The site stays up throughout.
+**Look carefully at the Repository Path:**
+
+- If it is something like `/home/takwafood/TakwaFoods-Website`, that is normal.
+  Carry on.
+- If it says `/home/takwafood/public_html`, **stop and say so.** That would
+  mean the repository *is* the live website rather than a working copy, and the
+  rest of Part 2 needs rethinking.
+
+- [ ] Go back without changing anything
+
+### 2.4 — Do NOT remove the old entry
+
+Leave it exactly where it is.
+
+cPanel allows several repositories at once, and they are independent — only the
+one you click Deploy on does anything. Keeping the old entry costs nothing and
+buys a free way back: if the new repository misbehaves, the old one is still
+sitting there fully configured, and you deploy from it instead.
+
+Remove it in Part 9, weeks later, once the new arrangement has proven itself.
+Never as part of setting this up.
+
+- [ ] Old entry left alone
 
 ### 2.5 — Create the new entry
 
@@ -368,6 +379,8 @@ likely mistake for someone new.
 
 # PART 9 — Clean up, only after Part 8 passes
 
+- [ ] Remove the old cPanel Git entry — only now, with the new one proven. Its
+      only purpose was to be your way back, and you no longer need one.
 - [ ] Delete `.git-OLD-archive/` from
       `Takwafoods web/takwaweb.designersidhost.com/`
 - [ ] Leave the old repository `Georgeyoussef066/TakwaFoods-Website` alone. It
@@ -386,7 +399,7 @@ likely mistake for someone new.
 |---|---|
 | She should not have access any more | Settings → Collaborators → remove |
 | A bad change went live | cPanel → deploy an earlier commit |
-| The new repository broke deploys | The old repository is untouched — point cPanel back at it using the settings you noted in 2.3 |
+| The new repository broke deploys | The old cPanel entry is still there — open it and deploy from it instead |
 | Everything is wrong | Restore `01-site-and-scripts-COMPLETE.tar.gz` from the Backup Plus drive |
 
 Never **transfer** the repository to her. Collaborator access does the same job
