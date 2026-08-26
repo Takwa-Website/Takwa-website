@@ -236,20 +236,39 @@ want it forced immediately.
 
 # PART 5 — Set the admin password
 
-**Do this the same day.** `/admin/` has no password set, and the first person
-to open it sets it. That includes a stranger who guesses the URL.
+A password is **already set**. `takwafoods.com/admin/` returns a **Sign in**
+screen, which `auth.php` only shows once a password exists — on a fresh install
+it says *Set a password* instead.
 
-### 5.1
+The password is not in either GitHub repository and never was. Only a bcrypt
+hash is stored, in `takwa-admin-config.php` in the folder **above**
+`public_html`. Deploys never write there, so nothing you do with git can set,
+change or reveal it.
 
-- [ ] Go to `takwafoods.com/admin/`
-- [ ] You get a setup screen asking you to choose a password
-- [ ] Choose a strong one and save it in a password manager immediately
+### 5.1 — if you know the password
 
-**Only a bcrypt hash is stored**, in a file above the web root. Nobody can
-recover the password later — not you, not me. If it is lost, that file has to
-be deleted on the server to bring the setup screen back.
+- [ ] Sign in at `takwafoods.com/admin/`
+- [ ] Save it in a password manager if it is not there already
 
-### 5.2 — check
+Done. Skip 5.2.
+
+### 5.2 — if you do not know it
+
+It cannot be recovered. Bcrypt is one-way; the plaintext does not exist
+anywhere, on the server or off it. Reset it:
+
+- [ ] cPanel → **File Manager**
+- [ ] Go to `/home/takwafood/` — the folder **containing** `public_html`, not
+      inside it
+- [ ] Delete **`takwa-admin-config.php`**
+- [ ] Reload `takwafoods.com/admin/`
+- [ ] You now get **Set a password**. Choose a strong one and save it in a
+      password manager immediately.
+
+Deleting that file destroys only the password. The applications live separately
+in `takwa-applications/` and are untouched.
+
+### 5.3 — check
 
 - [ ] Open `takwafoods.com/admin/` in a private window
 - [ ] It asks for the password rather than letting you in
