@@ -1,0 +1,98 @@
+{
+  "home-about": {
+    "source": "/home/geogre-youssef/obsidian/George/Takwa/website/Photos for Expo(DONE)/IMG_8663.JPG",
+    "name": "IMG_8663.JPG",
+    "reason": "Technician in whites at the freeze dryers. Bright, clean and clearly food-grade — reads as a modern facility rather than a workshop.",
+    "page": "Home Page"
+  },
+  "home-video-bg": {
+    "source": "/home/geogre-youssef/obsidian/Takwa-website/Photos/places/IMG_8824.JPG",
+    "name": "IMG_8824.JPG",
+    "reason": "Facility exterior under blue sky. Establishes real scale, and the open sky leaves room for the white heading text on top.",
+    "page": "Home Page"
+  },
+  "blog-thumb-1": {
+    "source": "/home/geogre-youssef/obsidian/Takwa-website/Photos/lap/IMG_8759.JPG",
+    "name": "IMG_8759.JPG",
+    "reason": "Lab bench with sample jars. Bright, colourful, speaks to R&D and quality control.",
+    "page": "Home Page"
+  },
+  "blog-thumb-2": {
+    "source": "/home/geogre-youssef/obsidian/George/Takwa/website/Photos for Expo(DONE)/PHOTO-2025-08-24-11-10-15.jpg",
+    "name": "PHOTO-2025-08-24-11-10-15.jpg",
+    "reason": "The branded delivery fleet — strong visual proof of distribution reach.",
+    "page": "Home Page"
+  },
+  "blog-thumb-3": {
+    "source": "/home/geogre-youssef/obsidian/Takwa-website/Photos/cafe/IMG_5764.jpg",
+    "name": "IMG_5764.jpg",
+    "page": "Blog",
+    "reason": "The Flavora Cafe interior, for the cafe opening article."
+  },
+  "blog-thumb-4": {
+    "source": "/home/geogre-youssef/obsidian/Takwa-website/Photos/cafe/IMG_0562.JPG",
+    "name": "IMG_0562.JPG",
+    "page": "Blog",
+    "reason": "The Enna soup range on the shelf, for the Enna launch article."
+  },
+  "testimonial-photo": {
+    "source": "/home/geogre-youssef/obsidian/George/Takwa/website/Photos for Expo(DONE)/IMG_8827.JPG",
+    "name": "IMG_8827.JPG",
+    "reason": "Landscaped grounds at the facility — green, bright and welcoming.",
+    "page": "Home Page"
+  },
+  "product-header": {
+    "source": "/home/geogre-youssef/obsidian/Takwa-website/Photos/products/04- MIXED SAUCES/Mixed (3).png",
+    "name": "Mixed (3).png",
+    "reason": "Bowls of spices on dark wood. Appetising and unmistakably a food company — the current header is a photo of cardboard boxes in a warehouse, which says logistics rather than food.",
+    "page": "Our Products"
+  },
+  "product-flavor-1": {
+    "source": "/home/geogre-youssef/obsidian/Takwa-website/Photos/products/03- CHIP & SNACK FLAVOUR/Potato_Chips (1).png",
+    "name": "Potato_Chips (1).png",
+    "reason": "All three flavour thumbnails on this page are currently the *same picture*. This gives the first one a real chips/snack-seasoning shot.",
+    "page": "Product Detail"
+  },
+  "product-flavor-2": {
+    "source": "/home/geogre-youssef/obsidian/Takwa-website/Photos/products/04- MIXED SAUCES/Mixed (1).png",
+    "name": "Mixed (1).png",
+    "reason": "Second of the three — sauces, so the row shows genuine variety instead of one image repeated.",
+    "page": "Product Detail"
+  },
+  "product-flavor-3": {
+    "source": "/home/geogre-youssef/obsidian/Takwa-website/Photos/products/07- بهارات الوجبات السريعة/Fastfood (1).png",
+    "name": "Fastfood (1).png",
+    "reason": "Third of the three — fried/fast-food seasoning, completing the set.",
+    "page": "Product Detail"
+  },
+  "about-vision": {
+    "source": "/home/geogre-youssef/obsidian/Takwa-website/Photos/products/02- MIXED SPICES/Mixed (2).png",
+    "name": "Mixed (2).png",
+    "page": "About Us",
+    "reason": "Bowls of spices from different cuisines — a direct match for “bridging global cultures through the universal language of food”. It's also a naturally dark image, so the white headline sits on it cleanly."
+  },
+  "about-mission": {
+    "source": "/home/geogre-youssef/obsidian/Takwa-website/Photos/work inviroment/IMG_7307.JPG",
+    "name": "IMG_7307.JPG",
+    "page": "About Us",
+    "reason": "Hands sifting dried herbs. Food-forward and authentic — matches “authentic products” and shows the craft side of production, pairing naturally with the spice photo on the Vision slide."
+  },
+  "history-2013": {
+    "source": "/home/geogre-youssef/obsidian/Takwa-website/Photos/products/02- MIXED SPICES/Mixed (3).png",
+    "name": "Mixed (3).png (spices)",
+    "page": "About Us",
+    "reason": "2013 is about B2B spice mixes and seasonings, so it should show spices. The current photo is a vat of drying herbs, which belongs to the 1996 story."
+  },
+  "history-2014": {
+    "source": "/home/geogre-youssef/obsidian/Takwa-website/Photos/products/08- منتجات الطهي/Culinary (1).png",
+    "name": "Culinary (1).png",
+    "page": "About Us",
+    "reason": "2014 is the Presto launch — powdered soups and stocks. Professional soup photography instead of the current snapshot of packets on a counter."
+  },
+  "history-2025": {
+    "source": "/home/geogre-youssef/obsidian/Takwa-website/Photos/products/01- Flavora  Category/Flavora category.png",
+    "name": "Flavora category.png",
+    "page": "About Us",
+    "reason": "2025 is about launching your own Flavora coffee line — so it should show the actual Flavora range. The current photo is workers sorting packets, which doesn't show the brand at all."
+  }
+}

@@ -1,0 +1,366 @@
+/* ==========================================================================
+   Arabic / right-to-left layout.
+
+   Loaded only by the -ar.html pages, after custom.css, and every rule is
+   scoped to [dir="rtl"] so it cannot affect the English site.
+
+   The theme was built left-to-right throughout, so this sheet mirrors the
+   parts that carry direction: text alignment, the header and its dropdowns,
+   list indents, the sliders, the history timeline and the footer. Anything
+   that is visually symmetric is left alone.
+   ========================================================================== */
+
+/* --------------------------------------------------------------- basics -- */
+[dir="rtl"] body {
+    direction: rtl;
+    text-align: right;
+    /* Tajawal for Arabic. It carries Latin glyphs too, so brand names, emails
+       and phone numbers set in the middle of Arabic copy stay in the same
+       family instead of dropping to a fallback mid-sentence. The rest are
+       system fonts so the page still reads if Google Fonts is blocked or slow.
+
+       Tajawal has no 600. The stylesheets ask for 600 more than any other
+       weight and CSS resolves a missing weight upward, so those rules render
+       at 700 -- a little heavier than the English side, which is fine in
+       Arabic, where thin strokes at small sizes are harder to read. */
+    font-family: "Tajawal", "Noto Kufi Arabic", "Segoe UI", Tahoma, sans-serif;
+}
+
+/* Setting body alone is not enough. The theme does not rely on inheritance for
+   type: style.css declares three font tokens on :root and its rules reach for
+   those, so headings, the footer link titles, form controls, the language
+   toggle and the cookie banner were all still resolving to DM Sans or Roboto.
+   Neither carries Arabic glyphs, so those elements were not showing the chosen
+   font at all -- the browser was quietly substituting whatever system Arabic
+   face it had, and the page came out set in two or three different typefaces.
+
+   Redefining the tokens fixes every rule that uses them at once, without
+   touching a single selector or needing !important. dir sits on <html>, so
+   this matches the same element :root does and wins on load order. */
+[dir="rtl"] {
+    --default-font: "Tajawal", "Noto Kufi Arabic", "Segoe UI", Tahoma, sans-serif;
+    --DMSans:       "Tajawal", "Noto Kufi Arabic", "Segoe UI", Tahoma, sans-serif;
+    --roboto:       "Tajawal", "Noto Kufi Arabic", "Segoe UI", Tahoma, sans-serif;
+}
+
+/* The CMS body copy carries its own inline font-family -- helvetica, arial --
+   which no stylesheet can outrank. These are the only declarations on the
+   Arabic pages that need forcing. */
+[dir="rtl"] [style*="helvetica"],
+[dir="rtl"] [style*="Helvetica"],
+[dir="rtl"] [style*="arial"],
+[dir="rtl"] [style*="Arial"] {
+    font-family: var(--default-font) !important;
+}
+
+[dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3,
+[dir="rtl"] h4, [dir="rtl"] h5, [dir="rtl"] h6,
+[dir="rtl"] p, [dir="rtl"] li, [dir="rtl"] span, [dir="rtl"] div {
+    letter-spacing: normal;   /* letter-spacing breaks Arabic joining */
+}
+
+/* Arabic reads better with a little more line height than the Latin copy */
+[dir="rtl"] p,
+[dir="rtl"] .section-title p,
+[dir="rtl"] .about-content p {
+    line-height: 1.9;
+}
+
+/* ...but not everything marked up as a paragraph is running copy. The About Us
+   figure is a <p>, so 1.9 applied to a 128px number and gave it a 243px line
+   box: the panel came out 422px tall against 293 in English, with the label
+   stranded a long way under the figure. These restate the intended leading at
+   a specificity that beats the blanket rule above. */
+[dir="rtl"] .years-panel .years-panel-figure { line-height: 1; }
+[dir="rtl"] .years-panel .years-panel-label  { line-height: 1.35; }
+[dir="rtl"] .years-panel .years-panel-eyebrow { line-height: 1.4; }
+
+[dir="rtl"] ul,
+[dir="rtl"] ol {
+    padding-right: 0;
+    padding-left: 0;
+}
+
+/* Latin runs inside Arabic text (emails, phone numbers, brand names).
+   Without isolation the leading + on a phone number jumps to the wrong end. */
+[dir="rtl"] a[href^="mailto:"],
+[dir="rtl"] a[href*="wa.me"],
+[dir="rtl"] a[href^="tel:"] {
+    direction: ltr;
+    display: inline-block;
+    unicode-bidi: isolate;
+}
+
+/* -------------------------------------------------------------- header -- */
+[dir="rtl"] .navbar-nav {
+    padding-right: 0;
+}
+
+[dir="rtl"] .main-menu .nav-item {
+    margin-right: 0;
+    margin-left: 28px;
+}
+
+[dir="rtl"] .main-menu .nav-item:last-child {
+    margin-left: 0;
+}
+
+[dir="rtl"] .dropdown-menu {
+    right: 0;
+    left: auto;
+    text-align: right;
+}
+
+[dir="rtl"] .header-btn,
+[dir="rtl"] .header-right-item {
+    margin-left: 0;
+    margin-right: auto;
+}
+
+/* The chevron needs no nudging: it is a flex item in the toggle now (see
+   custom.css), so the row's own gap spaces it on whichever side it lands.
+   The margin that used to be here was compensating for it being absolutely
+   positioned, and now just pushes it off-centre. */
+
+/* ------------------------------------------------------ section titles -- */
+[dir="rtl"] .section-title h3 {
+    padding-left: 0;
+    padding-right: 22px;          /* room for the leaf/marker background */
+    background-position: right center;
+}
+
+[dir="rtl"] .section-title,
+[dir="rtl"] .section-title h1,
+[dir="rtl"] .section-title h2,
+[dir="rtl"] .section-title h3 {
+    text-align: right;
+}
+
+/* centred sections stay centred */
+[dir="rtl"] .text-center,
+[dir="rtl"] .text-center .section-title,
+[dir="rtl"] .text-center .section-title h2,
+[dir="rtl"] .text-center .section-title h3 {
+    text-align: center;
+}
+
+/* ------------------------------------------------- banner readability -- */
+/* The banners darken one side of the photograph so the heading over it stays
+   legible. Which side is not decorative: it is whichever side the heading is
+   on. In Arabic the heading moves across, and the scrim did not follow, so the
+   Arabic headings were sitting over the bright part of the picture while the
+   dark wash covered empty photo on the other side.
+
+   Each gradient is mirrored by reflecting its angle, t -> 360 - t, which flips
+   it horizontally and leaves the colour stops and any vertical component
+   exactly as designed.
+
+   An earlier attempt here targeted .hero.hero-slider-layout .hero-slide, which
+   is not the element that paints either scrim -- so it never applied to
+   anything. */
+
+/* inner page banners: 270deg (opaque at the left edge) -> 90deg */
+[dir="rtl"] .page-header::before {
+    background: linear-gradient(90deg, rgba(4, 42, 45, 0) 22.28%,
+                                var(--primary-color) 100%);
+}
+
+/* home and video heroes: 82deg -> 278deg */
+[dir="rtl"] .hero::before {
+    background: linear-gradient(278deg, #000000c9, #00000080);
+}
+
+/* ------------------------------------------------------------ buttons -- */
+[dir="rtl"] .btn-default {
+    direction: rtl;
+}
+
+[dir="rtl"] .btn-default i,
+[dir="rtl"] .btn-default svg {
+    margin-left: 0;
+    margin-right: 8px;
+    transform: scaleX(-1);        /* arrows point the way the eye travels */
+}
+
+/* --------------------------------------------------------- our history -- */
+[dir="rtl"] .export-coaching-step,
+[dir="rtl"] .owl-carousel {
+    direction: rtl;
+}
+
+[dir="rtl"] .export-coaching-step .step-content {
+    text-align: right;
+}
+
+/* ------------------------------------------------------------ services -- */
+[dir="rtl"] .service-item,
+[dir="rtl"] .service-content {
+    text-align: right;
+}
+
+[dir="rtl"] .service-item .service-icon {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+/* ------------------------------------------------------------ products -- */
+[dir="rtl"] .filter-sidebar,
+[dir="rtl"] .filter-sidebar label,
+[dir="rtl"] .filter-sidebar select,
+[dir="rtl"] .filter-sidebar input {
+    text-align: right;
+    direction: rtl;
+}
+
+[dir="rtl"] .product-item,
+[dir="rtl"] .listing-content {
+    text-align: right;
+}
+
+/* --------------------------------------------------------------- forms -- */
+[dir="rtl"] input,
+[dir="rtl"] textarea,
+[dir="rtl"] select {
+    text-align: right;
+    direction: rtl;
+}
+
+[dir="rtl"] input[type="email"],
+[dir="rtl"] input[type="tel"] {
+    text-align: left;
+    direction: ltr;
+}
+
+/* -------------------------------------------------------------- footer -- */
+[dir="rtl"] .footer,
+[dir="rtl"] .footer-links,
+[dir="rtl"] .footer-widget {
+    text-align: right;
+}
+
+[dir="rtl"] .footer-links ul {
+    padding-right: 0;
+}
+
+/* --------------------------------------------------- bootstrap helpers -- */
+[dir="rtl"] .text-start { text-align: right !important; }
+[dir="rtl"] .text-end   { text-align: left  !important; }
+[dir="rtl"] .float-start { float: right !important; }
+[dir="rtl"] .float-end   { float: left  !important; }
+[dir="rtl"] .me-auto { margin-right: 0 !important; margin-left: auto !important; }
+[dir="rtl"] .ms-auto { margin-left: 0 !important; margin-right: auto !important; }
+
+/* ------------------------------------------------------------- cookies -- */
+[dir="rtl"] .cookie-banner,
+[dir="rtl"] .cookie-consent {
+    text-align: right;
+    direction: rtl;
+}
+
+/* ---------------------------------------------------------- mobile menu -- */
+/* The collapsed menu is built by SlickNav, which writes its own markup and
+   inline styles, so it needs mirroring separately from the desktop header. */
+[dir="rtl"] .slicknav_menu,
+[dir="rtl"] .slicknav_nav,
+[dir="rtl"] .slicknav_nav ul {
+    direction: rtl;
+    text-align: right;
+}
+
+[dir="rtl"] .slicknav_nav ul {
+    margin-right: 20px;
+    margin-left: 0;
+}
+
+[dir="rtl"] .slicknav_btn {
+    float: left;
+}
+
+/* the submenu caret is a literal character, so it is flipped rather than
+   swapped out -- that keeps it pointing the way the menu actually opens */
+[dir="rtl"] .slicknav_arrow {
+    display: inline-block;
+    transform: scaleX(-1);
+    margin-right: 6px;
+    margin-left: 0;
+}
+
+/* ------------------------------------------------------- phones in RTL -- */
+@media only screen and (max-width: 767px) {
+
+    /* the stats grid restored in custom.css needs its padding on the other
+       side, or the numbers sit hard against the middle of the screen */
+    [dir="rtl"] .export-coaching-box .export-coaching-step {
+        padding: 20px 0 0 12px;
+    }
+
+    [dir="rtl"] .accordion-body .form-check,
+    [dir="rtl"] .filter-sidebar .form-check {
+        flex-direction: row;
+    }
+
+    [dir="rtl"] .footer-links li a,
+    [dir="rtl"] .footer-widget ul li a {
+        text-align: right;
+    }
+}
+
+/* ------------------------------------------------- history full-bleed -- */
+/* The timeline breaks out of its centred container to run edge to edge.
+   custom.css does that with left:50% plus a negative margin, which relies on
+   `left` winning over `right` -- true in LTR, but RTL resolves the opposite
+   one. It happens to land in the same place here because both offsets are
+   equal, so this is belt-and-braces rather than a fix for a visible bug:
+   margins alone are direction-agnostic and stay correct if those offsets ever
+   stop matching. */
+[dir="rtl"] .history-content-box {
+    left: auto;
+    right: auto;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+}
+
+/* ------------------------------------------------------------- buttons -- */
+/* The arrow is a ::before pinned to the right edge, so in Arabic it moves to
+   the left and the label's breathing room moves with it. */
+[dir="rtl"] .btn-default,
+[dir="rtl"] button.btn-default,
+[dir="rtl"] input[type="submit"].btn-default{
+    padding: 12px 28px 12px 54px;
+}
+
+[dir="rtl"] .btn-default::before{
+    right: auto;
+    left: 0;
+    transform: translate(20px, 50%) scaleX(-1);
+}
+
+[dir="rtl"] .btn-default:hover::before{
+    transform: translate(20px, 50%) scaleX(-1) rotate(45deg);
+}
+
+[dir="rtl"] .btn-default + .btn-default,
+[dir="rtl"] .btn-default + .thm-btn-two,
+[dir="rtl"] .thm-btn-two + .btn-default{
+    margin-left: 0;
+    margin-right: 14px;
+}
+
+@media only screen and (max-width: 575px) {
+    [dir="rtl"] .btn-default + .btn-default,
+    [dir="rtl"] .btn-default + .thm-btn-two,
+    [dir="rtl"] .thm-btn-two + .btn-default {
+        margin-right: 0;
+    }
+}
+
+/* ------------------------------------------- homepage credibility bands -- */
+[dir="rtl"] .capability-list li{
+    padding-left: 0;
+    padding-right: 20px;
+}
+
+[dir="rtl"] .capability-list li::before{
+    left: auto;
+    right: 0;
+}

@@ -1,0 +1,56 @@
+---
+# ---------------------------------------------------------------------------
+# cPanel deployment.
+#
+# This file must sit at the REPOSITORY root. The repository root is now the
+# Takwa folder, not the website folder, so that the editing tools (start.py,
+# build_arabic.py, _photo-backups/) travel with the site instead of living on
+# one laptop. Every source path below therefore goes through $SRC.
+#
+# $SRC contains a space -- "Takwafoods web" -- so it is quoted everywhere.
+# An unquoted $SRC would split into two arguments and each copy would fail.
+#
+# Deploys run on a manual click in cPanel > Git Version Control. Pushing to
+# GitHub changes nothing on the live site by itself.
+# ---------------------------------------------------------------------------
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/takwafood/public_html/
+    - export SRC="$PWD/Takwafoods web/takwaweb.designersidhost.com"
+    # Underscore-prefixed pages are the local editing tools -- the photo index
+    # and the Arabic text index. A plain *.html glob matches them, which would
+    # publish both to takwafoods.com, where they would sit at guessable URLs,
+    # list the whole site's structure and post to endpoints that do not exist
+    # on a static host.
+    - find "$SRC" -maxdepth 1 -name '*.html' ! -name '_*' -exec /bin/cp -f {} $DEPLOYPATH \;
+    - /bin/cp -f "$SRC/robots.txt" "$SRC/sitemap.xml" $DEPLOYPATH
+    - /bin/cp -f "$SRC/.htaccess" $DEPLOYPATH
+    - /bin/cp -RT "$SRC/frontend" $DEPLOYPATH/frontend
+    - /bin/cp -RT "$SRC/global" $DEPLOYPATH/global
+    - /bin/cp -RT "$SRC/blog" $DEPLOYPATH/blog
+    - /bin/cp -RT "$SRC/career" $DEPLOYPATH/career
+    - /bin/cp -RT "$SRC/listing" $DEPLOYPATH/listing
+    - /bin/cp -RT "$SRC/our-brands" $DEPLOYPATH/our-brands
+    - /bin/cp -RT "$SRC/uploads" $DEPLOYPATH/uploads
+    # The application backend. Without these two lines the form posts to a
+    # 404 and the inbox does not exist -- the root copy step above matches
+    # *.html only, and admin/ is not in the directory list.
+    - /bin/cp -f "$SRC/apply-submit.php" $DEPLOYPATH
+    - /bin/cp -RT "$SRC/admin" $DEPLOYPATH/admin
+    # Every task above copies; none of them delete. A page retired in the repo
+    # therefore stayed on the live site indefinitely -- the demo product, the
+    # placeholder "atitle" vacancy and four of the template's car articles were
+    # all still being served from takwafoods.com, and so was the photo index.
+    #
+    # These two tasks remove what the repo no longer has. The loop is guarded on
+    # index.html being present in $SRC: if that variable were ever empty or
+    # wrong, an unguarded loop would delete every page on the live site rather
+    # than doing nothing.
+    # Underscore-prefixed files anywhere, not just at the root. The directory
+    # copies above are recursive, so listing/_product-template.html and
+    # uploads/share/_flavora-cafe-og.jpg.bak were both being published; the
+    # root-only glob never saw them. .htaccess denies them as well, but a file
+    # that was never copied cannot be exposed by a future .htaccess mistake.
+    - /bin/rm -f $DEPLOYPATH/_*.html
+    - find $DEPLOYPATH -type f -name '_*' -delete
+    - if [ -f "$SRC/index.html" ]; then ( cd "$DEPLOYPATH" && for f in *.html blog/*.html career/*.html listing/*.html our-brands/*.html; do [ -e "$f" ] || continue; [ -f "$SRC/$f" ] || /bin/rm -f "$f"; done ); fi

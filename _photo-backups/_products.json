@@ -1,0 +1,118 @@
+[
+  {
+    "slug": "mushroom-soup",
+    "name": "Mushroom Soup",
+    "short": "Creamy and rich, made with real mushrooms grown in Syria and dried in our own facility.",
+    "full": "Creamy and rich, made with real mushrooms grown in Syria and dried in our own facility. Wholesome, natural, and satisfying. Real ingredients, dried in-house.",
+    "category": "Soups",
+    "sizes": [
+      "6x80g"
+    ],
+    "image": "uploads/products/mushroom-soup.webp",
+    "brand": "Enna"
+  },
+  {
+    "slug": "chicken-noodle-soup",
+    "name": "Chicken Noodle Soup",
+    "short": "Real chicken, pre-dried in-house and ground into every serving, with enriched noodles.",
+    "full": "Real chicken, pre-dried in-house and ground into every serving, paired with enriched noodles for a hearty, comforting bowl. Real ingredients, dried in-house.",
+    "category": "Soups",
+    "sizes": [
+      "6x68g"
+    ],
+    "image": "uploads/products/chicken-noodle-soup.webp",
+    "brand": "Enna"
+  },
+  {
+    "slug": "broccoli-soup",
+    "name": "Broccoli Soup",
+    "short": "Smooth and creamy with real broccoli, dried in-house to lock in flavour and goodness.",
+    "full": "Smooth and creamy with real broccoli, dried in-house to lock in flavour and goodness. Real ingredients, dried in-house.",
+    "category": "Soups",
+    "sizes": [
+      "6x80g"
+    ],
+    "image": "uploads/products/broccoli-soup.webp",
+    "brand": "Enna"
+  },
+  {
+    "slug": "vegetable-soup",
+    "name": "Vegetable Soup",
+    "short": "More than ten real vegetables, all locally grown and dried in-house.",
+    "full": "More than ten real vegetables, all locally grown and dried in-house, for a nourishing, garden-fresh taste in every spoonful. Real ingredients, dried in-house.",
+    "category": "Soups",
+    "sizes": [
+      "6x68g"
+    ],
+    "image": "uploads/products/vegetable-soup.webp",
+    "brand": "Enna"
+  },
+  {
+    "slug": "three-in-one",
+    "name": "Three-in-One",
+    "short": "Premium coffee with less sugar and rich coconut cream, for a smooth, balanced cup.",
+    "full": "Premium coffee with less sugar and rich coconut cream, for a smooth, balanced cup. Premium coffee, crafted for our taste.",
+    "category": "Instant Coffee",
+    "sizes": [
+      "12x20g"
+    ],
+    "image": "uploads/products/three-in-one.webp",
+    "brand": "Flavora Cafe"
+  },
+  {
+    "slug": "two-in-one",
+    "name": "Two-in-One",
+    "short": "Premium coffee with rich coconut creamer and a bold, strong profile.",
+    "full": "Premium coffee with rich coconut creamer and a bold, strong profile that our region loves. Premium coffee, crafted for our taste.",
+    "category": "Instant Coffee",
+    "sizes": [
+      "12x20g"
+    ],
+    "image": "uploads/products/two-in-one.webp",
+    "brand": "Flavora Cafe"
+  },
+  {
+    "slug": "pure-coffee",
+    "name": "Pure Coffee",
+    "short": "Exceptionally pure, premium coffee that tastes incredible on its own or with any creamer.",
+    "full": "Exceptionally pure, premium coffee that tastes incredible on its own or with any creamer. Pure and strong. Premium coffee, crafted for our taste.",
+    "category": "Instant Coffee",
+    "sizes": [
+      "50g",
+      "50x2g"
+    ],
+    "image": "uploads/products/pure-coffee.webp",
+    "brand": "Flavora Cafe"
+  },
+  {
+    "slug": "coffee-creamer",
+    "name": "Coffee Creamer",
+    "short": "A high-quality, non-dairy creamer made with coconut oil for a smooth, rich finish.",
+    "full": "A high-quality, non-dairy creamer made with coconut oil for a smooth, rich finish. Premium coffee, crafted for our taste.",
+    "category": "Creamer",
+    "sizes": [],
+    "image": "uploads/products/coffee-creamer.webp",
+    "brand": "Flavora Cafe"
+  },
+  {
+    "slug": "espresso-capsules",
+    "name": "Espresso Capsules",
+    "short": "One hundred percent Arabica, sealed in nitrogen for maximum freshness.",
+    "full": "One hundred percent Arabica, sealed in a nitrogen environment for maximum freshness. Available as a Brazilian blend at a higher roast, and a Colombian at a medium roast. Premium coffee, crafted for our taste.",
+    "category": "Espresso Capsules",
+    "sizes": [
+      "10 capsules"
+    ],
+    "image": "uploads/products/espresso-capsules.webp",
+    "brand": "Flavora Cafe"
+  },
+  {
+    "slug": "mac-and-cheese",
+    "name": "Mac and Cheese",
+    "short": "",
+    "full": "",
+    "category": "Uncategorised",
+    "sizes": [],
+    "image": "uploads/products/mac-and-cheese.webp"
+  }
+]

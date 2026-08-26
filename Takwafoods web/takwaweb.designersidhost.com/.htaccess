@@ -1,0 +1,30 @@
+# --- internal tooling is never reachable in production ---
+# The photo index and the Arabic text index are local editing tools. They are
+# excluded from the deploy, but cPanel's copy step never deletes, so a copy
+# left by an earlier deploy stays in public_html and keeps being served --
+# _photo-index.html was answering 200 on the live site. This denies them
+# outright, so it cannot happen again whatever is sitting on disk.
+# Any extension, not just html and json: the underscore prefix is the site's
+# convention for "internal, never public", and it is used for image backups
+# too. _flavora-cafe-og.jpg.bak was reachable while this pattern ended in
+# \.(html|json)$.
+<FilesMatch "^_">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# --- article URLs renamed from the purchased template's car slugs ---
+# Kept so links already shared or indexed under the old paths still land.
+Redirect 301 /blog/car-on-highway-directional-road-signs.html /blog/quality-begins-with-every-test.html
+Redirect 301 /blog/mini-coupe-parking-on-the-highway-bridge.html /blog/introducing-enna-soups.html
+Redirect 301 /blog/professional-man-working-on-car-full-shot.html /blog/delivering-freshness-across-the-region.html
+Redirect 301 /blog/stylish-and-elegant-old-man-in-a-car-salon.html /blog/flavora-cafe-opens-its-doors.html
+Redirect 301 /blog/car-on-highway-directional-road-signs-ar.html /blog/quality-begins-with-every-test-ar.html
+Redirect 301 /blog/mini-coupe-parking-on-the-highway-bridge-ar.html /blog/introducing-enna-soups-ar.html
+Redirect 301 /blog/professional-man-working-on-car-full-shot-ar.html /blog/delivering-freshness-across-the-region-ar.html
+Redirect 301 /blog/stylish-and-elegant-old-man-in-a-car-salon-ar.html /blog/flavora-cafe-opens-its-doors-ar.html

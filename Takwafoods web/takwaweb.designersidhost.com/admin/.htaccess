@@ -1,0 +1,15 @@
+# Applications inbox: no crawling, no directory listing.
+#
+# The password itself is NOT set here. Use cPanel > Directory Privacy on this
+# folder -- cPanel writes the AuthUserFile line and the .htpasswd for you, with
+# the hash stored outside the web root. Hand-writing credentials into a file
+# that sits in public_html is how they end up in a git diff.
+#
+# index.php refuses to render at all unless Apache has already authenticated
+# the request, so a missing or broken password rule fails closed.
+
+Options -Indexes
+
+<IfModule mod_headers.c>
+    Header set X-Robots-Tag "noindex, nofollow"
+</IfModule>

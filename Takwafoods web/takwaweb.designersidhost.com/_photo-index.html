@@ -1,0 +1,1701 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Takwa — Photo Index</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin:0; font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+         color:#1e1e1e; background:#fafaf8; }
+  header { background:#4c9932; color:#fff; padding:28px 32px; }
+  header h1 { margin:0 0 6px; font-size:26px; }
+  header p { margin:0; opacity:.92; font-size:14px; }
+  nav { position:sticky; top:0; background:#fff; border-bottom:1px solid #e2e2dc; padding:12px 32px;
+        display:flex; flex-wrap:wrap; gap:14px; z-index:5; }
+  nav a { color:#3d7a28; text-decoration:none; font-size:13px; font-weight:600; }
+  nav a:hover { text-decoration:underline; }
+  .how { margin:24px 32px; padding:18px 22px; background:#fff; border:1px solid #e2e2dc;
+         border-radius:10px; }
+  .how h3 { margin:0 0 10px; font-size:15px; }
+  .how pre { background:#f4f4f0; padding:12px 14px; border-radius:7px; overflow-x:auto;
+             margin:8px 0; font-size:13px; }
+  .how ol { margin:8px 0 0 18px; padding:0; }
+  .how li { margin-bottom:6px; }
+  .hint { display:block; color:#777; font-size:12.5px; margin-top:3px; }
+  section { margin:0 32px 44px; }
+  section h2 { font-size:19px; border-bottom:2px solid #4c9932; padding-bottom:7px; margin:0 0 18px; }
+  .sub { font-weight:400; font-size:13px; color:#777; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(215px,1fr)); gap:18px; }
+  .card { margin:0; background:#fff; border:1px solid #e2e2dc; border-radius:10px;
+          overflow:hidden; display:flex; flex-direction:column; }
+  .thumbwrap { height:150px; background:#f0f0ea; display:flex; align-items:center;
+               justify-content:center; overflow:hidden; }
+  .thumb { max-width:100%; max-height:100%; object-fit:contain; }
+  figcaption { padding:11px 13px; font-size:12px; flex:1; display:flex; flex-direction:column; }
+  .slot { display:inline-block; background:#e8f4e2; color:#2f6b1e; padding:2px 7px;
+          border-radius:4px; font-size:12px; font-weight:700; align-self:flex-start;
+          user-select:all; cursor:pointer; }
+  .noslot { color:#999; font-style:italic; font-size:12px; }
+  .dims { margin:6px 0 3px; color:#666; }
+  .path { margin:0 0 8px; color:#999; word-break:break-all; font-size:11px;
+          user-select:all; cursor:text; }
+  .warn { margin:0 0 8px; color:#a05a00; background:#fdf3e3; padding:6px 8px;
+          border-radius:5px; font-size:11px; }
+  .actions { margin-top:auto; display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+  .rm, .blank { border:1px solid #e0c0bc; background:#fff; border-radius:6px; padding:6px 10px;
+                font-size:12px; cursor:pointer; color:#a33b2c; }
+  .rm:hover, .blank:hover { background:#fdf0ee; }
+  .removed { margin:0 0 8px; color:#a33b2c; background:#fdf0ee; padding:6px 8px;
+             border-radius:5px; font-size:11px; font-weight:600; }
+  .card.is-removed .thumbwrap { opacity:.28; filter:grayscale(1); }
+  .card.is-removed { border-color:#e0c0bc; }
+  .card.is-removed .rm { display:none; }
+  .pick { background:#4c9932; color:#fff; border-radius:6px; padding:6px 12px; font-size:12px;
+          font-weight:600; cursor:pointer; display:inline-block; }
+  .pick:hover { background:#3d7a28; }
+  .undo { border:1px solid #cfcfc7; background:#fff; border-radius:6px; padding:6px 10px;
+          font-size:12px; cursor:pointer; color:#666; }
+  .undo:hover { background:#f2f2ec; }
+  .status { margin:8px 0 0; font-size:11.5px; min-height:1px; }
+  .status.ok { color:#2f6b1e; }
+  .status.err { color:#b3261e; }
+  .status.busy { color:#777; }
+  .card.flash { outline:2px solid #4c9932; outline-offset:-2px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Takwa — Photo Index</h1>
+  <p>Every image on the site, grouped by the page it appears on.</p>
+</header>
+<nav><a href="#home-page">Home Page</a> <a href="#about-us">About Us</a> <a href="#our-products">Our Products</a> <a href="#our-brand-flavora">Our Brand — Flavora</a> <a href="#our-brand-enna">Our Brand — Enna</a> <a href="#our-team">Our Team</a> <a href="#blog-events">Blog &amp; Events</a> <a href="#vacancies">Vacancies</a> <a href="#contact-us">Contact Us</a> <a href="#employment-application">Employment Application</a> <a href="#product-product-full-name">Product — Product Full Name</a> <a href="#product-broccoli-soup">Product — Broccoli Soup</a> <a href="#product-chicken-noodle-soup">Product — Chicken Noodle Soup</a> <a href="#product-coffee-creamer">Product — Coffee Creamer</a> <a href="#product-espresso-capsules">Product — Espresso Capsules</a> <a href="#product-mac-and-cheese">Product — Mac and Cheese</a> <a href="#product-mushroom-soup">Product — Mushroom Soup</a> <a href="#product-pure-coffee">Product — Pure Coffee</a> <a href="#product-three-in-one">Product — Three-in-One</a> <a href="#product-two-in-one">Product — Two-in-One</a> <a href="#product-vegetable-soup">Product — Vegetable Soup</a> <a href="#article-delivering-freshness-across-the-region">Article — Delivering Freshness Across the Region</a> <a href="#article-flavora-cafe-opens-its-doors">Article — Flavora Cafe Opens Its Doors</a> <a href="#article-introducing-enna-soups-authentic-taste-ready-for-ramadan">Article — Introducing Enna Soups: Authentic Taste, Ready for Ramadan</a> <a href="#article-quality-begins-with-every-test">Article — Quality Begins with Every Test</a> <a href="#vacancy-project-manager-consultant">Vacancy — Project Manager &amp; Consultant</a> <a href="#shared">Logo &amp; Footer</a></nav>
+
+<div class="how">
+  <h3>How to change a photo</h3>
+  <p style="margin:0;font-size:14px;">Find the photo below, click <strong>Change photo</strong>,
+  and pick a picture from your computer. That's it &mdash; it's applied straight away.</p>
+  <p class="hint" style="margin-top:8px;">Your photo is cropped and resized automatically, so any
+  JPG or PNG works. To see the change on the real site, open it and press
+  <strong>Ctrl+Shift+R</strong>.</p>
+  <p class="hint"><strong>Remove</strong> takes the image out of the page completely and the
+  layout closes up. <strong>Blank</strong> empties the photo but keeps the space, ready for a
+  replacement. <strong>Undo</strong> reverses any of these &mdash; nothing here is permanent.</p>
+</div>
+
+<section id="home-page"><h2>Home Page</h2><div class="grid">
+    <figure class="card" data-slot="home-video">
+      <div class="thumbwrap"><video src="uploads/home/home2-intro-video-2025-07-31-06-02-41-6907.mp4" muted loop playsinline class="thumb"></video></div>
+      <figcaption>
+        <code class="slot">home-video</code>
+        <p class="dims"></p>
+        <p class="path">uploads/home/home2-intro-video-2025-07-31-06-02-41-6907.mp4</p>
+        <p class="warn">Video &mdash; the tool can't swap this one.</p>
+        <div class="actions"></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="home-about">
+      <div class="thumbwrap"><img src="uploads/home/home3-intro-image-2025-07-31-01-24-49-6785.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">home-about</code>
+        <p class="dims">672&times;796</p>
+        <p class="path">uploads/home/home3-intro-image-2025-07-31-01-24-49-6785.webp</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="home-about" hidden></label><button class="undo" data-slot="home-about" title="Put everything back">Undo</button><button class="rm" data-slot="home-about" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="home-about" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="home-badge">
+      <div class="thumbwrap"><img src="frontend/css/images/about-home-badge.png" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">home-badge</code>
+        <p class="dims">234&times;234</p>
+        <p class="path">frontend/css/images/about-home-badge.png</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="home-badge" hidden></label><button class="undo" data-slot="home-badge" title="Put everything back">Undo</button><button class="rm" data-slot="home-badge" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="home-badge" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="home-about-label">
+      <div class="thumbwrap"><img src="frontend/css/images/ABOUT%20US.png" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">home-about-label</code>
+        <p class="dims">105&times;761</p>
+        <p class="path">frontend/css/images/ABOUT US.png</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="home-about-label" hidden></label><button class="undo" data-slot="home-about-label" title="Put everything back">Undo</button><button class="rm" data-slot="home-about-label" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="home-about-label" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="service-1">
+      <div class="thumbwrap"><img src="uploads/home/recipes-flavors-development-20250731015853.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">service-1</code>
+        <p class="dims">100&times;100</p>
+        <p class="path">uploads/home/recipes-flavors-development-20250731015853.webp</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="service-1" hidden></label><button class="undo" data-slot="service-1" title="Put everything back">Undo</button><button class="rm" data-slot="service-1" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="service-1" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="service-2">
+      <div class="thumbwrap"><img src="uploads/home/co-manufacturing-services-20250731020615.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">service-2</code>
+        <p class="dims">100&times;100</p>
+        <p class="path">uploads/home/co-manufacturing-services-20250731020615.webp</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="service-2" hidden></label><button class="undo" data-slot="service-2" title="Put everything back">Undo</button><button class="rm" data-slot="service-2" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="service-2" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="service-3">
+      <div class="thumbwrap"><img src="uploads/home/private-label-food-manufacturing-20250731020035.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">service-3</code>
+        <p class="dims">100&times;100</p>
+        <p class="path">uploads/home/private-label-food-manufacturing-20250731020035.webp</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="service-3" hidden></label><button class="undo" data-slot="service-3" title="Put everything back">Undo</button><button class="rm" data-slot="service-3" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="service-3" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="service-4">
+      <div class="thumbwrap"><img src="uploads/home/custom-seasoning-spice-blends-20250731020151.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">service-4</code>
+        <p class="dims">100&times;100</p>
+        <p class="path">uploads/home/custom-seasoning-spice-blends-20250731020151.webp</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="service-4" hidden></label><button class="undo" data-slot="service-4" title="Put everything back">Undo</button><button class="rm" data-slot="service-4" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="service-4" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="testimonial-photo">
+      <div class="thumbwrap"><img src="frontend/css/images/testimonial-img.png" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">testimonial-photo</code>
+        <p class="dims">813&times;724</p>
+        <p class="path">frontend/css/images/testimonial-img.png</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="testimonial-photo" hidden></label><button class="undo" data-slot="testimonial-photo" title="Put everything back">Undo</button><button class="rm" data-slot="testimonial-photo" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="testimonial-photo" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="partner-1">
+      <div class="thumbwrap"><img src="uploads/home/client-katakit.png" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">partner-1</code>
+        <p class="dims">225&times;225</p>
+        <p class="path">uploads/home/client-katakit.png</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="partner-1" hidden></label><button class="undo" data-slot="partner-1" title="Put everything back">Undo</button><button class="rm" data-slot="partner-1" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="partner-1" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="partner-2">
+      <div class="thumbwrap"><img src="uploads/home/client-nestle.png" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">partner-2</code>
+        <p class="dims">200&times;100</p>
+        <p class="path">uploads/home/client-nestle.png</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="partner-2" hidden></label><button class="undo" data-slot="partner-2" title="Put everything back">Undo</button><button class="rm" data-slot="partner-2" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="partner-2" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="partner-3">
+      <div class="thumbwrap"><img src="uploads/home/client-darnieto.png" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">partner-3</code>
+        <p class="dims">200&times;100</p>
+        <p class="path">uploads/home/client-darnieto.png</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="partner-3" hidden></label><button class="undo" data-slot="partner-3" title="Put everything back">Undo</button><button class="rm" data-slot="partner-3" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="partner-3" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="partner-4">
+      <div class="thumbwrap"><img src="uploads/home/client-presto.png" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">partner-4</code>
+        <p class="dims">200&times;100</p>
+        <p class="path">uploads/home/client-presto.png</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="partner-4" hidden></label><button class="undo" data-slot="partner-4" title="Put everything back">Undo</button><button class="rm" data-slot="partner-4" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="partner-4" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="partner-5">
+      <div class="thumbwrap"><img src="uploads/home/client-delta.png" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">partner-5</code>
+        <p class="dims">200&times;100</p>
+        <p class="path">uploads/home/client-delta.png</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="partner-5" hidden></label><button class="undo" data-slot="partner-5" title="Put everything back">Undo</button><button class="rm" data-slot="partner-5" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="partner-5" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="partner-6">
+      <div class="thumbwrap"><img src="uploads/home/client-mr-corn.png" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">partner-6</code>
+        <p class="dims">200&times;100</p>
+        <p class="path">uploads/home/client-mr-corn.png</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="partner-6" hidden></label><button class="undo" data-slot="partner-6" title="Put everything back">Undo</button><button class="rm" data-slot="partner-6" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="partner-6" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="partner-7">
+      <div class="thumbwrap"><img src="uploads/home/client-meal-day.png" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">partner-7</code>
+        <p class="dims">200&times;100</p>
+        <p class="path">uploads/home/client-meal-day.png</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="partner-7" hidden></label><button class="undo" data-slot="partner-7" title="Put everything back">Undo</button><button class="rm" data-slot="partner-7" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="partner-7" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="partner-8">
+      <div class="thumbwrap"><img src="uploads/home/client-zenah.png" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">partner-8</code>
+        <p class="dims">200&times;100</p>
+        <p class="path">uploads/home/client-zenah.png</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="partner-8" hidden></label><button class="undo" data-slot="partner-8" title="Put everything back">Undo</button><button class="rm" data-slot="partner-8" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="partner-8" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="home-video-bg">
+      <div class="thumbwrap"><img src="uploads/home/video-bg-image-2025-06-15-04-18-44-5078.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">home-video-bg</code>
+        <p class="dims">1920&times;1280</p>
+        <p class="path">uploads/home/video-bg-image-2025-06-15-04-18-44-5078.webp</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="home-video-bg" hidden></label><button class="undo" data-slot="home-video-bg" title="Put everything back">Undo</button><button class="rm" data-slot="home-video-bg" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="home-video-bg" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="blog-thumb-1">
+      <div class="thumbwrap"><img src="uploads/shared/blog--2024-04-23-03-23-41-7233.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">blog-thumb-1</code>
+        <p class="dims">1026&times;618</p>
+        <p class="path">uploads/shared/blog--2024-04-23-03-23-41-7233.webp</p>
+        <p class="warn">Also on Article — Quality Begins with Every Test, Blog &amp; Events, Home Page. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="blog-thumb-1" hidden></label><button class="undo" data-slot="blog-thumb-1" title="Put everything back">Undo</button><button class="rm" data-slot="blog-thumb-1" data-pages="6" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="blog-thumb-1" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="blog-thumb-2">
+      <div class="thumbwrap"><img src="uploads/shared/blog--2024-04-23-03-24-23-9934.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">blog-thumb-2</code>
+        <p class="dims">1026&times;618</p>
+        <p class="path">uploads/shared/blog--2024-04-23-03-24-23-9934.webp</p>
+        <p class="warn">Also on Article — Delivering Freshness Across the Region, Blog &amp; Events, Home Page. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="blog-thumb-2" hidden></label><button class="undo" data-slot="blog-thumb-2" title="Put everything back">Undo</button><button class="rm" data-slot="blog-thumb-2" data-pages="6" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="blog-thumb-2" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="blog-thumb-3">
+      <div class="thumbwrap"><img src="uploads/shared/blog--2024-04-23-03-24-48-2419.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">blog-thumb-3</code>
+        <p class="dims">1026&times;618</p>
+        <p class="path">uploads/shared/blog--2024-04-23-03-24-48-2419.webp</p>
+        <p class="warn">Also on Article — Flavora Cafe Opens Its Doors, Blog &amp; Events, Home Page. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="blog-thumb-3" hidden></label><button class="undo" data-slot="blog-thumb-3" title="Put everything back">Undo</button><button class="rm" data-slot="blog-thumb-3" data-pages="6" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="blog-thumb-3" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="blog-thumb-4">
+      <div class="thumbwrap"><img src="uploads/shared/blog--2024-04-23-03-47-17-6858.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">blog-thumb-4</code>
+        <p class="dims">1026&times;618</p>
+        <p class="path">uploads/shared/blog--2024-04-23-03-47-17-6858.webp</p>
+        <p class="warn">Also on Article — Introducing Enna Soups: Authentic Taste, Ready for Ramadan, Blog &amp; Events, Home Page, Our Brand — Enna. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="blog-thumb-4" hidden></label><button class="undo" data-slot="blog-thumb-4" title="Put everything back">Undo</button><button class="rm" data-slot="blog-thumb-4" data-pages="8" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="blog-thumb-4" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure></div></section><section id="about-us"><h2>About Us</h2><div class="grid">
+    <figure class="card" data-slot="about-header">
+      <div class="thumbwrap"><img src="uploads/about-us/about-us-page-header.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">about-header</code>
+        <p class="dims">1280&times;720</p>
+        <p class="path">uploads/about-us/about-us-page-header.webp</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="about-header" hidden></label><button class="undo" data-slot="about-header" title="Put everything back">Undo</button><button class="rm" data-slot="about-header" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="about-header" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="about-vision">
+      <div class="thumbwrap"><img src="uploads/about-us/car-icon-2025-07-31-01-10-51-5127.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">about-vision</code>
+        <p class="dims">1280&times;853</p>
+        <p class="path">uploads/about-us/car-icon-2025-07-31-01-10-51-5127.webp</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="about-vision" hidden></label><button class="undo" data-slot="about-vision" title="Put everything back">Undo</button><button class="rm" data-slot="about-vision" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="about-vision" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="about-mission">
+      <div class="thumbwrap"><img src="uploads/about-us/reveiw-icon-2025-07-31-01-10-51-2216.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">about-mission</code>
+        <p class="dims">1280&times;853</p>
+        <p class="path">uploads/about-us/reveiw-icon-2025-07-31-01-10-51-2216.webp</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="about-mission" hidden></label><button class="undo" data-slot="about-mission" title="Put everything back">Undo</button><button class="rm" data-slot="about-mission" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="about-mission" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="history-1996">
+      <div class="thumbwrap"><img src="uploads/about-us/1996-20250731030002.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">history-1996</code>
+        <p class="dims">1280&times;853</p>
+        <p class="path">uploads/about-us/1996-20250731030002.webp</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="history-1996" hidden></label><button class="undo" data-slot="history-1996" title="Put everything back">Undo</button><button class="rm" data-slot="history-1996" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="history-1996" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="history-2007">
+      <div class="thumbwrap"><img src="uploads/about-us/2007-20250731030935.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">history-2007</code>
+        <p class="dims">1280&times;853</p>
+        <p class="path">uploads/about-us/2007-20250731030935.webp</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="history-2007" hidden></label><button class="undo" data-slot="history-2007" title="Put everything back">Undo</button><button class="rm" data-slot="history-2007" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="history-2007" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="history-2013">
+      <div class="thumbwrap"><img src="uploads/about-us/2013-20250731031323.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">history-2013</code>
+        <p class="dims">1280&times;853</p>
+        <p class="path">uploads/about-us/2013-20250731031323.webp</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="history-2013" hidden></label><button class="undo" data-slot="history-2013" title="Put everything back">Undo</button><button class="rm" data-slot="history-2013" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="history-2013" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="history-2014">
+      <div class="thumbwrap"><img src="uploads/about-us/2014-20250731031237.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">history-2014</code>
+        <p class="dims">1280&times;853</p>
+        <p class="path">uploads/about-us/2014-20250731031237.webp</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="history-2014" hidden></label><button class="undo" data-slot="history-2014" title="Put everything back">Undo</button><button class="rm" data-slot="history-2014" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="history-2014" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="history-2025">
+      <div class="thumbwrap"><img src="uploads/about-us/2025-20250731031618.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">history-2025</code>
+        <p class="dims">1280&times;853</p>
+        <p class="path">uploads/about-us/2025-20250731031618.webp</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="history-2025" hidden></label><button class="undo" data-slot="history-2025" title="Put everything back">Undo</button><button class="rm" data-slot="history-2025" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="history-2025" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="about-ceo">
+      <div class="thumbwrap"><img src="uploads/about-us/about-us-2025-07-31-01-17-41-6330.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">about-ceo</code>
+        <p class="dims">377&times;377</p>
+        <p class="path">uploads/about-us/about-us-2025-07-31-01-17-41-6330.webp</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="about-ceo" hidden></label><button class="undo" data-slot="about-ceo" title="Put everything back">Undo</button><button class="rm" data-slot="about-ceo" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="about-ceo" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="ceo-signature">
+      <div class="thumbwrap"><img src="frontend/css/images/signature.png" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">ceo-signature</code>
+        <p class="dims">265&times;96</p>
+        <p class="path">frontend/css/images/signature.png</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="ceo-signature" hidden></label><button class="undo" data-slot="ceo-signature" title="Put everything back">Undo</button><button class="rm" data-slot="ceo-signature" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="ceo-signature" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure></div></section><section id="our-products"><h2>Our Products</h2><div class="grid">
+    <figure class="card" data-slot="product-header">
+      <div class="thumbwrap"><img src="uploads/products/our-product-header.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">product-header</code>
+        <p class="dims">1280&times;720</p>
+        <p class="path">uploads/products/our-product-header.webp</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="product-header" hidden></label><button class="undo" data-slot="product-header" title="Put everything back">Undo</button><button class="rm" data-slot="product-header" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="product-header" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="product-mushroom-soup">
+      <div class="thumbwrap"><img src="uploads/products/mushroom-soup.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">product-mushroom-soup</code>
+        <p class="dims">555&times;586</p>
+        <p class="path">uploads/products/mushroom-soup.webp</p>
+        <p class="warn">Also on Our Brand — Enna, Our Products, Product — Mushroom Soup. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="product-mushroom-soup" hidden></label><button class="undo" data-slot="product-mushroom-soup" title="Put everything back">Undo</button><button class="rm" data-slot="product-mushroom-soup" data-pages="6" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="product-mushroom-soup" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="product-chicken-noodle-soup">
+      <div class="thumbwrap"><img src="uploads/products/chicken-noodle-soup.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">product-chicken-noodle-soup</code>
+        <p class="dims">555&times;586</p>
+        <p class="path">uploads/products/chicken-noodle-soup.webp</p>
+        <p class="warn">Also on Our Brand — Enna, Our Products, Product — Chicken Noodle Soup. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="product-chicken-noodle-soup" hidden></label><button class="undo" data-slot="product-chicken-noodle-soup" title="Put everything back">Undo</button><button class="rm" data-slot="product-chicken-noodle-soup" data-pages="6" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="product-chicken-noodle-soup" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="product-broccoli-soup">
+      <div class="thumbwrap"><img src="uploads/products/broccoli-soup.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">product-broccoli-soup</code>
+        <p class="dims">555&times;586</p>
+        <p class="path">uploads/products/broccoli-soup.webp</p>
+        <p class="warn">Also on Our Brand — Enna, Our Products, Product — Broccoli Soup. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="product-broccoli-soup" hidden></label><button class="undo" data-slot="product-broccoli-soup" title="Put everything back">Undo</button><button class="rm" data-slot="product-broccoli-soup" data-pages="6" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="product-broccoli-soup" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="product-vegetable-soup">
+      <div class="thumbwrap"><img src="uploads/products/vegetable-soup.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">product-vegetable-soup</code>
+        <p class="dims">555&times;586</p>
+        <p class="path">uploads/products/vegetable-soup.webp</p>
+        <p class="warn">Also on Our Brand — Enna, Our Products, Product — Vegetable Soup. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="product-vegetable-soup" hidden></label><button class="undo" data-slot="product-vegetable-soup" title="Put everything back">Undo</button><button class="rm" data-slot="product-vegetable-soup" data-pages="6" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="product-vegetable-soup" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="product-three-in-one">
+      <div class="thumbwrap"><img src="uploads/products/three-in-one.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">product-three-in-one</code>
+        <p class="dims">555&times;586</p>
+        <p class="path">uploads/products/three-in-one.webp</p>
+        <p class="warn">Also on Our Brand — Flavora, Our Products, Product — Three-in-One. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="product-three-in-one" hidden></label><button class="undo" data-slot="product-three-in-one" title="Put everything back">Undo</button><button class="rm" data-slot="product-three-in-one" data-pages="6" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="product-three-in-one" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="product-two-in-one">
+      <div class="thumbwrap"><img src="uploads/products/two-in-one.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">product-two-in-one</code>
+        <p class="dims">555&times;586</p>
+        <p class="path">uploads/products/two-in-one.webp</p>
+        <p class="warn">Also on Our Brand — Flavora, Our Products, Product — Two-in-One. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="product-two-in-one" hidden></label><button class="undo" data-slot="product-two-in-one" title="Put everything back">Undo</button><button class="rm" data-slot="product-two-in-one" data-pages="6" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="product-two-in-one" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="product-pure-coffee">
+      <div class="thumbwrap"><img src="uploads/products/pure-coffee.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">product-pure-coffee</code>
+        <p class="dims">555&times;586</p>
+        <p class="path">uploads/products/pure-coffee.webp</p>
+        <p class="warn">Also on Our Brand — Flavora, Our Products, Product — Pure Coffee. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="product-pure-coffee" hidden></label><button class="undo" data-slot="product-pure-coffee" title="Put everything back">Undo</button><button class="rm" data-slot="product-pure-coffee" data-pages="6" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="product-pure-coffee" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="product-coffee-creamer">
+      <div class="thumbwrap"><img src="uploads/products/coffee-creamer.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">product-coffee-creamer</code>
+        <p class="dims">555&times;586</p>
+        <p class="path">uploads/products/coffee-creamer.webp</p>
+        <p class="warn">Also on Our Brand — Flavora, Our Products, Product — Coffee Creamer. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="product-coffee-creamer" hidden></label><button class="undo" data-slot="product-coffee-creamer" title="Put everything back">Undo</button><button class="rm" data-slot="product-coffee-creamer" data-pages="6" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="product-coffee-creamer" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="product-espresso-capsules">
+      <div class="thumbwrap"><img src="uploads/products/espresso-capsules.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">product-espresso-capsules</code>
+        <p class="dims">555&times;586</p>
+        <p class="path">uploads/products/espresso-capsules.webp</p>
+        <p class="warn">Also on Our Brand — Flavora, Our Products, Product — Espresso Capsules. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="product-espresso-capsules" hidden></label><button class="undo" data-slot="product-espresso-capsules" title="Put everything back">Undo</button><button class="rm" data-slot="product-espresso-capsules" data-pages="6" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="product-espresso-capsules" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="">
+      <div class="thumbwrap"><img src="uploads/products/mac-and-cheese.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot"></code>
+        <p class="dims">555&times;586</p>
+        <p class="path">uploads/products/mac-and-cheese.webp</p>
+        <p class="warn">Also on Our Products, Product — Mac and Cheese. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="" hidden></label><button class="undo" data-slot="" title="Put everything back">Undo</button><button class="rm" data-slot="" data-pages="3" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure></div></section><section id="our-brand-flavora"><h2>Our Brand — Flavora</h2><div class="grid">
+    <figure class="card" data-slot="flavora-header">
+      <div class="thumbwrap"><img src="uploads/brands/flavora-header.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">flavora-header</code>
+        <p class="dims">1280&times;720</p>
+        <p class="path">uploads/brands/flavora-header.webp</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="flavora-header" hidden></label><button class="undo" data-slot="flavora-header" title="Put everything back">Undo</button><button class="rm" data-slot="flavora-header" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="flavora-header" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="brand-hero">
+      <div class="thumbwrap"><img src="uploads/brands/brand--2025-06-28-10-09-19-4041.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">brand-hero</code>
+        <p class="dims">606&times;479</p>
+        <p class="path">uploads/brands/brand--2025-06-28-10-09-19-4041.webp</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="brand-hero" hidden></label><button class="undo" data-slot="brand-hero" title="Put everything back">Undo</button><button class="rm" data-slot="brand-hero" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="brand-hero" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="product-three-in-one">
+      <div class="thumbwrap"><img src="uploads/products/three-in-one.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">product-three-in-one</code>
+        <p class="dims">555&times;586</p>
+        <p class="path">uploads/products/three-in-one.webp</p>
+        <p class="warn">Also on Our Brand — Flavora, Our Products, Product — Three-in-One. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="product-three-in-one" hidden></label><button class="undo" data-slot="product-three-in-one" title="Put everything back">Undo</button><button class="rm" data-slot="product-three-in-one" data-pages="6" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="product-three-in-one" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="product-two-in-one">
+      <div class="thumbwrap"><img src="uploads/products/two-in-one.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">product-two-in-one</code>
+        <p class="dims">555&times;586</p>
+        <p class="path">uploads/products/two-in-one.webp</p>
+        <p class="warn">Also on Our Brand — Flavora, Our Products, Product — Two-in-One. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="product-two-in-one" hidden></label><button class="undo" data-slot="product-two-in-one" title="Put everything back">Undo</button><button class="rm" data-slot="product-two-in-one" data-pages="6" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="product-two-in-one" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="product-pure-coffee">
+      <div class="thumbwrap"><img src="uploads/products/pure-coffee.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">product-pure-coffee</code>
+        <p class="dims">555&times;586</p>
+        <p class="path">uploads/products/pure-coffee.webp</p>
+        <p class="warn">Also on Our Brand — Flavora, Our Products, Product — Pure Coffee. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="product-pure-coffee" hidden></label><button class="undo" data-slot="product-pure-coffee" title="Put everything back">Undo</button><button class="rm" data-slot="product-pure-coffee" data-pages="6" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="product-pure-coffee" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="product-coffee-creamer">
+      <div class="thumbwrap"><img src="uploads/products/coffee-creamer.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">product-coffee-creamer</code>
+        <p class="dims">555&times;586</p>
+        <p class="path">uploads/products/coffee-creamer.webp</p>
+        <p class="warn">Also on Our Brand — Flavora, Our Products, Product — Coffee Creamer. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="product-coffee-creamer" hidden></label><button class="undo" data-slot="product-coffee-creamer" title="Put everything back">Undo</button><button class="rm" data-slot="product-coffee-creamer" data-pages="6" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="product-coffee-creamer" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="product-espresso-capsules">
+      <div class="thumbwrap"><img src="uploads/products/espresso-capsules.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">product-espresso-capsules</code>
+        <p class="dims">555&times;586</p>
+        <p class="path">uploads/products/espresso-capsules.webp</p>
+        <p class="warn">Also on Our Brand — Flavora, Our Products, Product — Espresso Capsules. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="product-espresso-capsules" hidden></label><button class="undo" data-slot="product-espresso-capsules" title="Put everything back">Undo</button><button class="rm" data-slot="product-espresso-capsules" data-pages="6" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="product-espresso-capsules" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="brand-gallery-1">
+      <div class="thumbwrap"><img src="uploads/brands/brand-gallery-2025-06-28-10-30-18-9409.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">brand-gallery-1</code>
+        <p class="dims">513&times;725</p>
+        <p class="path">uploads/brands/brand-gallery-2025-06-28-10-30-18-9409.webp</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="brand-gallery-1" hidden></label><button class="undo" data-slot="brand-gallery-1" title="Put everything back">Undo</button><button class="rm" data-slot="brand-gallery-1" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="brand-gallery-1" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="brand-gallery-2">
+      <div class="thumbwrap"><img src="uploads/brands/brand-gallery-2025-06-28-10-30-19-1492.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">brand-gallery-2</code>
+        <p class="dims">513&times;725</p>
+        <p class="path">uploads/brands/brand-gallery-2025-06-28-10-30-19-1492.webp</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="brand-gallery-2" hidden></label><button class="undo" data-slot="brand-gallery-2" title="Put everything back">Undo</button><button class="rm" data-slot="brand-gallery-2" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="brand-gallery-2" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="brand-gallery-3">
+      <div class="thumbwrap"><img src="uploads/brands/brand-gallery-2025-06-28-10-30-19-7861.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">brand-gallery-3</code>
+        <p class="dims">513&times;725</p>
+        <p class="path">uploads/brands/brand-gallery-2025-06-28-10-30-19-7861.webp</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="brand-gallery-3" hidden></label><button class="undo" data-slot="brand-gallery-3" title="Put everything back">Undo</button><button class="rm" data-slot="brand-gallery-3" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="brand-gallery-3" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure></div></section><section id="our-brand-enna"><h2>Our Brand — Enna</h2><div class="grid">
+    <figure class="card" data-slot="enna-header">
+      <div class="thumbwrap"><img src="uploads/brands/enna-header.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">enna-header</code>
+        <p class="dims">1280&times;720</p>
+        <p class="path">uploads/brands/enna-header.webp</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="enna-header" hidden></label><button class="undo" data-slot="enna-header" title="Put everything back">Undo</button><button class="rm" data-slot="enna-header" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="enna-header" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="blog-thumb-4">
+      <div class="thumbwrap"><img src="uploads/shared/blog--2024-04-23-03-47-17-6858.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">blog-thumb-4</code>
+        <p class="dims">1026&times;618</p>
+        <p class="path">uploads/shared/blog--2024-04-23-03-47-17-6858.webp</p>
+        <p class="warn">Also on Article — Introducing Enna Soups: Authentic Taste, Ready for Ramadan, Blog &amp; Events, Home Page, Our Brand — Enna. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="blog-thumb-4" hidden></label><button class="undo" data-slot="blog-thumb-4" title="Put everything back">Undo</button><button class="rm" data-slot="blog-thumb-4" data-pages="8" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="blog-thumb-4" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="product-mushroom-soup">
+      <div class="thumbwrap"><img src="uploads/products/mushroom-soup.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">product-mushroom-soup</code>
+        <p class="dims">555&times;586</p>
+        <p class="path">uploads/products/mushroom-soup.webp</p>
+        <p class="warn">Also on Our Brand — Enna, Our Products, Product — Mushroom Soup. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="product-mushroom-soup" hidden></label><button class="undo" data-slot="product-mushroom-soup" title="Put everything back">Undo</button><button class="rm" data-slot="product-mushroom-soup" data-pages="6" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="product-mushroom-soup" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="product-chicken-noodle-soup">
+      <div class="thumbwrap"><img src="uploads/products/chicken-noodle-soup.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">product-chicken-noodle-soup</code>
+        <p class="dims">555&times;586</p>
+        <p class="path">uploads/products/chicken-noodle-soup.webp</p>
+        <p class="warn">Also on Our Brand — Enna, Our Products, Product — Chicken Noodle Soup. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="product-chicken-noodle-soup" hidden></label><button class="undo" data-slot="product-chicken-noodle-soup" title="Put everything back">Undo</button><button class="rm" data-slot="product-chicken-noodle-soup" data-pages="6" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="product-chicken-noodle-soup" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="product-broccoli-soup">
+      <div class="thumbwrap"><img src="uploads/products/broccoli-soup.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">product-broccoli-soup</code>
+        <p class="dims">555&times;586</p>
+        <p class="path">uploads/products/broccoli-soup.webp</p>
+        <p class="warn">Also on Our Brand — Enna, Our Products, Product — Broccoli Soup. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="product-broccoli-soup" hidden></label><button class="undo" data-slot="product-broccoli-soup" title="Put everything back">Undo</button><button class="rm" data-slot="product-broccoli-soup" data-pages="6" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="product-broccoli-soup" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="product-vegetable-soup">
+      <div class="thumbwrap"><img src="uploads/products/vegetable-soup.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">product-vegetable-soup</code>
+        <p class="dims">555&times;586</p>
+        <p class="path">uploads/products/vegetable-soup.webp</p>
+        <p class="warn">Also on Our Brand — Enna, Our Products, Product — Vegetable Soup. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="product-vegetable-soup" hidden></label><button class="undo" data-slot="product-vegetable-soup" title="Put everything back">Undo</button><button class="rm" data-slot="product-vegetable-soup" data-pages="6" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="product-vegetable-soup" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure></div></section><section id="our-team"><h2>Our Team</h2><div class="grid">
+    <figure class="card" data-slot="generic-header">
+      <div class="thumbwrap"><img src="uploads/shared/breadcrumb-image-2025-07-31-01-12-58-1075.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">generic-header</code>
+        <p class="dims">1280&times;720</p>
+        <p class="path">uploads/shared/breadcrumb-image-2025-07-31-01-12-58-1075.webp</p>
+        <p class="warn">Also on Article — Delivering Freshness Across the Region, Article — Flavora Cafe Opens Its Doors, Article — Introducing Enna Soups: Authentic Taste, Ready for Ramadan, Article — Quality Begins with Every Test, Contact Us, Our Team, Product — Broccoli Soup, Product — Chicken Noodle Soup, Product — Coffee Creamer, Product — Espresso Capsules, Product — Mac and Cheese, Product — Mushroom Soup, Product — Product Full Name, Product — Pure Coffee, Product — Three-in-One, Product — Two-in-One, Product — Vegetable Soup, Vacancy — Project Manager &amp; Consultant. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="generic-header" hidden></label><button class="undo" data-slot="generic-header" title="Put everything back">Undo</button><button class="rm" data-slot="generic-header" data-pages="34" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="generic-header" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="team-mohamad-g-takwa">
+      <div class="thumbwrap"><img src="uploads/team/team-mohamad-g-takwa.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">team-mohamad-g-takwa</code>
+        <p class="dims">480&times;720</p>
+        <p class="path">uploads/team/team-mohamad-g-takwa.webp</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="team-mohamad-g-takwa" hidden></label><button class="undo" data-slot="team-mohamad-g-takwa" title="Put everything back">Undo</button><button class="rm" data-slot="team-mohamad-g-takwa" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="team-mohamad-g-takwa" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="team-khaled-takwa">
+      <div class="thumbwrap"><img src="uploads/team/team-khaled-takwa.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">team-khaled-takwa</code>
+        <p class="dims">480&times;720</p>
+        <p class="path">uploads/team/team-khaled-takwa.webp</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="team-khaled-takwa" hidden></label><button class="undo" data-slot="team-khaled-takwa" title="Put everything back">Undo</button><button class="rm" data-slot="team-khaled-takwa" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="team-khaled-takwa" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="team-khaldoun-takwa">
+      <div class="thumbwrap"><img src="uploads/team/team-khaldoun-takwa.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">team-khaldoun-takwa</code>
+        <p class="dims">480&times;720</p>
+        <p class="path">uploads/team/team-khaldoun-takwa.webp</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="team-khaldoun-takwa" hidden></label><button class="undo" data-slot="team-khaldoun-takwa" title="Put everything back">Undo</button><button class="rm" data-slot="team-khaldoun-takwa" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="team-khaldoun-takwa" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="team-soubhi-chammout">
+      <div class="thumbwrap"><img src="uploads/team/team-soubhi-chammout.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">team-soubhi-chammout</code>
+        <p class="dims">480&times;720</p>
+        <p class="path">uploads/team/team-soubhi-chammout.webp</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="team-soubhi-chammout" hidden></label><button class="undo" data-slot="team-soubhi-chammout" title="Put everything back">Undo</button><button class="rm" data-slot="team-soubhi-chammout" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="team-soubhi-chammout" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="team-mutassem-alsheikh">
+      <div class="thumbwrap"><img src="uploads/team/team-mutassem-alsheikh.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">team-mutassem-alsheikh</code>
+        <p class="dims">480&times;720</p>
+        <p class="path">uploads/team/team-mutassem-alsheikh.webp</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="team-mutassem-alsheikh" hidden></label><button class="undo" data-slot="team-mutassem-alsheikh" title="Put everything back">Undo</button><button class="rm" data-slot="team-mutassem-alsheikh" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="team-mutassem-alsheikh" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="team-wadeh-youssef">
+      <div class="thumbwrap"><img src="uploads/team/team-wadeh-youssef.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">team-wadeh-youssef</code>
+        <p class="dims">480&times;720</p>
+        <p class="path">uploads/team/team-wadeh-youssef.webp</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="team-wadeh-youssef" hidden></label><button class="undo" data-slot="team-wadeh-youssef" title="Put everything back">Undo</button><button class="rm" data-slot="team-wadeh-youssef" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="team-wadeh-youssef" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="team-mutaz-hamdan">
+      <div class="thumbwrap"><img src="uploads/team/team-mutaz-hamdan.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">team-mutaz-hamdan</code>
+        <p class="dims">480&times;720</p>
+        <p class="path">uploads/team/team-mutaz-hamdan.webp</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="team-mutaz-hamdan" hidden></label><button class="undo" data-slot="team-mutaz-hamdan" title="Put everything back">Undo</button><button class="rm" data-slot="team-mutaz-hamdan" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="team-mutaz-hamdan" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="team-ammar-al-bitar">
+      <div class="thumbwrap"><img src="uploads/team/team-ammar-al-bitar.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">team-ammar-al-bitar</code>
+        <p class="dims">480&times;720</p>
+        <p class="path">uploads/team/team-ammar-al-bitar.webp</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="team-ammar-al-bitar" hidden></label><button class="undo" data-slot="team-ammar-al-bitar" title="Put everything back">Undo</button><button class="rm" data-slot="team-ammar-al-bitar" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="team-ammar-al-bitar" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="team-annie-khorozian">
+      <div class="thumbwrap"><img src="uploads/team/team-annie-khorozian.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">team-annie-khorozian</code>
+        <p class="dims">480&times;720</p>
+        <p class="path">uploads/team/team-annie-khorozian.webp</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="team-annie-khorozian" hidden></label><button class="undo" data-slot="team-annie-khorozian" title="Put everything back">Undo</button><button class="rm" data-slot="team-annie-khorozian" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="team-annie-khorozian" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="team-alyaa-hamdan">
+      <div class="thumbwrap"><img src="uploads/team/team-alyaa-hamdan.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">team-alyaa-hamdan</code>
+        <p class="dims">480&times;720</p>
+        <p class="path">uploads/team/team-alyaa-hamdan.webp</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="team-alyaa-hamdan" hidden></label><button class="undo" data-slot="team-alyaa-hamdan" title="Put everything back">Undo</button><button class="rm" data-slot="team-alyaa-hamdan" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="team-alyaa-hamdan" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="team-abdullah-maqsosah">
+      <div class="thumbwrap"><img src="uploads/team/team-abdullah-maqsosah.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">team-abdullah-maqsosah</code>
+        <p class="dims">480&times;720</p>
+        <p class="path">uploads/team/team-abdullah-maqsosah.webp</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="team-abdullah-maqsosah" hidden></label><button class="undo" data-slot="team-abdullah-maqsosah" title="Put everything back">Undo</button><button class="rm" data-slot="team-abdullah-maqsosah" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="team-abdullah-maqsosah" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="team-hussam-hammoud">
+      <div class="thumbwrap"><img src="uploads/team/team-hussam-hammoud.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">team-hussam-hammoud</code>
+        <p class="dims">480&times;720</p>
+        <p class="path">uploads/team/team-hussam-hammoud.webp</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="team-hussam-hammoud" hidden></label><button class="undo" data-slot="team-hussam-hammoud" title="Put everything back">Undo</button><button class="rm" data-slot="team-hussam-hammoud" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="team-hussam-hammoud" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="team-majed-kousa">
+      <div class="thumbwrap"><img src="uploads/team/team-majed-kousa.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">team-majed-kousa</code>
+        <p class="dims">480&times;720</p>
+        <p class="path">uploads/team/team-majed-kousa.webp</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="team-majed-kousa" hidden></label><button class="undo" data-slot="team-majed-kousa" title="Put everything back">Undo</button><button class="rm" data-slot="team-majed-kousa" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="team-majed-kousa" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="team-mohammad-al-bazzal">
+      <div class="thumbwrap"><img src="uploads/team/team-mohammad-al-bazzal.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">team-mohammad-al-bazzal</code>
+        <p class="dims">480&times;720</p>
+        <p class="path">uploads/team/team-mohammad-al-bazzal.webp</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="team-mohammad-al-bazzal" hidden></label><button class="undo" data-slot="team-mohammad-al-bazzal" title="Put everything back">Undo</button><button class="rm" data-slot="team-mohammad-al-bazzal" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="team-mohammad-al-bazzal" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="team-ahmad-loda">
+      <div class="thumbwrap"><img src="uploads/team/team-ahmad-loda.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">team-ahmad-loda</code>
+        <p class="dims">480&times;720</p>
+        <p class="path">uploads/team/team-ahmad-loda.webp</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="team-ahmad-loda" hidden></label><button class="undo" data-slot="team-ahmad-loda" title="Put everything back">Undo</button><button class="rm" data-slot="team-ahmad-loda" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="team-ahmad-loda" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="team-bader-akkam">
+      <div class="thumbwrap"><img src="uploads/team/team-bader-akkam.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">team-bader-akkam</code>
+        <p class="dims">480&times;720</p>
+        <p class="path">uploads/team/team-bader-akkam.webp</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="team-bader-akkam" hidden></label><button class="undo" data-slot="team-bader-akkam" title="Put everything back">Undo</button><button class="rm" data-slot="team-bader-akkam" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="team-bader-akkam" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure></div></section><section id="blog-events"><h2>Blog &amp; Events</h2><div class="grid">
+    <figure class="card" data-slot="blog-header">
+      <div class="thumbwrap"><img src="uploads/blog/blog-header.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">blog-header</code>
+        <p class="dims">1280&times;720</p>
+        <p class="path">uploads/blog/blog-header.webp</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="blog-header" hidden></label><button class="undo" data-slot="blog-header" title="Put everything back">Undo</button><button class="rm" data-slot="blog-header" data-pages="2" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="blog-header" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="blog-thumb-1">
+      <div class="thumbwrap"><img src="uploads/shared/blog--2024-04-23-03-23-41-7233.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">blog-thumb-1</code>
+        <p class="dims">1026&times;618</p>
+        <p class="path">uploads/shared/blog--2024-04-23-03-23-41-7233.webp</p>
+        <p class="warn">Also on Article — Quality Begins with Every Test, Blog &amp; Events, Home Page. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="blog-thumb-1" hidden></label><button class="undo" data-slot="blog-thumb-1" title="Put everything back">Undo</button><button class="rm" data-slot="blog-thumb-1" data-pages="6" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="blog-thumb-1" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="blog-thumb-2">
+      <div class="thumbwrap"><img src="uploads/shared/blog--2024-04-23-03-24-23-9934.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">blog-thumb-2</code>
+        <p class="dims">1026&times;618</p>
+        <p class="path">uploads/shared/blog--2024-04-23-03-24-23-9934.webp</p>
+        <p class="warn">Also on Article — Delivering Freshness Across the Region, Blog &amp; Events, Home Page. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="blog-thumb-2" hidden></label><button class="undo" data-slot="blog-thumb-2" title="Put everything back">Undo</button><button class="rm" data-slot="blog-thumb-2" data-pages="6" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="blog-thumb-2" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="blog-thumb-3">
+      <div class="thumbwrap"><img src="uploads/shared/blog--2024-04-23-03-24-48-2419.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">blog-thumb-3</code>
+        <p class="dims">1026&times;618</p>
+        <p class="path">uploads/shared/blog--2024-04-23-03-24-48-2419.webp</p>
+        <p class="warn">Also on Article — Flavora Cafe Opens Its Doors, Blog &amp; Events, Home Page. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="blog-thumb-3" hidden></label><button class="undo" data-slot="blog-thumb-3" title="Put everything back">Undo</button><button class="rm" data-slot="blog-thumb-3" data-pages="6" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="blog-thumb-3" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="blog-thumb-4">
+      <div class="thumbwrap"><img src="uploads/shared/blog--2024-04-23-03-47-17-6858.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">blog-thumb-4</code>
+        <p class="dims">1026&times;618</p>
+        <p class="path">uploads/shared/blog--2024-04-23-03-47-17-6858.webp</p>
+        <p class="warn">Also on Article — Introducing Enna Soups: Authentic Taste, Ready for Ramadan, Blog &amp; Events, Home Page, Our Brand — Enna. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="blog-thumb-4" hidden></label><button class="undo" data-slot="blog-thumb-4" title="Put everything back">Undo</button><button class="rm" data-slot="blog-thumb-4" data-pages="8" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="blog-thumb-4" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure></div></section><section id="vacancies"><h2>Vacancies</h2><div class="grid">
+    <figure class="card" data-slot="vacancies-header">
+      <div class="thumbwrap"><img src="uploads/vacancies/vacancies-header.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">vacancies-header</code>
+        <p class="dims">1280&times;720</p>
+        <p class="path">uploads/vacancies/vacancies-header.webp</p>
+        <p class="warn">Also on Employment Application, Vacancies. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="vacancies-header" hidden></label><button class="undo" data-slot="vacancies-header" title="Put everything back">Undo</button><button class="rm" data-slot="vacancies-header" data-pages="4" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="vacancies-header" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure></div></section><section id="contact-us"><h2>Contact Us</h2><div class="grid">
+    <figure class="card" data-slot="generic-header">
+      <div class="thumbwrap"><img src="uploads/shared/breadcrumb-image-2025-07-31-01-12-58-1075.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">generic-header</code>
+        <p class="dims">1280&times;720</p>
+        <p class="path">uploads/shared/breadcrumb-image-2025-07-31-01-12-58-1075.webp</p>
+        <p class="warn">Also on Article — Delivering Freshness Across the Region, Article — Flavora Cafe Opens Its Doors, Article — Introducing Enna Soups: Authentic Taste, Ready for Ramadan, Article — Quality Begins with Every Test, Contact Us, Our Team, Product — Broccoli Soup, Product — Chicken Noodle Soup, Product — Coffee Creamer, Product — Espresso Capsules, Product — Mac and Cheese, Product — Mushroom Soup, Product — Product Full Name, Product — Pure Coffee, Product — Three-in-One, Product — Two-in-One, Product — Vegetable Soup, Vacancy — Project Manager &amp; Consultant. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="generic-header" hidden></label><button class="undo" data-slot="generic-header" title="Put everything back">Undo</button><button class="rm" data-slot="generic-header" data-pages="34" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="generic-header" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="icon-phone">
+      <div class="thumbwrap"><img src="frontend/css/images/icon-phone.svg" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">icon-phone</code>
+        <p class="dims"></p>
+        <p class="path">frontend/css/images/icon-phone.svg</p>
+        <p class="warn">SVG icon &mdash; the tool can't swap this one.</p>
+        <div class="actions"></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="icon-whatsapp">
+      <div class="thumbwrap"><img src="frontend/css/images/icon-whatsapp.svg" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">icon-whatsapp</code>
+        <p class="dims"></p>
+        <p class="path">frontend/css/images/icon-whatsapp.svg</p>
+        <p class="warn">SVG icon &mdash; the tool can't swap this one.</p>
+        <div class="actions"></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="icon-mail">
+      <div class="thumbwrap"><img src="frontend/css/images/icon-mail.svg" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">icon-mail</code>
+        <p class="dims"></p>
+        <p class="path">frontend/css/images/icon-mail.svg</p>
+        <p class="warn">SVG icon &mdash; the tool can't swap this one.</p>
+        <div class="actions"></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="icon-location">
+      <div class="thumbwrap"><img src="frontend/css/images/icon-location.svg" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">icon-location</code>
+        <p class="dims"></p>
+        <p class="path">frontend/css/images/icon-location.svg</p>
+        <p class="warn">SVG icon &mdash; the tool can't swap this one.</p>
+        <div class="actions"></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure></div></section><section id="employment-application"><h2>Employment Application</h2><div class="grid">
+    <figure class="card" data-slot="vacancies-header">
+      <div class="thumbwrap"><img src="uploads/vacancies/vacancies-header.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">vacancies-header</code>
+        <p class="dims">1280&times;720</p>
+        <p class="path">uploads/vacancies/vacancies-header.webp</p>
+        <p class="warn">Also on Employment Application, Vacancies. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="vacancies-header" hidden></label><button class="undo" data-slot="vacancies-header" title="Put everything back">Undo</button><button class="rm" data-slot="vacancies-header" data-pages="4" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="vacancies-header" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure></div></section><section id="product-product-full-name"><h2>Product — Product Full Name</h2><div class="grid">
+    <figure class="card" data-slot="generic-header">
+      <div class="thumbwrap"><img src="uploads/shared/breadcrumb-image-2025-07-31-01-12-58-1075.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">generic-header</code>
+        <p class="dims">1280&times;720</p>
+        <p class="path">uploads/shared/breadcrumb-image-2025-07-31-01-12-58-1075.webp</p>
+        <p class="warn">Also on Article — Delivering Freshness Across the Region, Article — Flavora Cafe Opens Its Doors, Article — Introducing Enna Soups: Authentic Taste, Ready for Ramadan, Article — Quality Begins with Every Test, Contact Us, Our Team, Product — Broccoli Soup, Product — Chicken Noodle Soup, Product — Coffee Creamer, Product — Espresso Capsules, Product — Mac and Cheese, Product — Mushroom Soup, Product — Product Full Name, Product — Pure Coffee, Product — Three-in-One, Product — Two-in-One, Product — Vegetable Soup, Vacancy — Project Manager &amp; Consultant. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="generic-header" hidden></label><button class="undo" data-slot="generic-header" title="Put everything back">Undo</button><button class="rm" data-slot="generic-header" data-pages="34" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="generic-header" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="product-card">
+      <div class="thumbwrap"><img src="uploads/shared/car-2025-07-31-02-13-32-7758.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">product-card</code>
+        <p class="dims">555&times;586</p>
+        <p class="path">uploads/shared/car-2025-07-31-02-13-32-7758.webp</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="product-card" hidden></label><button class="undo" data-slot="product-card" title="Put everything back">Undo</button><button class="rm" data-slot="product-card" data-pages="1" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="product-card" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="product-flavor-1">
+      <div class="thumbwrap"><img src="uploads/products/car-flavor-2025-07-31-02-17-23-4956.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">product-flavor-1</code>
+        <p class="dims">555&times;586</p>
+        <p class="path">uploads/products/car-flavor-2025-07-31-02-17-23-4956.webp</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="product-flavor-1" hidden></label><button class="undo" data-slot="product-flavor-1" title="Put everything back">Undo</button><button class="rm" data-slot="product-flavor-1" data-pages="1" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="product-flavor-1" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="product-flavor-2">
+      <div class="thumbwrap"><img src="uploads/products/car-flavor-2025-07-31-02-17-44-7854.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">product-flavor-2</code>
+        <p class="dims">555&times;586</p>
+        <p class="path">uploads/products/car-flavor-2025-07-31-02-17-44-7854.webp</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="product-flavor-2" hidden></label><button class="undo" data-slot="product-flavor-2" title="Put everything back">Undo</button><button class="rm" data-slot="product-flavor-2" data-pages="1" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="product-flavor-2" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="product-flavor-3">
+      <div class="thumbwrap"><img src="uploads/products/car-flavor-2025-07-31-02-18-09-6000.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">product-flavor-3</code>
+        <p class="dims">555&times;586</p>
+        <p class="path">uploads/products/car-flavor-2025-07-31-02-18-09-6000.webp</p>
+        
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="product-flavor-3" hidden></label><button class="undo" data-slot="product-flavor-3" title="Put everything back">Undo</button><button class="rm" data-slot="product-flavor-3" data-pages="1" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="product-flavor-3" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure></div></section><section id="product-broccoli-soup"><h2>Product — Broccoli Soup</h2><div class="grid">
+    <figure class="card" data-slot="generic-header">
+      <div class="thumbwrap"><img src="uploads/shared/breadcrumb-image-2025-07-31-01-12-58-1075.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">generic-header</code>
+        <p class="dims">1280&times;720</p>
+        <p class="path">uploads/shared/breadcrumb-image-2025-07-31-01-12-58-1075.webp</p>
+        <p class="warn">Also on Article — Delivering Freshness Across the Region, Article — Flavora Cafe Opens Its Doors, Article — Introducing Enna Soups: Authentic Taste, Ready for Ramadan, Article — Quality Begins with Every Test, Contact Us, Our Team, Product — Broccoli Soup, Product — Chicken Noodle Soup, Product — Coffee Creamer, Product — Espresso Capsules, Product — Mac and Cheese, Product — Mushroom Soup, Product — Product Full Name, Product — Pure Coffee, Product — Three-in-One, Product — Two-in-One, Product — Vegetable Soup, Vacancy — Project Manager &amp; Consultant. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="generic-header" hidden></label><button class="undo" data-slot="generic-header" title="Put everything back">Undo</button><button class="rm" data-slot="generic-header" data-pages="34" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="generic-header" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="product-broccoli-soup">
+      <div class="thumbwrap"><img src="uploads/products/broccoli-soup.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">product-broccoli-soup</code>
+        <p class="dims">555&times;586</p>
+        <p class="path">uploads/products/broccoli-soup.webp</p>
+        <p class="warn">Also on Our Brand — Enna, Our Products, Product — Broccoli Soup. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="product-broccoli-soup" hidden></label><button class="undo" data-slot="product-broccoli-soup" title="Put everything back">Undo</button><button class="rm" data-slot="product-broccoli-soup" data-pages="6" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="product-broccoli-soup" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure></div></section><section id="product-chicken-noodle-soup"><h2>Product — Chicken Noodle Soup</h2><div class="grid">
+    <figure class="card" data-slot="generic-header">
+      <div class="thumbwrap"><img src="uploads/shared/breadcrumb-image-2025-07-31-01-12-58-1075.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">generic-header</code>
+        <p class="dims">1280&times;720</p>
+        <p class="path">uploads/shared/breadcrumb-image-2025-07-31-01-12-58-1075.webp</p>
+        <p class="warn">Also on Article — Delivering Freshness Across the Region, Article — Flavora Cafe Opens Its Doors, Article — Introducing Enna Soups: Authentic Taste, Ready for Ramadan, Article — Quality Begins with Every Test, Contact Us, Our Team, Product — Broccoli Soup, Product — Chicken Noodle Soup, Product — Coffee Creamer, Product — Espresso Capsules, Product — Mac and Cheese, Product — Mushroom Soup, Product — Product Full Name, Product — Pure Coffee, Product — Three-in-One, Product — Two-in-One, Product — Vegetable Soup, Vacancy — Project Manager &amp; Consultant. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="generic-header" hidden></label><button class="undo" data-slot="generic-header" title="Put everything back">Undo</button><button class="rm" data-slot="generic-header" data-pages="34" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="generic-header" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="product-chicken-noodle-soup">
+      <div class="thumbwrap"><img src="uploads/products/chicken-noodle-soup.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">product-chicken-noodle-soup</code>
+        <p class="dims">555&times;586</p>
+        <p class="path">uploads/products/chicken-noodle-soup.webp</p>
+        <p class="warn">Also on Our Brand — Enna, Our Products, Product — Chicken Noodle Soup. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="product-chicken-noodle-soup" hidden></label><button class="undo" data-slot="product-chicken-noodle-soup" title="Put everything back">Undo</button><button class="rm" data-slot="product-chicken-noodle-soup" data-pages="6" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="product-chicken-noodle-soup" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure></div></section><section id="product-coffee-creamer"><h2>Product — Coffee Creamer</h2><div class="grid">
+    <figure class="card" data-slot="generic-header">
+      <div class="thumbwrap"><img src="uploads/shared/breadcrumb-image-2025-07-31-01-12-58-1075.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">generic-header</code>
+        <p class="dims">1280&times;720</p>
+        <p class="path">uploads/shared/breadcrumb-image-2025-07-31-01-12-58-1075.webp</p>
+        <p class="warn">Also on Article — Delivering Freshness Across the Region, Article — Flavora Cafe Opens Its Doors, Article — Introducing Enna Soups: Authentic Taste, Ready for Ramadan, Article — Quality Begins with Every Test, Contact Us, Our Team, Product — Broccoli Soup, Product — Chicken Noodle Soup, Product — Coffee Creamer, Product — Espresso Capsules, Product — Mac and Cheese, Product — Mushroom Soup, Product — Product Full Name, Product — Pure Coffee, Product — Three-in-One, Product — Two-in-One, Product — Vegetable Soup, Vacancy — Project Manager &amp; Consultant. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="generic-header" hidden></label><button class="undo" data-slot="generic-header" title="Put everything back">Undo</button><button class="rm" data-slot="generic-header" data-pages="34" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="generic-header" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="product-coffee-creamer">
+      <div class="thumbwrap"><img src="uploads/products/coffee-creamer.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">product-coffee-creamer</code>
+        <p class="dims">555&times;586</p>
+        <p class="path">uploads/products/coffee-creamer.webp</p>
+        <p class="warn">Also on Our Brand — Flavora, Our Products, Product — Coffee Creamer. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="product-coffee-creamer" hidden></label><button class="undo" data-slot="product-coffee-creamer" title="Put everything back">Undo</button><button class="rm" data-slot="product-coffee-creamer" data-pages="6" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="product-coffee-creamer" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure></div></section><section id="product-espresso-capsules"><h2>Product — Espresso Capsules</h2><div class="grid">
+    <figure class="card" data-slot="generic-header">
+      <div class="thumbwrap"><img src="uploads/shared/breadcrumb-image-2025-07-31-01-12-58-1075.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">generic-header</code>
+        <p class="dims">1280&times;720</p>
+        <p class="path">uploads/shared/breadcrumb-image-2025-07-31-01-12-58-1075.webp</p>
+        <p class="warn">Also on Article — Delivering Freshness Across the Region, Article — Flavora Cafe Opens Its Doors, Article — Introducing Enna Soups: Authentic Taste, Ready for Ramadan, Article — Quality Begins with Every Test, Contact Us, Our Team, Product — Broccoli Soup, Product — Chicken Noodle Soup, Product — Coffee Creamer, Product — Espresso Capsules, Product — Mac and Cheese, Product — Mushroom Soup, Product — Product Full Name, Product — Pure Coffee, Product — Three-in-One, Product — Two-in-One, Product — Vegetable Soup, Vacancy — Project Manager &amp; Consultant. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="generic-header" hidden></label><button class="undo" data-slot="generic-header" title="Put everything back">Undo</button><button class="rm" data-slot="generic-header" data-pages="34" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="generic-header" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="product-espresso-capsules">
+      <div class="thumbwrap"><img src="uploads/products/espresso-capsules.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">product-espresso-capsules</code>
+        <p class="dims">555&times;586</p>
+        <p class="path">uploads/products/espresso-capsules.webp</p>
+        <p class="warn">Also on Our Brand — Flavora, Our Products, Product — Espresso Capsules. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="product-espresso-capsules" hidden></label><button class="undo" data-slot="product-espresso-capsules" title="Put everything back">Undo</button><button class="rm" data-slot="product-espresso-capsules" data-pages="6" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="product-espresso-capsules" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure></div></section><section id="product-mac-and-cheese"><h2>Product — Mac and Cheese</h2><div class="grid">
+    <figure class="card" data-slot="generic-header">
+      <div class="thumbwrap"><img src="uploads/shared/breadcrumb-image-2025-07-31-01-12-58-1075.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">generic-header</code>
+        <p class="dims">1280&times;720</p>
+        <p class="path">uploads/shared/breadcrumb-image-2025-07-31-01-12-58-1075.webp</p>
+        <p class="warn">Also on Article — Delivering Freshness Across the Region, Article — Flavora Cafe Opens Its Doors, Article — Introducing Enna Soups: Authentic Taste, Ready for Ramadan, Article — Quality Begins with Every Test, Contact Us, Our Team, Product — Broccoli Soup, Product — Chicken Noodle Soup, Product — Coffee Creamer, Product — Espresso Capsules, Product — Mac and Cheese, Product — Mushroom Soup, Product — Product Full Name, Product — Pure Coffee, Product — Three-in-One, Product — Two-in-One, Product — Vegetable Soup, Vacancy — Project Manager &amp; Consultant. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="generic-header" hidden></label><button class="undo" data-slot="generic-header" title="Put everything back">Undo</button><button class="rm" data-slot="generic-header" data-pages="34" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="generic-header" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="">
+      <div class="thumbwrap"><img src="uploads/products/mac-and-cheese.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot"></code>
+        <p class="dims">555&times;586</p>
+        <p class="path">uploads/products/mac-and-cheese.webp</p>
+        <p class="warn">Also on Our Products, Product — Mac and Cheese. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="" hidden></label><button class="undo" data-slot="" title="Put everything back">Undo</button><button class="rm" data-slot="" data-pages="3" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure></div></section><section id="product-mushroom-soup"><h2>Product — Mushroom Soup</h2><div class="grid">
+    <figure class="card" data-slot="generic-header">
+      <div class="thumbwrap"><img src="uploads/shared/breadcrumb-image-2025-07-31-01-12-58-1075.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">generic-header</code>
+        <p class="dims">1280&times;720</p>
+        <p class="path">uploads/shared/breadcrumb-image-2025-07-31-01-12-58-1075.webp</p>
+        <p class="warn">Also on Article — Delivering Freshness Across the Region, Article — Flavora Cafe Opens Its Doors, Article — Introducing Enna Soups: Authentic Taste, Ready for Ramadan, Article — Quality Begins with Every Test, Contact Us, Our Team, Product — Broccoli Soup, Product — Chicken Noodle Soup, Product — Coffee Creamer, Product — Espresso Capsules, Product — Mac and Cheese, Product — Mushroom Soup, Product — Product Full Name, Product — Pure Coffee, Product — Three-in-One, Product — Two-in-One, Product — Vegetable Soup, Vacancy — Project Manager &amp; Consultant. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="generic-header" hidden></label><button class="undo" data-slot="generic-header" title="Put everything back">Undo</button><button class="rm" data-slot="generic-header" data-pages="34" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="generic-header" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="product-mushroom-soup">
+      <div class="thumbwrap"><img src="uploads/products/mushroom-soup.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">product-mushroom-soup</code>
+        <p class="dims">555&times;586</p>
+        <p class="path">uploads/products/mushroom-soup.webp</p>
+        <p class="warn">Also on Our Brand — Enna, Our Products, Product — Mushroom Soup. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="product-mushroom-soup" hidden></label><button class="undo" data-slot="product-mushroom-soup" title="Put everything back">Undo</button><button class="rm" data-slot="product-mushroom-soup" data-pages="6" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="product-mushroom-soup" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure></div></section><section id="product-pure-coffee"><h2>Product — Pure Coffee</h2><div class="grid">
+    <figure class="card" data-slot="generic-header">
+      <div class="thumbwrap"><img src="uploads/shared/breadcrumb-image-2025-07-31-01-12-58-1075.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">generic-header</code>
+        <p class="dims">1280&times;720</p>
+        <p class="path">uploads/shared/breadcrumb-image-2025-07-31-01-12-58-1075.webp</p>
+        <p class="warn">Also on Article — Delivering Freshness Across the Region, Article — Flavora Cafe Opens Its Doors, Article — Introducing Enna Soups: Authentic Taste, Ready for Ramadan, Article — Quality Begins with Every Test, Contact Us, Our Team, Product — Broccoli Soup, Product — Chicken Noodle Soup, Product — Coffee Creamer, Product — Espresso Capsules, Product — Mac and Cheese, Product — Mushroom Soup, Product — Product Full Name, Product — Pure Coffee, Product — Three-in-One, Product — Two-in-One, Product — Vegetable Soup, Vacancy — Project Manager &amp; Consultant. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="generic-header" hidden></label><button class="undo" data-slot="generic-header" title="Put everything back">Undo</button><button class="rm" data-slot="generic-header" data-pages="34" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="generic-header" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="product-pure-coffee">
+      <div class="thumbwrap"><img src="uploads/products/pure-coffee.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">product-pure-coffee</code>
+        <p class="dims">555&times;586</p>
+        <p class="path">uploads/products/pure-coffee.webp</p>
+        <p class="warn">Also on Our Brand — Flavora, Our Products, Product — Pure Coffee. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="product-pure-coffee" hidden></label><button class="undo" data-slot="product-pure-coffee" title="Put everything back">Undo</button><button class="rm" data-slot="product-pure-coffee" data-pages="6" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="product-pure-coffee" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure></div></section><section id="product-three-in-one"><h2>Product — Three-in-One</h2><div class="grid">
+    <figure class="card" data-slot="generic-header">
+      <div class="thumbwrap"><img src="uploads/shared/breadcrumb-image-2025-07-31-01-12-58-1075.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">generic-header</code>
+        <p class="dims">1280&times;720</p>
+        <p class="path">uploads/shared/breadcrumb-image-2025-07-31-01-12-58-1075.webp</p>
+        <p class="warn">Also on Article — Delivering Freshness Across the Region, Article — Flavora Cafe Opens Its Doors, Article — Introducing Enna Soups: Authentic Taste, Ready for Ramadan, Article — Quality Begins with Every Test, Contact Us, Our Team, Product — Broccoli Soup, Product — Chicken Noodle Soup, Product — Coffee Creamer, Product — Espresso Capsules, Product — Mac and Cheese, Product — Mushroom Soup, Product — Product Full Name, Product — Pure Coffee, Product — Three-in-One, Product — Two-in-One, Product — Vegetable Soup, Vacancy — Project Manager &amp; Consultant. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="generic-header" hidden></label><button class="undo" data-slot="generic-header" title="Put everything back">Undo</button><button class="rm" data-slot="generic-header" data-pages="34" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="generic-header" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="product-three-in-one">
+      <div class="thumbwrap"><img src="uploads/products/three-in-one.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">product-three-in-one</code>
+        <p class="dims">555&times;586</p>
+        <p class="path">uploads/products/three-in-one.webp</p>
+        <p class="warn">Also on Our Brand — Flavora, Our Products, Product — Three-in-One. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="product-three-in-one" hidden></label><button class="undo" data-slot="product-three-in-one" title="Put everything back">Undo</button><button class="rm" data-slot="product-three-in-one" data-pages="6" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="product-three-in-one" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure></div></section><section id="product-two-in-one"><h2>Product — Two-in-One</h2><div class="grid">
+    <figure class="card" data-slot="generic-header">
+      <div class="thumbwrap"><img src="uploads/shared/breadcrumb-image-2025-07-31-01-12-58-1075.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">generic-header</code>
+        <p class="dims">1280&times;720</p>
+        <p class="path">uploads/shared/breadcrumb-image-2025-07-31-01-12-58-1075.webp</p>
+        <p class="warn">Also on Article — Delivering Freshness Across the Region, Article — Flavora Cafe Opens Its Doors, Article — Introducing Enna Soups: Authentic Taste, Ready for Ramadan, Article — Quality Begins with Every Test, Contact Us, Our Team, Product — Broccoli Soup, Product — Chicken Noodle Soup, Product — Coffee Creamer, Product — Espresso Capsules, Product — Mac and Cheese, Product — Mushroom Soup, Product — Product Full Name, Product — Pure Coffee, Product — Three-in-One, Product — Two-in-One, Product — Vegetable Soup, Vacancy — Project Manager &amp; Consultant. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="generic-header" hidden></label><button class="undo" data-slot="generic-header" title="Put everything back">Undo</button><button class="rm" data-slot="generic-header" data-pages="34" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="generic-header" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="product-two-in-one">
+      <div class="thumbwrap"><img src="uploads/products/two-in-one.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">product-two-in-one</code>
+        <p class="dims">555&times;586</p>
+        <p class="path">uploads/products/two-in-one.webp</p>
+        <p class="warn">Also on Our Brand — Flavora, Our Products, Product — Two-in-One. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="product-two-in-one" hidden></label><button class="undo" data-slot="product-two-in-one" title="Put everything back">Undo</button><button class="rm" data-slot="product-two-in-one" data-pages="6" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="product-two-in-one" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure></div></section><section id="product-vegetable-soup"><h2>Product — Vegetable Soup</h2><div class="grid">
+    <figure class="card" data-slot="generic-header">
+      <div class="thumbwrap"><img src="uploads/shared/breadcrumb-image-2025-07-31-01-12-58-1075.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">generic-header</code>
+        <p class="dims">1280&times;720</p>
+        <p class="path">uploads/shared/breadcrumb-image-2025-07-31-01-12-58-1075.webp</p>
+        <p class="warn">Also on Article — Delivering Freshness Across the Region, Article — Flavora Cafe Opens Its Doors, Article — Introducing Enna Soups: Authentic Taste, Ready for Ramadan, Article — Quality Begins with Every Test, Contact Us, Our Team, Product — Broccoli Soup, Product — Chicken Noodle Soup, Product — Coffee Creamer, Product — Espresso Capsules, Product — Mac and Cheese, Product — Mushroom Soup, Product — Product Full Name, Product — Pure Coffee, Product — Three-in-One, Product — Two-in-One, Product — Vegetable Soup, Vacancy — Project Manager &amp; Consultant. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="generic-header" hidden></label><button class="undo" data-slot="generic-header" title="Put everything back">Undo</button><button class="rm" data-slot="generic-header" data-pages="34" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="generic-header" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="product-vegetable-soup">
+      <div class="thumbwrap"><img src="uploads/products/vegetable-soup.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">product-vegetable-soup</code>
+        <p class="dims">555&times;586</p>
+        <p class="path">uploads/products/vegetable-soup.webp</p>
+        <p class="warn">Also on Our Brand — Enna, Our Products, Product — Vegetable Soup. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="product-vegetable-soup" hidden></label><button class="undo" data-slot="product-vegetable-soup" title="Put everything back">Undo</button><button class="rm" data-slot="product-vegetable-soup" data-pages="6" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="product-vegetable-soup" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure></div></section><section id="article-delivering-freshness-across-the-region"><h2>Article — Delivering Freshness Across the Region</h2><div class="grid">
+    <figure class="card" data-slot="generic-header">
+      <div class="thumbwrap"><img src="uploads/shared/breadcrumb-image-2025-07-31-01-12-58-1075.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">generic-header</code>
+        <p class="dims">1280&times;720</p>
+        <p class="path">uploads/shared/breadcrumb-image-2025-07-31-01-12-58-1075.webp</p>
+        <p class="warn">Also on Article — Delivering Freshness Across the Region, Article — Flavora Cafe Opens Its Doors, Article — Introducing Enna Soups: Authentic Taste, Ready for Ramadan, Article — Quality Begins with Every Test, Contact Us, Our Team, Product — Broccoli Soup, Product — Chicken Noodle Soup, Product — Coffee Creamer, Product — Espresso Capsules, Product — Mac and Cheese, Product — Mushroom Soup, Product — Product Full Name, Product — Pure Coffee, Product — Three-in-One, Product — Two-in-One, Product — Vegetable Soup, Vacancy — Project Manager &amp; Consultant. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="generic-header" hidden></label><button class="undo" data-slot="generic-header" title="Put everything back">Undo</button><button class="rm" data-slot="generic-header" data-pages="34" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="generic-header" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="blog-thumb-2">
+      <div class="thumbwrap"><img src="uploads/shared/blog--2024-04-23-03-24-23-9934.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">blog-thumb-2</code>
+        <p class="dims">1026&times;618</p>
+        <p class="path">uploads/shared/blog--2024-04-23-03-24-23-9934.webp</p>
+        <p class="warn">Also on Article — Delivering Freshness Across the Region, Blog &amp; Events, Home Page. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="blog-thumb-2" hidden></label><button class="undo" data-slot="blog-thumb-2" title="Put everything back">Undo</button><button class="rm" data-slot="blog-thumb-2" data-pages="6" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="blog-thumb-2" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure></div></section><section id="article-flavora-cafe-opens-its-doors"><h2>Article — Flavora Cafe Opens Its Doors</h2><div class="grid">
+    <figure class="card" data-slot="generic-header">
+      <div class="thumbwrap"><img src="uploads/shared/breadcrumb-image-2025-07-31-01-12-58-1075.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">generic-header</code>
+        <p class="dims">1280&times;720</p>
+        <p class="path">uploads/shared/breadcrumb-image-2025-07-31-01-12-58-1075.webp</p>
+        <p class="warn">Also on Article — Delivering Freshness Across the Region, Article — Flavora Cafe Opens Its Doors, Article — Introducing Enna Soups: Authentic Taste, Ready for Ramadan, Article — Quality Begins with Every Test, Contact Us, Our Team, Product — Broccoli Soup, Product — Chicken Noodle Soup, Product — Coffee Creamer, Product — Espresso Capsules, Product — Mac and Cheese, Product — Mushroom Soup, Product — Product Full Name, Product — Pure Coffee, Product — Three-in-One, Product — Two-in-One, Product — Vegetable Soup, Vacancy — Project Manager &amp; Consultant. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="generic-header" hidden></label><button class="undo" data-slot="generic-header" title="Put everything back">Undo</button><button class="rm" data-slot="generic-header" data-pages="34" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="generic-header" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="blog-thumb-3">
+      <div class="thumbwrap"><img src="uploads/shared/blog--2024-04-23-03-24-48-2419.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">blog-thumb-3</code>
+        <p class="dims">1026&times;618</p>
+        <p class="path">uploads/shared/blog--2024-04-23-03-24-48-2419.webp</p>
+        <p class="warn">Also on Article — Flavora Cafe Opens Its Doors, Blog &amp; Events, Home Page. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="blog-thumb-3" hidden></label><button class="undo" data-slot="blog-thumb-3" title="Put everything back">Undo</button><button class="rm" data-slot="blog-thumb-3" data-pages="6" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="blog-thumb-3" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure></div></section><section id="article-introducing-enna-soups-authentic-taste-ready-for-ramadan"><h2>Article — Introducing Enna Soups: Authentic Taste, Ready for Ramadan</h2><div class="grid">
+    <figure class="card" data-slot="generic-header">
+      <div class="thumbwrap"><img src="uploads/shared/breadcrumb-image-2025-07-31-01-12-58-1075.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">generic-header</code>
+        <p class="dims">1280&times;720</p>
+        <p class="path">uploads/shared/breadcrumb-image-2025-07-31-01-12-58-1075.webp</p>
+        <p class="warn">Also on Article — Delivering Freshness Across the Region, Article — Flavora Cafe Opens Its Doors, Article — Introducing Enna Soups: Authentic Taste, Ready for Ramadan, Article — Quality Begins with Every Test, Contact Us, Our Team, Product — Broccoli Soup, Product — Chicken Noodle Soup, Product — Coffee Creamer, Product — Espresso Capsules, Product — Mac and Cheese, Product — Mushroom Soup, Product — Product Full Name, Product — Pure Coffee, Product — Three-in-One, Product — Two-in-One, Product — Vegetable Soup, Vacancy — Project Manager &amp; Consultant. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="generic-header" hidden></label><button class="undo" data-slot="generic-header" title="Put everything back">Undo</button><button class="rm" data-slot="generic-header" data-pages="34" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="generic-header" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="blog-thumb-4">
+      <div class="thumbwrap"><img src="uploads/shared/blog--2024-04-23-03-47-17-6858.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">blog-thumb-4</code>
+        <p class="dims">1026&times;618</p>
+        <p class="path">uploads/shared/blog--2024-04-23-03-47-17-6858.webp</p>
+        <p class="warn">Also on Article — Introducing Enna Soups: Authentic Taste, Ready for Ramadan, Blog &amp; Events, Home Page, Our Brand — Enna. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="blog-thumb-4" hidden></label><button class="undo" data-slot="blog-thumb-4" title="Put everything back">Undo</button><button class="rm" data-slot="blog-thumb-4" data-pages="8" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="blog-thumb-4" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure></div></section><section id="article-quality-begins-with-every-test"><h2>Article — Quality Begins with Every Test</h2><div class="grid">
+    <figure class="card" data-slot="generic-header">
+      <div class="thumbwrap"><img src="uploads/shared/breadcrumb-image-2025-07-31-01-12-58-1075.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">generic-header</code>
+        <p class="dims">1280&times;720</p>
+        <p class="path">uploads/shared/breadcrumb-image-2025-07-31-01-12-58-1075.webp</p>
+        <p class="warn">Also on Article — Delivering Freshness Across the Region, Article — Flavora Cafe Opens Its Doors, Article — Introducing Enna Soups: Authentic Taste, Ready for Ramadan, Article — Quality Begins with Every Test, Contact Us, Our Team, Product — Broccoli Soup, Product — Chicken Noodle Soup, Product — Coffee Creamer, Product — Espresso Capsules, Product — Mac and Cheese, Product — Mushroom Soup, Product — Product Full Name, Product — Pure Coffee, Product — Three-in-One, Product — Two-in-One, Product — Vegetable Soup, Vacancy — Project Manager &amp; Consultant. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="generic-header" hidden></label><button class="undo" data-slot="generic-header" title="Put everything back">Undo</button><button class="rm" data-slot="generic-header" data-pages="34" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="generic-header" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="blog-thumb-1">
+      <div class="thumbwrap"><img src="uploads/shared/blog--2024-04-23-03-23-41-7233.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">blog-thumb-1</code>
+        <p class="dims">1026&times;618</p>
+        <p class="path">uploads/shared/blog--2024-04-23-03-23-41-7233.webp</p>
+        <p class="warn">Also on Article — Quality Begins with Every Test, Blog &amp; Events, Home Page. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="blog-thumb-1" hidden></label><button class="undo" data-slot="blog-thumb-1" title="Put everything back">Undo</button><button class="rm" data-slot="blog-thumb-1" data-pages="6" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="blog-thumb-1" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure></div></section><section id="vacancy-project-manager-consultant"><h2>Vacancy — Project Manager &amp; Consultant</h2><div class="grid">
+    <figure class="card" data-slot="generic-header">
+      <div class="thumbwrap"><img src="uploads/shared/breadcrumb-image-2025-07-31-01-12-58-1075.webp" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">generic-header</code>
+        <p class="dims">1280&times;720</p>
+        <p class="path">uploads/shared/breadcrumb-image-2025-07-31-01-12-58-1075.webp</p>
+        <p class="warn">Also on Article — Delivering Freshness Across the Region, Article — Flavora Cafe Opens Its Doors, Article — Introducing Enna Soups: Authentic Taste, Ready for Ramadan, Article — Quality Begins with Every Test, Contact Us, Our Team, Product — Broccoli Soup, Product — Chicken Noodle Soup, Product — Coffee Creamer, Product — Espresso Capsules, Product — Mac and Cheese, Product — Mushroom Soup, Product — Product Full Name, Product — Pure Coffee, Product — Three-in-One, Product — Two-in-One, Product — Vegetable Soup, Vacancy — Project Manager &amp; Consultant. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="generic-header" hidden></label><button class="undo" data-slot="generic-header" title="Put everything back">Undo</button><button class="rm" data-slot="generic-header" data-pages="34" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="generic-header" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure></div></section><section id="shared"><h2>Logo &amp; Footer <span class="sub">(appears on every page)</span></h2><div class="grid">
+    <figure class="card" data-slot="watermark">
+      <div class="thumbwrap"><img src="frontend/css/images/takwafoods.png" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">watermark</code>
+        <p class="dims">1802&times;149</p>
+        <p class="path">frontend/css/images/takwafoods.png</p>
+        <p class="warn">Also on About Us, Article — Delivering Freshness Across the Region, Article — Flavora Cafe Opens Its Doors, Article — Introducing Enna Soups: Authentic Taste, Ready for Ramadan, Article — Quality Begins with Every Test, Blog &amp; Events, Contact Us, Employment Application, Home Page, Our Brand — Enna, Our Brand — Flavora, Our Products, Our Team, Product — Broccoli Soup, Product — Chicken Noodle Soup, Product — Coffee Creamer, Product — Espresso Capsules, Product — Mac and Cheese, Product — Mushroom Soup, Product — Product Full Name, Product — Pure Coffee, Product — Three-in-One, Product — Two-in-One, Product — Vegetable Soup, Vacancies, Vacancy — Project Manager &amp; Consultant. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="watermark" hidden></label><button class="undo" data-slot="watermark" title="Put everything back">Undo</button><button class="rm" data-slot="watermark" data-pages="50" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="watermark" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="footer-3">
+      <div class="thumbwrap"><img src="uploads/shared/footer-image-2025-07-30-10-54-22-1747.png" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">footer-3</code>
+        <p class="dims">100&times;100</p>
+        <p class="path">uploads/shared/footer-image-2025-07-30-10-54-22-1747.png</p>
+        <p class="warn">Also on About Us, Article — Delivering Freshness Across the Region, Article — Flavora Cafe Opens Its Doors, Article — Introducing Enna Soups: Authentic Taste, Ready for Ramadan, Article — Quality Begins with Every Test, Blog &amp; Events, Contact Us, Employment Application, Home Page, Our Brand — Enna, Our Brand — Flavora, Our Products, Our Team, Product — Broccoli Soup, Product — Chicken Noodle Soup, Product — Coffee Creamer, Product — Espresso Capsules, Product — Mac and Cheese, Product — Mushroom Soup, Product — Product Full Name, Product — Pure Coffee, Product — Three-in-One, Product — Two-in-One, Product — Vegetable Soup, Vacancies, Vacancy — Project Manager &amp; Consultant. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="footer-3" hidden></label><button class="undo" data-slot="footer-3" title="Put everything back">Undo</button><button class="rm" data-slot="footer-3" data-pages="50" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="footer-3" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="footer-1">
+      <div class="thumbwrap"><img src="uploads/shared/footer-image-2025-07-30-10-54-22-6261.png" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">footer-1</code>
+        <p class="dims">100&times;100</p>
+        <p class="path">uploads/shared/footer-image-2025-07-30-10-54-22-6261.png</p>
+        <p class="warn">Also on About Us, Article — Delivering Freshness Across the Region, Article — Flavora Cafe Opens Its Doors, Article — Introducing Enna Soups: Authentic Taste, Ready for Ramadan, Article — Quality Begins with Every Test, Blog &amp; Events, Contact Us, Employment Application, Home Page, Our Brand — Enna, Our Brand — Flavora, Our Products, Our Team, Product — Broccoli Soup, Product — Chicken Noodle Soup, Product — Coffee Creamer, Product — Espresso Capsules, Product — Mac and Cheese, Product — Mushroom Soup, Product — Product Full Name, Product — Pure Coffee, Product — Three-in-One, Product — Two-in-One, Product — Vegetable Soup, Vacancies, Vacancy — Project Manager &amp; Consultant. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="footer-1" hidden></label><button class="undo" data-slot="footer-1" title="Put everything back">Undo</button><button class="rm" data-slot="footer-1" data-pages="50" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="footer-1" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="footer-2">
+      <div class="thumbwrap"><img src="uploads/shared/footer-image-2025-07-30-10-54-22-6425.png" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">footer-2</code>
+        <p class="dims">100&times;100</p>
+        <p class="path">uploads/shared/footer-image-2025-07-30-10-54-22-6425.png</p>
+        <p class="warn">Also on About Us, Article — Delivering Freshness Across the Region, Article — Flavora Cafe Opens Its Doors, Article — Introducing Enna Soups: Authentic Taste, Ready for Ramadan, Article — Quality Begins with Every Test, Blog &amp; Events, Contact Us, Employment Application, Home Page, Our Brand — Enna, Our Brand — Flavora, Our Products, Our Team, Product — Broccoli Soup, Product — Chicken Noodle Soup, Product — Coffee Creamer, Product — Espresso Capsules, Product — Mac and Cheese, Product — Mushroom Soup, Product — Product Full Name, Product — Pure Coffee, Product — Three-in-One, Product — Two-in-One, Product — Vegetable Soup, Vacancies, Vacancy — Project Manager &amp; Consultant. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="footer-2" hidden></label><button class="undo" data-slot="footer-2" title="Put everything back">Undo</button><button class="rm" data-slot="footer-2" data-pages="50" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="footer-2" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="logo">
+      <div class="thumbwrap"><img src="uploads/shared/logo-2025-06-10-01-43-50-9143.png" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">logo</code>
+        <p class="dims">175&times;57</p>
+        <p class="path">uploads/shared/logo-2025-06-10-01-43-50-9143.png</p>
+        <p class="warn">Also on About Us, Article — Delivering Freshness Across the Region, Article — Flavora Cafe Opens Its Doors, Article — Introducing Enna Soups: Authentic Taste, Ready for Ramadan, Article — Quality Begins with Every Test, Blog &amp; Events, Contact Us, Employment Application, Home Page, Our Brand — Enna, Our Brand — Flavora, Our Products, Our Team, Product — Broccoli Soup, Product — Chicken Noodle Soup, Product — Coffee Creamer, Product — Espresso Capsules, Product — Mac and Cheese, Product — Mushroom Soup, Product — Product Full Name, Product — Pure Coffee, Product — Three-in-One, Product — Two-in-One, Product — Vegetable Soup, Vacancies, Vacancy — Project Manager &amp; Consultant. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="logo" hidden></label><button class="undo" data-slot="logo" title="Put everything back">Undo</button><button class="rm" data-slot="logo" data-pages="50" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="logo" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure>
+
+    <figure class="card" data-slot="logo-footer">
+      <div class="thumbwrap"><img src="uploads/shared/logo2-2025-06-10-01-43-51-7810.png" loading="lazy" class="thumb" alt=""></div>
+      <figcaption>
+        <code class="slot">logo-footer</code>
+        <p class="dims">263&times;87</p>
+        <p class="path">uploads/shared/logo2-2025-06-10-01-43-51-7810.png</p>
+        <p class="warn">Also on About Us, Article — Delivering Freshness Across the Region, Article — Flavora Cafe Opens Its Doors, Article — Introducing Enna Soups: Authentic Taste, Ready for Ramadan, Article — Quality Begins with Every Test, Blog &amp; Events, Contact Us, Employment Application, Home Page, Our Brand — Enna, Our Brand — Flavora, Our Products, Our Team, Product — Broccoli Soup, Product — Chicken Noodle Soup, Product — Coffee Creamer, Product — Espresso Capsules, Product — Mac and Cheese, Product — Mushroom Soup, Product — Product Full Name, Product — Pure Coffee, Product — Three-in-One, Product — Two-in-One, Product — Vegetable Soup, Vacancies, Vacancy — Project Manager &amp; Consultant. Changing it changes all of them.</p>
+        <div class="actions"><label class="pick">Change photo<input type="file" accept="image/*" data-slot="logo-footer" hidden></label><button class="undo" data-slot="logo-footer" title="Put everything back">Undo</button><button class="rm" data-slot="logo-footer" data-pages="50" title="Take the image out of the page completely">Remove</button><button class="blank" data-slot="logo-footer" title="Empty the photo but keep the space">Blank</button></div>
+        <p class="status"></p>
+      </figcaption>
+    </figure></div></section>
+
+<script>
+function cardOf(el) { return el.closest('.card'); }
+
+// Show/hide the "removed from the page" state without rebuilding the file.
+function markRemoved(card, isRemoved) {
+  card.classList.toggle('is-removed', isRemoved);
+  var badge = card.querySelector('.removed');
+  if (isRemoved && !badge) {
+    badge = document.createElement('p');
+    badge.className = 'removed';
+    badge.textContent = 'Removed from the page — press Undo to bring it back.';
+    card.querySelector('.actions').before(badge);
+  } else if (!isRemoved && badge) {
+    badge.remove();
+  }
+}
+
+// Ask the server what's currently removed, so a refresh shows the truth.
+fetch('/_state')
+  .then(function (r) { return r.json(); })
+  .then(function (s) {
+    (s.removed || []).forEach(function (slot) {
+      var card = document.querySelector('.card[data-slot="' + slot + '"]');
+      if (card) markRemoved(card, true);
+    });
+  })
+  .catch(function () { /* server not running — leave the page as generated */ });
+
+function say(card, text, kind) {
+  var s = card.querySelector('.status');
+  s.textContent = text;
+  s.className = 'status ' + (kind || '');
+}
+
+function refreshThumb(card) {
+  var img = card.querySelector('.thumb');
+  if (!img) return;
+  var base = img.getAttribute('src').split('?')[0];
+  img.setAttribute('src', base + '?t=' + Date.now());
+}
+
+function send(card, url, body) {
+  return fetch(url, body ? { method: 'POST', body: body } : { method: 'POST' })
+    .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+    .then(function (res) {
+      if (!res.ok || !res.j.ok) throw new Error(res.j.message || 'Failed');
+      say(card, res.j.message, 'ok');
+      refreshThumb(card);
+      card.classList.add('flash');
+      setTimeout(function () { card.classList.remove('flash'); }, 1500);
+    })
+    .catch(function (e) {
+      say(card, e.message || 'Could not reach the server — is start.py still running?', 'err');
+    });
+}
+
+document.querySelectorAll('input[type=file]').forEach(function (input) {
+  input.addEventListener('change', function () {
+    var file = input.files && input.files[0];
+    if (!file) return;
+    var card = cardOf(input);
+    say(card, 'Uploading ' + file.name + '...', 'busy');
+    send(card, '/_upload?slot=' + encodeURIComponent(input.dataset.slot), file)
+      .then(function () { input.value = ''; });
+  });
+});
+
+document.querySelectorAll('.undo').forEach(function (b) {
+  b.addEventListener('click', function () {
+    var card = cardOf(b);
+    say(card, 'Restoring...', 'busy');
+    send(card, '/_undo?slot=' + encodeURIComponent(b.dataset.slot), null)
+      .then(function () { markRemoved(card, false); });
+  });
+});
+
+// Take the image out of the page entirely (the layout closes up).
+document.querySelectorAll('.rm').forEach(function (b) {
+  b.addEventListener('click', function () {
+    var n = parseInt(b.dataset.pages, 10) || 1;
+    var where = n > 1 ? n + ' pages' : 'the page';
+    if (!confirm('Remove "' + b.dataset.slot + '" from ' + where + '?\n\n' +
+                 'The image disappears completely and the layout closes up.\n' +
+                 'You can put it back with Undo.')) return;
+    var card = cardOf(b);
+    say(card, 'Removing...', 'busy');
+    send(card, '/_remove?slot=' + encodeURIComponent(b.dataset.slot), null)
+      .then(function () { markRemoved(card, true); });
+  });
+});
+
+// Empty the photo but leave the space exactly as it is.
+document.querySelectorAll('.blank').forEach(function (b) {
+  b.addEventListener('click', function () {
+    if (!confirm('Blank out "' + b.dataset.slot + '"?\n\n' +
+                 'The photo becomes empty white, but the space stays the same size.\n' +
+                 'You can put it back with Undo.')) return;
+    var card = cardOf(b);
+    say(card, 'Blanking...', 'busy');
+    send(card, '/_blank?slot=' + encodeURIComponent(b.dataset.slot), null);
+  });
+});
+</script>
+</body>
+</html>

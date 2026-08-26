@@ -1,0 +1,32 @@
+# ---------------------------------------------------------------------------
+# What deliberately stays out of this repository.
+#
+# The rule is size and privacy, not tidiness. Everything needed to run the
+# site and its editing tools is tracked; nothing else is.
+# ---------------------------------------------------------------------------
+
+# Original photography and video: 3.4 GB of .ARW, .DNG and .MP4. Individual
+# files exceed GitHub's 100 MB limit, so this cannot be pushed even if it were
+# wanted. The site's images are cut from these and are tracked under uploads/.
+# The originals live on the Backup Plus drive.
+website/
+
+# Cafe playlist. Not website material.
+music/
+
+# Personal documents, notes and a WhatsApp export. Nothing here is needed to
+# build or edit the site, and it should not be shared with collaborators.
+other/
+
+# Compiled Python, regenerates itself on every run.
+__pycache__/
+*.pyc
+
+# The previous repository, kept only until the new remote is confirmed working.
+# Delete it once the first push and the first cPanel deploy have both succeeded.
+.git-OLD-archive/
+
+# Editor and OS litter
+.vscode/
+.DS_Store
+Thumbs.db

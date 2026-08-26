@@ -1,0 +1,21 @@
+{
+  "partner-9": {
+    "pages": [
+      "index.html",
+      "language-switcher?lang_code=ar.html",
+      "language-switcher?lang_code=en.html"
+    ]
+  },
+  "testimonial-logo": {
+    "pages": [
+      "index.html",
+      "language-switcher?lang_code=ar.html",
+      "language-switcher?lang_code=en.html"
+    ]
+  },
+  "team-4": {
+    "pages": [
+      "our-team.html"
+    ]
+  }
+}
