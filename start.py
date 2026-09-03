@@ -282,6 +282,13 @@ def rebuild_pages(pages):
             except Exception:
                 pass  # the page changed shape; skip rather than corrupt it
 
+        # news items live in a manifest for the same reason as products: this
+        # function restores from the pristine copy, which never had them, so
+        # without this every rebuild would silently unpublish everything that
+        # had been added.
+        if page == "blogs.html":
+            write_html(full, insert_news_cards(read_html(full)))
+
         # products live in a manifest too, so they survive the same rebuild
         if page == "listings.html":
             b = insert_product_cards(read_html(full))
@@ -951,12 +958,180 @@ def delete_product(slug):
     gone = next(p for p in items if p["slug"] == slug)
     write_products(keep)
 
+    # the -ar twin too: it is generated, so nothing else will ever clean it up,
+    # and an orphan Arabic page outlives the product it describes
     for path in (os.path.join(SITE, "listing", slug + ".html"),
+                 os.path.join(SITE, "listing", slug + "-ar.html"),
                  os.path.join(SITE, gone.get("image", ""))):
         if path and os.path.exists(path) and os.path.isfile(path):
             os.remove(path)
     rebuild_pages(["listings.html"])
     return "Removed “%s”." % gone["name"]
+
+
+# ----------------------------------------------------------------- news
+
+NEWS_JSON = os.path.join(BACKUPS, "_news.json")
+# Cloned from introducing-enna-soups.html, with one fix: the original's <h1>
+# reads "Blog Details" and demotes the real headline to a <span> inside it,
+# which the audit flagged. The template carries the headline alone, so articles
+# added from here do not inherit the bug. The underscore keeps the file out of
+# all_pages, the sitemap and the deploy glob, and .htaccess denies it.
+NEWS_TEMPLATE = os.path.join("blog", "_news-template.html")
+
+
+def read_news():
+    if os.path.exists(NEWS_JSON):
+        try:
+            with open(NEWS_JSON, encoding="utf-8") as fh:
+                return json.load(fh)
+        except Exception:
+            pass
+    return []
+
+
+def write_news(items):
+    os.makedirs(BACKUPS, exist_ok=True)
+    with open(NEWS_JSON, "w", encoding="utf-8") as fh:
+        json.dump(items, fh, indent=2, ensure_ascii=False)
+
+
+def news_card(n):
+    """One card for the Blog & Events listing, matching the four hand-built
+    ones already on the page."""
+    slug, title = _esc(n["slug"]), _esc(n["title"])
+    return (
+        '\n                <div class="col-lg-6 col-md-6">\n'
+        '                    <div class="post-item wow fadeInUp">\n'
+        '                        <div class="post-item-content">\n'
+        '                            <span class="blog-category">%s</span>\n'
+        '                            <h2><a href="blog/%s.html">%s</a></h2>\n'
+        '                            <p>%s</p>\n'
+        '                            <div class="align-items-center"> <a href="blog/%s.html" class="aa" >'
+        '<span class="bloglink">Read more</span><i class="fa-solid fa-chevron-right bb"></i></a></div>\n'
+        '                        </div>\n'
+        '                        <div class="post-featured-image">\n'
+        '                            <figure>\n'
+        '                                <a href="blog/%s.html" class="image-anime" data-cursor-text="View">\n'
+        '                                    <img src="%s" alt="%s">\n'
+        '                                </a>\n'
+        '                            </figure>\n'
+        '                       </div>\n'
+        '                    </div>\n'
+        '                </div>\n'
+        % (_esc(n.get("date", "")), slug, title, _esc(n["summary"]),
+           slug, slug, _esc(n["image"]), title))
+
+
+def insert_news_cards(body):
+    """Add every saved news item to the Blog & Events listing.
+
+    They go in at the top of the row rather than the bottom, so the newest
+    thing is the first thing read. The four original articles keep their
+    order below.
+    """
+    items = read_news()
+    if not items:
+        return body
+    cards = "".join(news_card(n) for n in reversed(items))
+    anchor = '<div class="row alignbaseline">'
+    i = body.find(anchor)
+    if i == -1:
+        return body
+    return body[:i + len(anchor)] + cards + body[i + len(anchor):]
+
+
+def build_news_page(n):
+    """Create the article's own page from the template."""
+    body = read_html(os.path.join(SITE, NEWS_TEMPLATE))
+    title, img = _esc(n["title"]), _esc(n["image"])
+
+    body = re.sub(r"<title>.*?</title>",
+                  "<title>%s | Takwa Foods</title>" % title, body, count=1, flags=re.S)
+    body = re.sub(r'(<h1 class="wow fadeInUp">).*?(</h1>)',
+                  lambda m: m.group(1) + title + m.group(2), body, count=1, flags=re.S)
+
+    # the hero, above the article body
+    body = re.sub(r'(<div class="post-image">\s*<figure[^>]*>\s*<img src=")[^"]*(" alt=")[^"]*(")',
+                  lambda m: m.group(1) + "../" + img + m.group(2) + title + m.group(3),
+                  body, count=1, flags=re.S)
+
+    paragraphs = "\n".join(
+        "<p>%s</p>" % _esc(line.strip())
+        for line in (n.get("body") or "").splitlines() if line.strip())
+    body = replace_div_contents(body, '<div class="post-entry">',
+                                " " + paragraphs + "\n ")
+
+    # the share links carry the old article's slug and headline in their URLs
+    body = re.sub(r'(https://takwafoods\.com/blog/)[a-z0-9\-]+', r'\g<1>' + n["slug"], body)
+    for key in ("&t=", "&title=", "&text="):
+        body = re.sub(re.escape(key) + r'[^"]*', key + title, body)
+
+    out = os.path.join(SITE, "blog", n["slug"] + ".html")
+    write_html(out, body)
+    return out
+
+
+def add_news(data):
+    title = (data.get("title") or "").strip()
+    if not title:
+        raise ValueError("The news item needs a headline.")
+    summary = (data.get("summary") or "").strip()
+    if not summary:
+        raise ValueError("Write a short summary — it is what shows on the listing.")
+    text = (data.get("body") or "").strip() or summary
+    date = (data.get("date") or "").strip()
+
+    items = read_news()
+    slug = slugify(title)
+    if any(n["slug"] == slug for n in items) or \
+       os.path.exists(os.path.join(SITE, "blog", slug + ".html")):
+        raise ValueError("A news item with that headline already exists.")
+
+    img_data = data.get("image") or ""
+    if not img_data.startswith("data:image"):
+        raise ValueError("Please choose a photo.")
+    import base64
+    header, b64 = img_data.split(",", 1)
+    try:
+        src = Image.open(io.BytesIO(base64.b64decode(b64)))
+        src.load()
+    except Exception:
+        raise ValueError("That photo couldn't be read. Try a JPG or PNG.")
+
+    rel = "uploads/blog/%s.webp" % slug
+    os.makedirs(os.path.join(SITE, "uploads", "blog"), exist_ok=True)
+    # 1026x618 matches the width/height the article template already declares
+    cover(flatten(src), 1026, 618).save(os.path.join(SITE, rel), quality=88, method=6)
+
+    n = {"slug": slug, "title": title, "summary": summary,
+         "body": text, "date": date, "image": rel}
+    items.append(n)
+    write_news(items)
+
+    build_news_page(n)
+    backup_page("blogs.html")
+    rebuild_pages(["blogs.html"])
+    return "Published “%s”." % title
+
+
+def delete_news(slug):
+    items = read_news()
+    keep = [n for n in items if n["slug"] != slug]
+    if len(keep) == len(items):
+        raise ValueError("No such news item.")
+    gone = next(n for n in items if n["slug"] == slug)
+    write_news(keep)
+
+    # the -ar twin too: it is generated, so nothing else will ever clean it up,
+    # and an orphan Arabic article outlives the news it reported
+    for path in (os.path.join(SITE, "blog", slug + ".html"),
+                 os.path.join(SITE, "blog", slug + "-ar.html"),
+                 os.path.join(SITE, gone.get("image", ""))):
+        if path and os.path.exists(path) and os.path.isfile(path):
+            os.remove(path)
+    rebuild_pages(["blogs.html"])
+    return "Removed “%s”." % gone["title"]
 
 
 # ------------------------------------------------------- photo proposals
@@ -1467,6 +1642,128 @@ document.getElementById('list').addEventListener('click',function(e){
 </body></html>""".replace("@@ROWS@@", rows)
 
 
+def render_add_news():
+    items = read_news()
+    rows = "".join(
+        '<tr><td><img src="/%s"></td><td><strong>%s</strong><br><span>%s</span></td>'
+        '<td>%s</td><td><a href="/blog/%s.html" target="_blank">view</a></td>'
+        '<td><button class="del" data-slug="%s">Remove</button></td></tr>'
+        % (_esc(n["image"]), _esc(n["title"]), _esc(n["summary"][:70]),
+           _esc(n.get("date", "") or "—"), _esc(n["slug"]), _esc(n["slug"]))
+        for n in reversed(items)) or '<tr><td colspan="5" class="none">No news added yet.</td></tr>'
+
+    return """<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Takwa — Add News</title>
+<style>
+ *{box-sizing:border-box}
+ body{margin:0;font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+      background:#fafaf8;color:#1e1e1e}
+ header{background:#4c9932;color:#fff;padding:26px 32px}
+ header h1{margin:0 0 6px;font-size:24px}header p{margin:0;opacity:.93;font-size:14px}
+ .wrap{margin:24px 32px 60px;max-width:1100px}
+ .card{background:#fff;border:1px solid #e2e2dc;border-radius:10px;padding:22px 24px;margin-bottom:26px}
+ h2{font-size:18px;margin:0 0 16px;border-bottom:2px solid #4c9932;padding-bottom:7px}
+ label{display:block;font-size:13px;font-weight:600;margin:14px 0 5px}
+ .hint{font-weight:400;color:#888}
+ input[type=text],textarea{width:100%;border:1px solid #cfcfc7;border-radius:6px;
+      padding:9px 11px;font:14px inherit}
+ textarea{resize:vertical}
+ input[type=file]{margin-top:6px;font-size:13px}
+ .row2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+ button{border:none;border-radius:6px;padding:10px 20px;font-size:13.5px;font-weight:600;cursor:pointer}
+ .save{background:#4c9932;color:#fff;margin-top:20px}
+ .save:hover{background:#3d7a28}
+ .del{background:#fff;border:1px solid #e0c0bc;color:#a33b2c;padding:6px 12px;font-size:12px}
+ .del:hover{background:#fdf0ee}
+ table{width:100%;border-collapse:collapse;font-size:13.5px}
+ td{border-top:1px solid #eee;padding:9px 8px;vertical-align:middle}
+ td img{width:78px;height:47px;object-fit:cover;border-radius:5px;background:#f0f0ea;display:block}
+ td span{color:#888;font-size:12px}
+ .none{color:#999;text-align:center;padding:22px}
+ #status{margin-top:14px;font-size:13px;min-height:1px}
+ #status.ok{color:#2f6b1e}#status.err{color:#b3261e}#status.busy{color:#777}
+ #preview{max-width:230px;border-radius:8px;margin-top:10px;display:none}
+ .note{background:#f4f8f2;border-left:3px solid #4c9932;padding:11px 14px;
+       font-size:13px;color:#4a5a45;margin:0 0 20px;border-radius:0 6px 6px 0}
+</style></head><body>
+<header><h1>Add News</h1>
+<p>Creates the article's own page and puts it at the top of Blog &amp; Events.</p></header>
+<div class="wrap">
+
+ <p class="note">The Arabic version is generated automatically, but it starts as
+ the English text. Open the Arabic text index afterwards to translate it.</p>
+
+ <div class="card">
+  <h2>New news item</h2>
+  <div class="row2">
+   <div>
+    <label>Headline</label>
+    <input type="text" id="title" placeholder="e.g. Takwa Opens New Production Line">
+    <label>Date <span class="hint">(shown on the card, optional)</span></label>
+    <input type="text" id="date" placeholder="e.g. September 2026">
+    <label>Photo</label>
+    <input type="file" id="image" accept="image/*">
+    <img id="preview">
+   </div>
+   <div>
+    <label>Summary <span class="hint">(one or two lines, shown on the listing)</span></label>
+    <textarea id="summary" rows="3"></textarea>
+    <label>Article <span class="hint">(one paragraph per line)</span></label>
+    <textarea id="body" rows="11" placeholder="Leave a blank line between paragraphs if you like — each line becomes its own paragraph."></textarea>
+   </div>
+  </div>
+  <button class="save" id="save">Publish news item</button>
+  <p id="status"></p>
+ </div>
+
+ <div class="card">
+  <h2>News you've added</h2>
+  <table><tbody id="list">@@ROWS@@</tbody></table>
+ </div>
+</div>
+
+<script>
+var imgData="";
+document.getElementById('image').addEventListener('change',function(e){
+  var f=e.target.files[0]; if(!f) return;
+  var r=new FileReader();
+  r.onload=function(){ imgData=r.result;
+    var p=document.getElementById('preview'); p.src=r.result; p.style.display='block'; };
+  r.readAsDataURL(f);
+});
+function say(t,k){var s=document.getElementById('status');s.textContent=t;s.className=k||'';}
+document.getElementById('save').addEventListener('click',function(){
+  var body={title:document.getElementById('title').value,
+            date:document.getElementById('date').value,
+            summary:document.getElementById('summary').value,
+            body:document.getElementById('body').value,
+            image:imgData};
+  if(!body.title.trim()){say('Give the news item a headline first.','err');return;}
+  if(!body.summary.trim()){say('Write a short summary — it is what shows on the listing.','err');return;}
+  if(!imgData){say('Choose a photo first.','err');return;}
+  say('Publishing...','busy');
+  fetch('/_add_news',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(body)})
+   .then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j};});})
+   .then(function(res){
+      if(!res.ok||!res.j.ok) throw new Error(res.j.message||'Failed');
+      say(res.j.message+' Reloading...','ok');
+      setTimeout(function(){location.reload();},900);
+   }).catch(function(e){say(e.message,'err');});
+});
+document.getElementById('list').addEventListener('click',function(e){
+  var b=e.target.closest('.del'); if(!b) return;
+  if(!confirm('Remove this news item? Its page and photo will be deleted.')) return;
+  fetch('/_delete_news?slug='+encodeURIComponent(b.dataset.slug),{method:'POST'})
+   .then(function(r){return r.json();})
+   .then(function(j){ say(j.message||'Removed','ok'); setTimeout(function(){location.reload();},700); })
+   .catch(function(){ say('Could not remove it.','err'); });
+});
+</script>
+</body></html>""".replace("@@ROWS@@", rows)
+
+
 class Handler(SimpleHTTPRequestHandler):
     def __init__(self, *a, **kw):
         super().__init__(*a, directory=SITE, **kw)
@@ -1493,6 +1790,15 @@ class Handler(SimpleHTTPRequestHandler):
         if path == "/_state":
             # what the page needs to show current state without being regenerated
             return self._json(200, {"ok": True, "removed": sorted(read_manifest().keys())})
+
+        if path == "/_add-news.html":
+            body = render_add_news().encode("utf-8")
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+            return
 
         if path == "/_add-product.html":
             body = render_add_product().encode("utf-8")
@@ -1611,6 +1917,13 @@ class Handler(SimpleHTTPRequestHandler):
         slot = (query.get("slot") or [""])[0]
 
         try:
+            if parsed.path == "/_add_news":
+                return self._json(200, {"ok": True, "message": add_news(self._json_body())})
+
+            if parsed.path == "/_delete_news":
+                slug = (query.get("slug") or [""])[0]
+                return self._json(200, {"ok": True, "message": delete_news(slug)})
+
             if parsed.path == "/_add_product":
                 return self._json(200, {"ok": True, "message": add_product(self._json_body())})
 
@@ -1716,6 +2029,7 @@ if __name__ == "__main__":
     print("  Edit Arabic text:   http://localhost:%d/_text-index-ar.html" % PORT)
     print("  Photo proposal:     http://localhost:%d/_photo-proposal.html" % PORT)
     print("  Add a product:      http://localhost:%d/_add-product.html" % PORT)
+    print("  Add news:           http://localhost:%d/_add-news.html" % PORT)
     print("  From another device: http://%s:%d/_photo-index.html" % (lan_ip(), PORT))
     print("                   or: http://%s:%d/_text-index.html" % (lan_ip(), PORT))
     print("\n  See the site itself: http://localhost:%d/\n" % PORT)

@@ -46,22 +46,28 @@ PAGES = [
 
 # Detail pages, linked from the listing and blog grids above. They are built
 # the same way; they are listed apart only because the grids link into them.
-DETAIL_PAGES = [
-    "listing/mushroom-soup.html",
-    "listing/chicken-noodle-soup.html",
-    "listing/broccoli-soup.html",
-    "listing/vegetable-soup.html",
-    "listing/three-in-one.html",
-    "listing/two-in-one.html",
-    "listing/pure-coffee.html",
-    "listing/coffee-creamer.html",
-    "listing/espresso-capsules.html",
-    "blog/quality-begins-with-every-test.html",
-    "blog/delivering-freshness-across-the-region.html",
-    "blog/flavora-cafe-opens-its-doors.html",
-    "blog/introducing-enna-soups.html",
-    "career/project-manager-consultant.html",
-]
+#
+# Discovered from disk rather than listed by hand. A hardcoded list meant a
+# product or news item added through the tool got an English page and no
+# Arabic one -- silently, because nothing here knew the file existed. The
+# English and Arabic sites then disagreed about what the company sells.
+#
+# Skipped: files already ending -ar.html (they are the output), and anything
+# starting with _ (templates and tooling, never pages).
+def _detail_pages():
+    found = []
+    for folder in ("listing", "blog", "career"):
+        d = os.path.join(SITE, folder)
+        if not os.path.isdir(d):
+            continue
+        for name in sorted(os.listdir(d)):
+            if (name.endswith(".html") and not name.endswith("-ar.html")
+                    and not name.startswith("_")):
+                found.append("%s/%s" % (folder, name))
+    return found
+
+
+DETAIL_PAGES = _detail_pages()
 
 ALL_PAGES = PAGES + DETAIL_PAGES
 
