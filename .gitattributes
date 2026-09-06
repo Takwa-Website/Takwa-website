@@ -1,0 +1,24 @@
+# ---------------------------------------------------------------------------
+# Line endings.
+#
+# Batch files must keep CRLF. With LF endings cmd.exe mishandles labels and
+# goto, so takwa-tools.bat would fail on Windows in a way that looks like the
+# script is broken rather than the checkout being wrong.
+#
+# Shell scripts must keep LF. A .sh with CRLF fails with the classic
+# "bad interpreter: /usr/bin/env bash^M".
+# ---------------------------------------------------------------------------
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+*.sh  text eol=lf
+*.py  text eol=lf
+
+# The site's own files were scraped with mixed endings and the tooling reads
+# and writes them byte-for-byte on purpose. Git must not rewrite them, or every
+# rebuild produces a diff of the whole file.
+*.html -text
+*.css  -text
+*.js   -text
+*.json -text
