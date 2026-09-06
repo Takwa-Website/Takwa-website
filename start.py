@@ -1797,6 +1797,22 @@ def git_publish(message):
                 '  git config --global user.email "you@example.com"')
         raise ValueError("Could not save the changes.\n\n" + out)
 
+    # Catch up with anything published elsewhere before sending. Without this,
+    # any change made on another computer since this copy was cloned makes the
+    # push bounce, and the person is left with committed work they cannot send
+    # and no way forward that does not involve a terminal.
+    #
+    # --rebase replays this work on top of the newer history rather than making
+    # a merge commit; --autostash covers anything still unstaged.
+    ok, out = _git(["pull", "--rebase", "--autostash"], timeout=180)
+    if not ok:
+        _git(["rebase", "--abort"])          # leave the copy usable
+        raise ValueError(
+            "Your work is saved on this computer, but it could not be combined "
+            "with a change someone else made to the same thing.\n\n"
+            "Nothing is lost. Send George this message and he will sort it "
+            "out.\n\n" + out)
+
     ok, out = _git(["push"], timeout=180)
     if not ok:
         low = out.lower()
@@ -1808,10 +1824,9 @@ def git_publish(message):
                 "been lost.\n\n" + out)
         if "rejected" in low or "non-fast-forward" in low or "behind" in low:
             raise ValueError(
-                "Someone else changed the website since you started, so this "
-                "could not be sent yet. Your work is saved on this computer "
-                "and nothing is lost — tell George rather than pressing "
-                "Publish again.\n\n" + out)
+                "Someone published something in the last few seconds, so this "
+                "could not be sent. Your work is saved — press Publish again "
+                "in a moment.\n\n" + out)
         raise ValueError("Saved on this computer, but could not reach GitHub."
                          "\n\n" + out)
 

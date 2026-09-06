@@ -65,7 +65,17 @@ REM --- 3. The website -------------------------------------------------------
 if exist "%DEST%\start.py" (
     echo   [ok] Website folder already here - updating it
     pushd "%DEST%"
-    git pull
+    REM --rebase keeps any unsent work on top of the newer history instead of
+    REM opening a merge-message editor, which a plain "git pull" does and which
+    REM drops a non-technical person into vim. --autostash covers edits that
+    REM were never published.
+    git pull --rebase --autostash
+    if errorlevel 1 (
+        echo.
+        echo   [!] Could not update cleanly. Nothing was lost.
+        echo       Send George a photo of this window.
+        echo.
+    )
     popd
 ) else (
     echo   [..] Downloading the website, this takes a minute
