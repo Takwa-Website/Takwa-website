@@ -13,32 +13,58 @@ You need **Python 3** and **Git**. One extra library:
 pip install Pillow
 ```
 
-Then, from this folder:
+## Starting the tools
 
-```bash
-python3 start.py
-```
+**Just double-click the launcher.** It starts the server and opens the browser.
 
-Open **http://localhost:8099**. That is the whole site running on your machine.
-Nothing you do there touches the live website.
+| | |
+|---|---|
+| Linux | `takwa-tools.sh`, or **Takwa Website Editor** in the applications menu |
+| Windows | `takwa-tools.bat` |
 
-Stop the server with `Ctrl+C`.
+Running it twice is safe — it notices the server is already up and just opens
+the browser.
+
+To stop: `takwa-tools-stop.sh` on Linux, or close the minimised Python window
+on Windows.
+
+If you would rather use a terminal, `python3 start.py` from this folder does
+the same thing, and `Ctrl+C` stops it.
+
+Either way the tools are at **http://localhost:8099**. That is the whole site
+running on your own machine — nothing you do there touches the live website
+until someone deploys.
 
 ---
 
-## The two editing tools
+## The four editing tools
 
-Both are ordinary pages served by `start.py`, and both save straight to disk.
+All are ordinary pages served by `start.py`, and all save straight to disk.
 
-**http://localhost:8099/_photo-index.html** — every image on the site in one
-place. Swap a photo, and it is replaced everywhere it appears.
+**/_photo-index.html** — every image on the site in one place. Swap a photo and
+it is replaced everywhere it appears.
 
-**http://localhost:8099/_text-index-ar.html** — every piece of Arabic text,
-next to its English original. Fix a translation here rather than editing the
-`-ar.html` pages by hand.
+**/_text-index-ar.html** — every piece of Arabic text next to its English
+original. Fix a translation here rather than editing the `-ar.html` pages by
+hand.
+
+**/_add-product.html** — adds a product. Creates its page, its card on Our
+Products, and its Arabic version.
+
+**/_add-news.html** — adds a news item. Creates the article page, puts a card
+at the top of Blog & Events, and makes the Arabic version. Write one paragraph
+per line.
+
+Both "add" tools generate the Arabic page from the English text, so it starts
+out in English. Open the Arabic text index afterwards and translate it.
 
 These pages start with `_`, which keeps them off the live site: the deploy
 script skips them and `.htaccess` denies them.
+
+**They only run on your machine, and that is deliberate.** They write files, so
+putting them on the public server would mean a password away from someone
+writing arbitrary files into the web root. Anything you publish goes out the
+same way as everything else — commit, push, and George deploys.
 
 ---
 
