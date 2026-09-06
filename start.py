@@ -17,6 +17,7 @@ import os
 import re
 import shutil
 import socket
+import subprocess
 import sys
 import urllib.parse
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -1642,6 +1643,190 @@ document.getElementById('list').addEventListener('click',function(e){
 </body></html>""".replace("@@ROWS@@", rows)
 
 
+# --------------------------------------------------------------- publishing
+#
+# The point of this section is that editing the website should not require
+# knowing what git is. The tools already write files; these functions send
+# those files to GitHub, so the whole job is "edit, then press Publish".
+#
+# Publishing does NOT put anything on takwafoods.com. It uploads the work to
+# GitHub, where George deploys it from cPanel. Saying so plainly in the UI
+# matters: someone who believes Publish means "live" will press it and then
+# panic about a typo that is not actually public.
+
+FRIENDLY_NAMES = [
+    ("uploads/",         "photo"),
+    ("blog/",            "news article"),
+    ("listing/",         "product page"),
+    ("_photo-backups/",  "internal record"),
+    (".html",            "page"),
+]
+
+
+def _git(args, timeout=90):
+    """Run git in the repository and return (ok, output)."""
+    try:
+        r = subprocess.run(["git"] + args, cwd=ROOT, capture_output=True,
+                           text=True, timeout=timeout)
+        return r.returncode == 0, (r.stdout + r.stderr).strip()
+    except FileNotFoundError:
+        return False, ("Git is not installed on this computer. "
+                       "Install it from git-scm.com, then restart the tools.")
+    except subprocess.TimeoutExpired:
+        return False, "Git took too long and was stopped."
+
+
+def describe_change(path):
+    """Turn a file path into something a non-technical person can check."""
+    for prefix, label in FRIENDLY_NAMES:
+        if path.startswith(prefix) or path.endswith(prefix):
+            name = os.path.basename(path).replace("-", " ")
+            for ext in (".html", ".webp", ".jpg", ".png", ".json"):
+                name = name.replace(ext, "")
+            return "%s — %s" % (label, name)
+    return path
+
+
+def git_changes():
+    """What is waiting to be published."""
+    ok, out = _git(["status", "--porcelain"])
+    if not ok:
+        return {"ok": False, "message": out, "files": []}
+    files = []
+    for line in out.splitlines():
+        line = line.rstrip()
+        if len(line) < 4:
+            continue
+        path = line[3:].strip().strip('"')
+        files.append({"path": path, "what": describe_change(path)})
+    return {"ok": True, "files": files}
+
+
+def git_publish(message):
+    """Commit everything and push it to GitHub."""
+    changes = git_changes()
+    if not changes["ok"]:
+        raise ValueError(changes["message"])
+    if not changes["files"]:
+        raise ValueError("Nothing has changed, so there is nothing to publish.")
+
+    message = (message or "").strip() or "Website update"
+
+    ok, out = _git(["add", "-A"])
+    if not ok:
+        raise ValueError("Could not stage the changes.\n\n" + out)
+
+    ok, out = _git(["commit", "-m", message])
+    if not ok and "nothing to commit" not in out.lower():
+        # the usual cause is git never being told who is making the change
+        if "please tell me who you are" in out.lower() or "user.email" in out.lower():
+            raise ValueError(
+                "Git does not know who you are yet. Run these two lines once, "
+                "in a terminal, with your own name and email:\n\n"
+                '  git config --global user.name "Your Name"\n'
+                '  git config --global user.email "you@example.com"')
+        raise ValueError("Could not save the changes.\n\n" + out)
+
+    ok, out = _git(["push"], timeout=180)
+    if not ok:
+        low = out.lower()
+        if "authentication" in low or "could not read" in low or "403" in low:
+            raise ValueError(
+                "Your work is saved on this computer, but GitHub would not "
+                "accept it — it did not recognise the sign-in.\n\n"
+                "Sign in to GitHub once and press Publish again. Nothing has "
+                "been lost.\n\n" + out)
+        if "rejected" in low or "non-fast-forward" in low or "behind" in low:
+            raise ValueError(
+                "Someone else changed the website since you started, so this "
+                "could not be sent yet. Your work is saved on this computer "
+                "and nothing is lost — tell George rather than pressing "
+                "Publish again.\n\n" + out)
+        raise ValueError("Saved on this computer, but could not reach GitHub."
+                         "\n\n" + out)
+
+    n = len(changes["files"])
+    return "Published %d change%s. Tell George so he can put it on the website." % (
+        n, "" if n == 1 else "s")
+
+
+# The bar is injected into every tool page rather than living on a page of its
+# own, so Publish is where the work happens and cannot be forgotten.
+PUBLISH_BAR = """
+<style>
+ #tk-pub{position:fixed;left:0;right:0;bottom:0;z-index:99999;
+   background:#20301c;color:#eaf3e6;font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+   box-shadow:0 -2px 14px rgba(0,0,0,.22);padding:11px 18px;
+   display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+ #tk-pub b{font-weight:600}
+ #tk-pub .grow{flex:1 1 auto;min-width:120px}
+ #tk-pub button{border:none;border-radius:6px;padding:9px 18px;font:600 13.5px inherit;cursor:pointer}
+ #tk-pub .go{background:#73ED7C;color:#12300f}
+ #tk-pub .go:disabled{background:#5b6b57;color:#b9c7b5;cursor:default}
+ #tk-pub .ghost{background:transparent;color:#cfe3ca;border:1px solid #4a6144}
+ #tk-pub .msg{font-size:13px;opacity:.95}
+ #tk-pub .msg.err{color:#ffb4a8}#tk-pub .msg.ok{color:#a8f0a4}
+ #tk-list{position:fixed;left:0;right:0;bottom:52px;z-index:99998;max-height:44vh;overflow:auto;
+   background:#16210f;color:#dce9d7;padding:14px 18px;display:none;
+   font:13px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+   border-top:1px solid #33482c}
+ #tk-list ul{margin:6px 0 0;padding-left:18px}
+ body{padding-bottom:64px}
+</style>
+<div id="tk-list"></div>
+<div id="tk-pub">
+  <span class="grow"><b id="tk-count">Checking…</b>
+    <span class="msg" id="tk-msg"></span></span>
+  <button class="ghost" id="tk-see">See what changed</button>
+  <button class="go" id="tk-go" disabled>Publish</button>
+</div>
+<script>
+(function(){
+ var count=document.getElementById('tk-count'), msg=document.getElementById('tk-msg'),
+     go=document.getElementById('tk-go'), see=document.getElementById('tk-see'),
+     list=document.getElementById('tk-list'), files=[];
+ function say(t,k){ msg.textContent=t?(' — '+t):''; msg.className='msg'+(k?' '+k:''); }
+ function refresh(){
+   fetch('/_changes').then(function(r){return r.json();}).then(function(j){
+     files=j.files||[];
+     if(!j.ok){ count.textContent='Cannot check'; say(j.message||'','err'); return; }
+     if(!files.length){ count.textContent='Nothing to publish'; go.disabled=true; return; }
+     count.textContent=files.length+' change'+(files.length===1?'':'s')+' ready';
+     go.disabled=false;
+   }).catch(function(){ count.textContent='Cannot check'; });
+ }
+ see.addEventListener('click',function(){
+   if(list.style.display==='block'){ list.style.display='none'; return; }
+   list.innerHTML='<b>These will be sent:</b><ul>'+
+     (files.length?files.map(function(f){return '<li>'+f.what+'</li>';}).join('')
+                  :'<li>nothing</li>')+'</ul>';
+   list.style.display='block';
+ });
+ go.addEventListener('click',function(){
+   var what=prompt('Briefly, what did you change?\\n\\n(This is just a note so it can be found later.)','Website update');
+   if(what===null) return;
+   go.disabled=true; list.style.display='none'; say('Sending…');
+   fetch('/_publish',{method:'POST',headers:{'Content-Type':'application/json'},
+         body:JSON.stringify({message:what})})
+    .then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j};});})
+    .then(function(res){
+       if(!res.ok||!res.j.ok) throw new Error(res.j.message||'Failed');
+       count.textContent='Published'; say(res.j.message,'ok');
+       setTimeout(refresh,2500);
+    }).catch(function(e){ alert(e.message); say('Not sent','err'); go.disabled=false; });
+ });
+ refresh(); setInterval(refresh,20000);
+})();
+</script>
+"""
+
+
+def with_publish_bar(html):
+    if "</body>" not in html:
+        return html + PUBLISH_BAR
+    return html.replace("</body>", PUBLISH_BAR + "\n</body>", 1)
+
+
 def render_add_news():
     items = read_news()
     rows = "".join(
@@ -1791,8 +1976,26 @@ class Handler(SimpleHTTPRequestHandler):
             # what the page needs to show current state without being regenerated
             return self._json(200, {"ok": True, "removed": sorted(read_manifest().keys())})
 
+        if path == "/_changes":
+            return self._json(200, git_changes())
+
+        # The tool pages are static files on disk. Serving them through here
+        # rather than letting SimpleHTTPRequestHandler do it is what puts the
+        # Publish bar on every one of them, including ones added later.
+        if re.fullmatch(r"/_[a-z0-9\-]+\.html", path):
+            disk = os.path.join(SITE, path.lstrip("/"))
+            if os.path.exists(disk):
+                body = with_publish_bar(read_html(disk)).encode("utf-8", "replace")
+                self.send_response(200)
+                self.send_header("Content-Type", "text/html; charset=utf-8")
+                self.send_header("Content-Length", str(len(body)))
+                self.send_header("Cache-Control", "no-store")
+                self.end_headers()
+                self.wfile.write(body)
+                return
+
         if path == "/_add-news.html":
-            body = render_add_news().encode("utf-8")
+            body = with_publish_bar(render_add_news()).encode("utf-8")
             self.send_response(200)
             self.send_header("Content-Type", "text/html; charset=utf-8")
             self.send_header("Content-Length", str(len(body)))
@@ -1801,7 +2004,7 @@ class Handler(SimpleHTTPRequestHandler):
             return
 
         if path == "/_add-product.html":
-            body = render_add_product().encode("utf-8")
+            body = with_publish_bar(render_add_product()).encode("utf-8")
             self.send_response(200)
             self.send_header("Content-Type", "text/html; charset=utf-8")
             self.send_header("Content-Length", str(len(body)))
@@ -1917,6 +2120,11 @@ class Handler(SimpleHTTPRequestHandler):
         slot = (query.get("slot") or [""])[0]
 
         try:
+            if parsed.path == "/_publish":
+                body = self._json_body()
+                return self._json(200, {"ok": True,
+                                        "message": git_publish(body.get("message", ""))})
+
             if parsed.path == "/_add_news":
                 return self._json(200, {"ok": True, "message": add_news(self._json_body())})
 
