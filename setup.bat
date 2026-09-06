@@ -90,21 +90,43 @@ if errorlevel 1 (
 echo   [ok] Image library ready
 
 REM --- 5. Desktop icon ------------------------------------------------------
+REM Errors are NOT hidden here. An earlier version sent them to nul and then
+REM printed "[ok]" regardless, so a failed shortcut looked like a success and
+REM the person was left hunting the desktop for an icon that was never made.
+REM GetFolderPath('Desktop') is used rather than %USERPROFILE%\Desktop because
+REM OneDrive relocates the desktop and the literal path is then wrong.
 powershell -NoProfile -ExecutionPolicy Bypass -Command ^
   "$d=[Environment]::GetFolderPath('Desktop');" ^
   "$s=(New-Object -ComObject WScript.Shell).CreateShortcut((Join-Path $d 'Takwa Website Editor.lnk'));" ^
   "$s.TargetPath='%DEST%\takwa-tools.bat';" ^
   "$s.WorkingDirectory='%DEST%';" ^
   "$s.Description='Edit the Takwa website';" ^
-  "$s.Save();" >nul 2>&1
-echo   [ok] Icon placed on the desktop
+  "$s.Save();" ^
+  "if(Test-Path (Join-Path $d 'Takwa Website Editor.lnk')){exit 0}else{exit 1}"
+
+if errorlevel 1 (
+    echo   [!] Could not put an icon on the desktop.
+    echo.
+    echo       Do it by hand, it takes a moment:
+    echo         1. Open  %DEST%
+    echo         2. Right-click  takwa-tools.bat
+    echo         3. Send to  ^>  Desktop ^(create shortcut^)
+    echo.
+    echo       Opening the folder for you now...
+    start "" "%DEST%"
+) else (
+    echo   [ok] Icon placed on the desktop
+)
 
 echo.
 echo   ============================================
 echo      Done.
 echo   ============================================
 echo.
-echo   From now on, just double-click "Takwa Website Editor"
-echo   on your desktop. You will not need this setup file again.
+echo   From now on, double-click "Takwa Website Editor".
+echo   You will not need this setup file again.
+echo.
+echo   The website itself is in:
+echo     %DEST%
 echo.
 pause
