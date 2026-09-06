@@ -1742,6 +1742,36 @@ def git_changes():
     return {"ok": True, "files": files}
 
 
+def git_identity():
+    """Who git thinks is making the changes.
+
+    Git refuses to commit without this, and the stock error tells people to run
+    two terminal commands. The whole point of the Publish button is that there
+    is no terminal, so the tools ask in the browser instead.
+    """
+    ok_n, name = _git(["config", "user.name"])
+    ok_e, email = _git(["config", "user.email"])
+    name = name.strip() if ok_n else ""
+    email = email.strip() if ok_e else ""
+    return {"ok": True, "set": bool(name and email), "name": name, "email": email}
+
+
+def set_git_identity(name, email):
+    name = (name or "").strip()
+    email = (email or "").strip()
+    if not name:
+        raise ValueError("Please give a name.")
+    if "@" not in email or "." not in email.split("@")[-1]:
+        raise ValueError("That does not look like an email address.")
+    # --global, so it is set once per computer rather than once per copy of
+    # the website
+    for key, value in (("user.name", name), ("user.email", email)):
+        ok, out = _git(["config", "--global", key, value])
+        if not ok:
+            raise ValueError("Could not save that.\n\n" + out)
+    return "Thanks — your changes will be signed as %s." % name
+
+
 def git_publish(message):
     """Commit everything and push it to GitHub."""
     changes = git_changes()
@@ -1842,18 +1872,35 @@ PUBLISH_BAR = """
                   :'<li>nothing</li>')+'</ul>';
    list.style.display='block';
  });
+ function ensureIdentity(){
+   return fetch('/_identity').then(function(r){return r.json();}).then(function(j){
+     if(j.set) return true;
+     var n=prompt('Before your first publish:\\n\\nWhat is your name? (it is recorded against your changes)');
+     if(!n) return false;
+     var e=prompt('And your email address?');
+     if(!e) return false;
+     return fetch('/_identity',{method:'POST',headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({name:n,email:e})})
+       .then(function(r){return r.json().then(function(k){return {ok:r.ok,k:k};});})
+       .then(function(res){ if(!res.ok||!res.k.ok) throw new Error(res.k.message||'Failed');
+                            return true; });
+   });
+ }
  go.addEventListener('click',function(){
    var what=prompt('Briefly, what did you change?\\n\\n(This is just a note so it can be found later.)','Website update');
    if(what===null) return;
    go.disabled=true; list.style.display='none'; say('Sending…');
-   fetch('/_publish',{method:'POST',headers:{'Content-Type':'application/json'},
+   ensureIdentity().then(function(okid){
+    if(!okid){ say('Not sent','err'); go.disabled=false; return; }
+    return fetch('/_publish',{method:'POST',headers:{'Content-Type':'application/json'},
          body:JSON.stringify({message:what})})
     .then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j};});})
     .then(function(res){
        if(!res.ok||!res.j.ok) throw new Error(res.j.message||'Failed');
        count.textContent='Published'; say(res.j.message,'ok');
        setTimeout(refresh,2500);
-    }).catch(function(e){ alert(e.message); say('Not sent','err'); go.disabled=false; });
+    });
+   }).catch(function(e){ alert(e.message); say('Not sent','err'); go.disabled=false; });
  });
  refresh(); setInterval(refresh,20000);
 })();
@@ -2019,6 +2066,9 @@ class Handler(SimpleHTTPRequestHandler):
         if path == "/_changes":
             return self._json(200, git_changes())
 
+        if path == "/_identity":
+            return self._json(200, git_identity())
+
         # The tool pages are static files on disk. Serving them through here
         # rather than letting SimpleHTTPRequestHandler do it is what puts the
         # Publish bar on every one of them, including ones added later.
@@ -2160,6 +2210,11 @@ class Handler(SimpleHTTPRequestHandler):
         slot = (query.get("slot") or [""])[0]
 
         try:
+            if parsed.path == "/_identity":
+                b = self._json_body()
+                return self._json(200, {"ok": True,
+                    "message": set_git_identity(b.get("name", ""), b.get("email", ""))})
+
             if parsed.path == "/_publish":
                 body = self._json_body()
                 return self._json(200, {"ok": True,
