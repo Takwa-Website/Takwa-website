@@ -1671,10 +1671,14 @@ def _git(args, timeout=90):
     quotepath is off so an Arabic or accented filename comes back as itself
     rather than as \\330\\247 escapes, which would be shown to the user.
     """
+    # GIT_EDITOR=true: a git command that wants a message must never open an
+    # editor here. There is no terminal attached, so vim would block forever
+    # and the button would appear to hang.
+    env = dict(os.environ, GIT_EDITOR="true", GIT_TERMINAL_PROMPT="0")
     try:
         r = subprocess.run(["git", "-c", "core.quotepath=false"] + args,
                            cwd=ROOT, capture_output=True, text=True,
-                           timeout=timeout)
+                           timeout=timeout, env=env)
         return r.returncode == 0, (r.stdout + r.stderr).strip()
     except FileNotFoundError:
         return False, ("Git is not installed on this computer. "

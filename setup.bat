@@ -37,6 +37,15 @@ if errorlevel 1 (
 )
 echo   [ok] Git is installed
 
+REM Never open an editor. Git's default merge behaviour launches vim to ask for
+REM a merge message, which strands anyone who does not know that ":wq" is the
+REM way out -- it happened on this setup's first run. rebase avoids the merge
+REM commit entirely, and the editor settings are a belt-and-braces guard for
+REM any other command that would otherwise prompt.
+git config --global pull.rebase true          >nul 2>&1
+git config --global core.editor "true"        >nul 2>&1
+git config --global merge.ours.driver true    >nul 2>&1
+
 REM --- 2. Python ------------------------------------------------------------
 REM "where python" is not a real test: Windows ships a stub at that name that
 REM only opens the Microsoft Store. Ask for a version instead.
