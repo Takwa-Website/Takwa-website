@@ -1655,19 +1655,26 @@ document.getElementById('list').addEventListener('click',function(e){
 # panic about a typo that is not actually public.
 
 FRIENDLY_NAMES = [
-    ("uploads/",         "photo"),
-    ("blog/",            "news article"),
-    ("listing/",         "product page"),
-    ("_photo-backups/",  "internal record"),
-    (".html",            "page"),
+    ("uploads/products/", "product photo"),
+    ("uploads/blog/",     "news photo"),
+    ("uploads/",          "photo"),
+    ("blog/",             "news article"),
+    ("listing/",          "product page"),
+    ("_photo-backups/",   "internal record"),
+    ("frontend/",         "styling"),
 ]
 
 
 def _git(args, timeout=90):
-    """Run git in the repository and return (ok, output)."""
+    """Run git in the repository and return (ok, output).
+
+    quotepath is off so an Arabic or accented filename comes back as itself
+    rather than as \\330\\247 escapes, which would be shown to the user.
+    """
     try:
-        r = subprocess.run(["git"] + args, cwd=ROOT, capture_output=True,
-                           text=True, timeout=timeout)
+        r = subprocess.run(["git", "-c", "core.quotepath=false"] + args,
+                           cwd=ROOT, capture_output=True, text=True,
+                           timeout=timeout)
         return r.returncode == 0, (r.stdout + r.stderr).strip()
     except FileNotFoundError:
         return False, ("Git is not installed on this computer. "
@@ -1677,27 +1684,60 @@ def _git(args, timeout=90):
 
 
 def describe_change(path):
-    """Turn a file path into something a non-technical person can check."""
+    """Turn a file path into something a non-technical person can check.
+
+    Matched against the path inside the website folder, not the repository
+    root: every site file is prefixed "Takwafoods web/takwaweb…/", so testing
+    the start of the raw path never matches anything.
+    """
+    inner = path.replace("\\", "/")
+    marker = "takwaweb.designersidhost.com/"
+    if marker in inner:
+        inner = inner.split(marker, 1)[1]
+
+    name = os.path.basename(inner)
+    for ext in (".html", ".webp", ".jpg", ".jpeg", ".png", ".json", ".css", ".js"):
+        if name.endswith(ext):
+            name = name[: -len(ext)]
+            break
+    name = name.replace("-", " ").replace("_", " ").strip() or inner
+
     for prefix, label in FRIENDLY_NAMES:
-        if path.startswith(prefix) or path.endswith(prefix):
-            name = os.path.basename(path).replace("-", " ")
-            for ext in (".html", ".webp", ".jpg", ".png", ".json"):
-                name = name.replace(ext, "")
+        if inner.startswith(prefix):
             return "%s — %s" % (label, name)
+    if inner.endswith(".html") or "/" not in inner and inner != path:
+        return "page — %s" % name
     return path
 
 
 def git_changes():
-    """What is waiting to be published."""
-    ok, out = _git(["status", "--porcelain"])
-    if not ok:
-        return {"ok": False, "message": out, "files": []}
+    """What is waiting to be published.
+
+    -z gives NUL-separated records, so a filename containing a space -- and
+    this repository has "Takwafoods web" in every path -- cannot be split in
+    the wrong place. Each record is two status characters, a space, then the
+    path, so the path always begins at index 3.
+    """
+    try:
+        r = subprocess.run(["git", "-c", "core.quotepath=false", "status",
+                            "--porcelain", "--no-renames", "-z"],
+                           cwd=ROOT, capture_output=True, timeout=90)
+    except FileNotFoundError:
+        return {"ok": False, "files": [],
+                "message": "Git is not installed on this computer. "
+                           "Install it from git-scm.com, then restart the tools."}
+    except subprocess.TimeoutExpired:
+        return {"ok": False, "files": [], "message": "Git took too long."}
+
+    if r.returncode != 0:
+        return {"ok": False, "files": [],
+                "message": (r.stderr or b"").decode("utf-8", "replace").strip()}
+
     files = []
-    for line in out.splitlines():
-        line = line.rstrip()
-        if len(line) < 4:
+    for record in r.stdout.decode("utf-8", "replace").split("\0"):
+        if len(record) < 4:
             continue
-        path = line[3:].strip().strip('"')
+        path = record[3:]
         files.append({"path": path, "what": describe_change(path)})
     return {"ok": True, "files": files}
 
