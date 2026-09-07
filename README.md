@@ -66,6 +66,11 @@ Products, and its Arabic version. Pick **Enna** or **Flavora Cafe** from the
 Brand list and it is listed on that brand's own page as well; leave it as
 *None* and it appears under Our Products only.
 
+Each product in the list underneath has an **Edit** button. It loads the
+product into the form; leave the photo empty to keep the current one. The
+web address never changes, even if you rename the product, so no existing link
+breaks. Changing the Brand moves it between brand pages.
+
 **/_add-news.html** — adds a news item. Creates the article page, puts a card
 at the top of Blog & Events, and makes the Arabic version. Write one paragraph
 per line.

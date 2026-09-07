@@ -972,6 +972,139 @@ def build_product_page(p):
     return out
 
 
+def _card_blocks(html, slug):
+    """Every grid-column block on the page that is this product's card.
+
+    Returns (start, end) offsets, latest first, so a caller can edit in place
+    without invalidating the earlier ones.
+
+    Needed because the original nine products' cards are written into the
+    pages themselves rather than generated from the manifest, so an edit has
+    to reach into the markup. A newly added product has no such block and is
+    regenerated instead.
+    """
+    found = []
+    for m in re.finditer(r'listing/%s\.html' % re.escape(slug), html):
+        # Walk back through every <div> before the link and take the nearest
+        # one that genuinely encloses it and is a grid column.
+        #
+        # Matching '<div class="col' textually is not enough: the list-tab
+        # wrapper is '<div class=" col-xxl-6 ...' with a space after the
+        # quote, so that search ran past it and landed on a different
+        # product's card, which was then rewritten with this product's name.
+        for d in reversed([x.start() for x in
+                           re.finditer(r"<div\b", html[:m.start()])]):
+            depth, end = 0, None
+            for tag in re.finditer(r"<div\b|</div>", html[d:]):
+                depth += 1 if tag.group().startswith("<div") else -1
+                if depth == 0:
+                    end = d + tag.end()
+                    break
+            if end is None or end <= m.end():
+                continue                      # does not enclose the link
+            opening = html[d:html.find(">", d) + 1]
+            if not re.search(r'class="\s*[^"]*\bcol-', opening):
+                continue                      # not a grid column
+            if (d, end) not in found:
+                found.append((d, end))
+            break
+    # a block must really contain the link: a wrong one would rewrite some
+    # other product's card with this product's name
+    found = [(a, b) for a, b in found if ('listing/%s.html' % slug) in html[a:b]]
+    return sorted(found, reverse=True)
+
+
+def rewrite_cards(html, slug, name, short):
+    """Update the visible name and description on this product's cards."""
+    for start, end in _card_blocks(html, slug):
+        block = html[start:end]
+        block = re.sub(r'(<h5 class="Prodctname">).*?(</h5>)',
+                       lambda m: m.group(1) + _esc(name) + m.group(2),
+                       block, flags=re.S)
+        block = re.sub(r'(<h3>).*?(</h3>)',
+                       lambda m: m.group(1) + _esc(name) + m.group(2),
+                       block, flags=re.S)
+        block = re.sub(r'(<p class="short-desc"[^>]*>).*?(</p>)',
+                       lambda m: m.group(1) + _esc(short) + m.group(2),
+                       block, flags=re.S)
+        html = html[:start] + block + html[end:]
+    return html
+
+
+def remove_cards(html, slug):
+    """Take this product's cards off the page entirely."""
+    for start, end in _card_blocks(html, slug):
+        html = html[:start] + html[end:]
+    return html
+
+
+def edit_product(data):
+    """Change a product that already exists.
+
+    The slug is deliberately left alone even when the name changes. It is the
+    page's address, and rewriting it would break every link already pointing
+    at the product.
+    """
+    slug = (data.get("slug") or "").strip()
+    items = read_products()
+    p = next((x for x in items if x["slug"] == slug), None)
+    if p is None:
+        raise ValueError("No such product.")
+
+    name = (data.get("name") or "").strip()
+    if not name:
+        raise ValueError("The product needs a name.")
+    short = (data.get("short") or "").strip()
+    brand = (data.get("brand") or "").strip()
+    if brand and brand not in BRAND_PAGES:
+        raise ValueError("Unknown brand: %s" % brand)
+
+    was_brand = p.get("brand", "")
+    p["name"] = name
+    p["short"] = short
+    p["full"] = (data.get("full") or "").strip() or short
+    p["category"] = (data.get("category") or "").strip() or "Uncategorised"
+    p["brand"] = brand
+    p["sizes"] = [x.strip() for x in (data.get("sizes") or "").split(",") if x.strip()]
+
+    # a photo is optional on an edit: no new file means keep the current one
+    img_data = data.get("image") or ""
+    if img_data.startswith("data:image"):
+        import base64
+        try:
+            src = Image.open(io.BytesIO(base64.b64decode(img_data.split(",", 1)[1])))
+            src.load()
+        except Exception:
+            raise ValueError("That photo couldn't be read. Try a JPG or PNG.")
+        cover(flatten(src), 555, 586).save(os.path.join(SITE, p["image"]),
+                                           quality=88, method=6)
+
+    write_products(items)
+    build_product_page(p)
+
+    # Cards already written into a page are edited in the pristine copy: the
+    # rebuild below regenerates the live page from it, so a change made only
+    # to the live page would be undone immediately.
+    pages = ["listings.html"]
+    for b in (was_brand, brand):
+        if b in BRAND_PAGES and BRAND_PAGES[b] not in pages:
+            pages.append(BRAND_PAGES[b])
+
+    owner = BRAND_PAGES.get(brand)
+    for page in pages:
+        backup_page(page)
+        path = pristine_path(page)
+        body = read_html(path)
+        if page != "listings.html" and page != owner:
+            body = remove_cards(body, slug)     # moved away from this brand
+        else:
+            body = rewrite_cards(body, slug, name, short)
+        write_html(path, body)
+
+    rebuild_pages(pages)
+    return "Updated \u201c%s\u201d." % name
+
+
 def add_product(data):
     name = (data.get("name") or "").strip()
     if not name:
@@ -1606,10 +1739,12 @@ def render_add_product():
     rows = "".join(
         '<tr><td><img src="/%s"></td><td><strong>%s</strong><br><span>%s</span></td>'
         '<td>%s</td><td><a href="/listing/%s.html" target="_blank">view</a></td>'
-        '<td><button class="del" data-slug="%s">Remove</button></td></tr>'
+        '<td><button class="edit" data-p="%s">Edit</button> '
+        '<button class="del" data-slug="%s">Remove</button></td></tr>'
         % (_esc(p["image"]), _esc(p["name"]),
            _esc(" · ".join(x for x in (p.get("brand", ""), p.get("category", "")) if x)),
-           _esc(", ".join(p.get("sizes", [])) or "—"), _esc(p["slug"]), _esc(p["slug"]))
+           _esc(", ".join(p.get("sizes", [])) or "—"), _esc(p["slug"]),
+           _esc(json.dumps(p)), _esc(p["slug"]))
         for p in items) or '<tr><td colspan="5" class="none">No products added yet.</td></tr>'
 
     return """<!doctype html><html lang="en"><head><meta charset="utf-8">
@@ -1634,6 +1769,8 @@ def render_add_product():
  button{border:none;border-radius:6px;padding:10px 20px;font-size:13.5px;font-weight:600;cursor:pointer}
  .save{background:#4c9932;color:#fff;margin-top:20px}
  .save:hover{background:#3d7a28}
+ .edit{background:#fff;border:1px solid #c3d6bc;color:#3d7a28;padding:6px 12px;font-size:12px;margin-right:4px}
+ .edit:hover{background:#f2f8ef}
  .del{background:#fff;border:1px solid #e0c0bc;color:#a33b2c;padding:6px 12px;font-size:12px}
  .del:hover{background:#fdf0ee}
  table{width:100%;border-collapse:collapse;font-size:13.5px}
@@ -1650,7 +1787,7 @@ def render_add_product():
 <div class="wrap">
 
  <div class="card">
-  <h2>New product</h2>
+  <h2 id="formTitle">New product</h2>
   <div class="row2">
    <div>
     <label>Product name</label>
@@ -1677,6 +1814,7 @@ def render_add_product():
    </div>
   </div>
   <button class="save" id="save">Add product</button>
+  <button class="del" id="cancel" style="display:none;margin-left:8px">Cancel editing</button>
   <p id="status"></p>
  </div>
 
@@ -1696,6 +1834,35 @@ document.getElementById('image').addEventListener('change',function(e){
   r.readAsDataURL(f);
 });
 function say(t,k){var s=document.getElementById('status');s.textContent=t;s.className=k||'';}
+var editing=null;   // slug being edited, or null when adding
+
+function setMode(p){
+  editing = p ? p.slug : null;
+  document.getElementById('formTitle').textContent =
+     p ? ('Editing: '+p.name) : 'New product';
+  document.getElementById('save').textContent = p ? 'Save changes' : 'Add product';
+  document.getElementById('cancel').style.display = p ? 'inline-block' : 'none';
+  document.getElementById('name').value     = p ? p.name : '';
+  document.getElementById('brand').value    = p ? (p.brand||'') : '';
+  document.getElementById('category').value = p ? (p.category||'') : '';
+  document.getElementById('sizes').value    = p ? (p.sizes||[]).join(', ') : '';
+  document.getElementById('short').value    = p ? (p.short||'') : '';
+  document.getElementById('full').value     = p ? (p.full||'') : '';
+  imgData='';
+  var pv=document.getElementById('preview');
+  if(p){ pv.src='/'+p.image; pv.style.display='block'; }
+  else { pv.style.display='none'; }
+  document.getElementById('image').value='';
+  say(p ? 'Leave the photo empty to keep the current one.' : '');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+document.getElementById('list').addEventListener('click',function(e){
+  var b=e.target.closest('.edit'); if(!b) return;
+  setMode(JSON.parse(b.getAttribute('data-p')));
+});
+document.getElementById('cancel').addEventListener('click',function(){ setMode(null); });
+
 document.getElementById('save').addEventListener('click',function(){
   var body={name:document.getElementById('name').value,
             brand:document.getElementById('brand').value,
@@ -1705,9 +1872,11 @@ document.getElementById('save').addEventListener('click',function(){
             full:document.getElementById('full').value,
             image:imgData};
   if(!body.name.trim()){say('Give the product a name first.','err');return;}
-  if(!imgData){say('Choose a product photo first.','err');return;}
-  say('Adding...','busy');
-  fetch('/_add_product',{method:'POST',headers:{'Content-Type':'application/json'},
+  if(!editing && !imgData){say('Choose a product photo first.','err');return;}
+  if(editing){ body.slug=editing; }
+  say(editing?'Saving...':'Adding...','busy');
+  fetch(editing?'/_edit_product':'/_add_product',
+        {method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify(body)})
    .then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j};});})
    .then(function(res){
@@ -2605,6 +2774,10 @@ class Handler(SimpleHTTPRequestHandler):
             if parsed.path == "/_delete_news":
                 slug = (query.get("slug") or [""])[0]
                 return self._json(200, {"ok": True, "message": delete_news(slug)})
+
+            if parsed.path == "/_edit_product":
+                return self._json(200, {"ok": True,
+                                        "message": edit_product(self._json_body())})
 
             if parsed.path == "/_add_product":
                 return self._json(200, {"ok": True, "message": add_product(self._json_body())})
