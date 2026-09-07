@@ -73,6 +73,17 @@ per line.
 Both "add" tools generate the Arabic page from the English text, so it starts
 out in English. Open the Arabic text index afterwards and translate it.
 
+Every tool page carries the same bar along the bottom:
+
+| | |
+|---|---|
+| **See what changed** | Lists what is waiting, in plain words |
+| **Undo all** | Throws away everything since your last publish. Asks twice. |
+| **Publish** | Sends your work to George |
+
+**Undo all** cannot touch anything already published, and it does not delete
+your saved password.
+
 These pages start with `_`, which keeps them off the live site: the deploy
 script skips them and `.htaccess` denies them.
 
