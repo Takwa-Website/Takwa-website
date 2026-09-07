@@ -78,7 +78,11 @@ if exist "%DEST%\start.py" (
     REM opening a merge-message editor, which a plain "git pull" does and which
     REM drops a non-technical person into vim. --autostash covers edits that
     REM were never published.
+    echo   [..] Version before: 
+    git log -1 --format="       %%h %%s"
     git pull --rebase --autostash
+    echo   [..] Version after:
+    git log -1 --format="       %%h %%s"
     if errorlevel 1 (
         echo.
         echo   [!] Could not update cleanly. Nothing was lost.

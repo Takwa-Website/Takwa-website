@@ -1973,6 +1973,7 @@ PUBLISH_BAR = """
  #tk-pub .undo:disabled{color:#6b7a67;border-color:#3d4a3a;cursor:default}
  #tk-pub .msg{font-size:13px;opacity:.95}
  #tk-pub .msg.err{color:#ffb4a8}#tk-pub .msg.ok{color:#a8f0a4}
+ #tk-pub .ver{display:block;font-size:11px;opacity:.5;margin-top:2px}
  #tk-list{position:fixed;left:0;right:0;bottom:52px;z-index:99998;max-height:44vh;overflow:auto;
    background:#16210f;color:#dce9d7;padding:14px 18px;display:none;
    font:13px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
@@ -1983,7 +1984,8 @@ PUBLISH_BAR = """
 <div id="tk-list"></div>
 <div id="tk-pub">
   <span class="grow"><b id="tk-count">Checking…</b>
-    <span class="msg" id="tk-msg"></span></span>
+    <span class="msg" id="tk-msg"></span>
+    <span class="ver">@@VERSION@@</span></span>
   <button class="ghost" id="tk-see">See what changed</button>
   <button class="undo" id="tk-undo" disabled>Undo all</button>
   <button class="go" id="tk-go" disabled>Publish</button>
@@ -2063,10 +2065,22 @@ PUBLISH_BAR = """
 """
 
 
+def tools_version():
+    """Short description of the code actually running.
+
+    Pulling changes the files on disk; the running server keeps executing what
+    it loaded at startup. Showing the commit makes a missed restart obvious
+    instead of looking like the update never arrived.
+    """
+    ok, out = _git(["log", "-1", "--format=%h %ad", "--date=format:%d %b %H:%M"])
+    return out.strip() if ok else "unknown"
+
+
 def with_publish_bar(html):
+    bar = PUBLISH_BAR.replace("@@VERSION@@", _esc(tools_version()))
     if "</body>" not in html:
-        return html + PUBLISH_BAR
-    return html.replace("</body>", PUBLISH_BAR + "\n</body>", 1)
+        return html + bar
+    return html.replace("</body>", bar + "\n</body>", 1)
 
 
 # -------------------------------------------------------------------- lock
