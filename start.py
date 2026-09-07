@@ -1960,7 +1960,7 @@ def git_publish(message):
 
 # The bar is injected into every tool page rather than living on a page of its
 # own, so Publish is where the work happens and cannot be forgotten.
-PUBLISH_BAR = """
+PUBLISH_BAR = r"""
 <style>
  #tk-pub{position:fixed;left:0;right:0;bottom:0;z-index:99999;
    background:#20301c;color:#eaf3e6;font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
@@ -2033,7 +2033,7 @@ PUBLISH_BAR = """
  function ensureIdentity(){
    return fetch('/_identity').then(function(r){return r.json();}).then(function(j){
      if(j.set) return true;
-     var n=prompt('Before your first publish:\\n\\nWhat is your name? (it is recorded against your changes)');
+     var n=prompt('Before your first publish:\n\nWhat is your name? (it is recorded against your changes)');
      if(!n) return false;
      var e=prompt('And your email address?');
      if(!e) return false;
@@ -2060,7 +2060,7 @@ PUBLISH_BAR = """
     }).catch(function(e){ alert(e.message); say('Not undone','err'); refresh(); });
  });
  go.addEventListener('click',function(){
-   var what=prompt('Briefly, what did you change?\\n\\n(This is just a note so it can be found later.)','Website update');
+   var what=prompt('Briefly, what did you change?\n\n(This is just a note so it can be found later.)','Website update');
    if(what===null) return;
    go.disabled=true; list.style.display='none'; say('Sending…');
    ensureIdentity().then(function(okid){
@@ -2090,6 +2090,31 @@ def tools_version():
     """
     ok, out = _git(["log", "-1", "--format=%h %ad", "--date=format:%d %b %H:%M"])
     return out.strip() if ok else "unknown"
+
+
+def _check_publish_bar():
+    """Fail loudly at startup if the bar's script cannot parse.
+
+    PUBLISH_BAR was a normal triple-quoted string, so a \\n written in it
+    became a real newline inside a JavaScript string literal. That is a syntax
+    error: the whole block failed to parse, nothing in it ran, and the bar sat
+    on "Checking..." forever with no error anywhere -- the server was fine and
+    every endpoint answered, so it looked like a hang rather than a typo.
+
+    Nothing here is exercised by testing endpoints with curl, which is exactly
+    how it survived. This is the cheap check that would have caught it.
+    """
+    script = re.search(r"<script>(.*?)</script>", PUBLISH_BAR, re.S)
+    if not script:
+        raise AssertionError("publish bar has no script block")
+    for n, line in enumerate(script.group(1).split("\n"), 1):
+        if (line.count("'") - line.count("\\'")) % 2:
+            raise AssertionError(
+                "publish bar line %d has an unterminated string: %s"
+                % (n, line.strip()[:70]))
+
+
+_check_publish_bar()
 
 
 def with_publish_bar(html):
