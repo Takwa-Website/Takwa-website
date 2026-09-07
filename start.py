@@ -1810,13 +1810,17 @@ def git_changes():
     try:
         r = subprocess.run(["git", "-c", "core.quotepath=false", "status",
                             "--porcelain", "--no-renames", "-z"],
-                           cwd=ROOT, capture_output=True, timeout=90)
+                           cwd=ROOT, capture_output=True, timeout=25,
+                           env=dict(os.environ, GIT_TERMINAL_PROMPT="0",
+                                    GIT_OPTIONAL_LOCKS="0"))
     except FileNotFoundError:
         return {"ok": False, "files": [],
                 "message": "Git is not installed on this computer. "
                            "Install it from git-scm.com, then restart the tools."}
     except subprocess.TimeoutExpired:
-        return {"ok": False, "files": [], "message": "Git took too long."}
+        return {"ok": False, "files": [],
+                "message": "Git did not answer within 25 seconds. Antivirus "
+                           "scanning every file it touches is the usual cause."}
 
     if r.returncode != 0:
         return {"ok": False, "files": [],
@@ -1998,14 +2002,26 @@ PUBLISH_BAR = """
      list=document.getElementById('tk-list'), files=[];
  function say(t,k){ msg.textContent=t?(' — '+t):''; msg.className='msg'+(k?' '+k:''); }
  function refresh(){
-   fetch('/_changes').then(function(r){return r.json();}).then(function(j){
+   // Without a timeout a request that never returns leaves the bar reading
+   // "Checking..." indefinitely, which looks like the tools are broken rather
+   // than like one call being slow.
+   var stop = new AbortController();
+   var timer = setTimeout(function(){ stop.abort(); }, 20000);
+   fetch('/_changes',{signal:stop.signal})
+    .then(function(r){ clearTimeout(timer); return r.json(); }).then(function(j){
      files=j.files||[];
      if(!j.ok){ count.textContent='Cannot check'; say(j.message||'','err'); return; }
      if(!files.length){ count.textContent='Nothing to publish';
                         go.disabled=true; undo.disabled=true; return; }
      count.textContent=files.length+' change'+(files.length===1?'':'s')+' ready';
      go.disabled=false; undo.disabled=false;
-   }).catch(function(){ count.textContent='Cannot check'; });
+   }).catch(function(e){
+      clearTimeout(timer);
+      count.textContent='Cannot check for changes';
+      say(e && e.name==='AbortError'
+            ? 'took too long — is antivirus scanning the folder?'
+            : 'the tools stopped responding — restart them', 'err');
+   });
  }
  see.addEventListener('click',function(){
    if(list.style.display==='block'){ list.style.display='none'; return; }
