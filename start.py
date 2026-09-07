@@ -290,6 +290,12 @@ def rebuild_pages(pages):
         if page == "blogs.html":
             write_html(full, insert_news_cards(read_html(full)))
 
+        # a brand page is rebuilt from pristine like any other, so its products
+        # have to be put back too or publishing anything unlists them
+        for brand_name, brand_page in BRAND_PAGES.items():
+            if page == brand_page:
+                write_html(full, insert_brand_cards(read_html(full), brand_name))
+
         # products live in a manifest too, so they survive the same rebuild
         if page == "listings.html":
             b = insert_product_cards(read_html(full))
@@ -838,9 +844,66 @@ def add_filter_ui(body):
     return body
 
 
+# Which brand page each brand owns. A product with a brand is listed twice:
+# once on Our Products, once on its brand's own page. Anything else -- a
+# product belonging to neither brand -- appears on Our Products only.
+BRAND_PAGES = {
+    "Enna":         os.path.join("our-brands", "enna.html"),
+    "Flavora Cafe": os.path.join("our-brands", "flavora-cafe.html"),
+}
+
+
+def brand_card(p):
+    """One card for a brand page, matching the hand-built ones already there.
+
+    The paths carry ../ because these pages sit one folder down.
+    """
+    return (
+        '\n                             <div class="col-lg-3 col-sm-6">\n'
+        '                      <div class="product-container">\n'
+        '                          <img src="../%s" alt="%s" loading="lazy">\n'
+        '                          <h5 class="Prodctname">%s</h5>\n'
+        '                          <p class="short-desc">%s</p>\n'
+        '                          <a href="../listing/%s.html" class="btn-default">More Info</a>\n'
+        '                        </div>\n'
+        '                  </div>\n'
+        % (_esc(p["image"]), _esc(p["name"]), _esc(p["name"]),
+           _esc(p["short"]), _esc(p["slug"])))
+
+
+def insert_brand_cards(body, brand):
+    """Add this brand's saved products to its own page.
+
+    Unlike Our Products, the brand pages were built by hand and already list
+    the original nine products. Every product is in the manifest as well, so
+    inserting the whole manifest would show each of them twice. Anything the
+    page already links to is therefore skipped, and only genuinely new
+    products are added.
+    """
+    items = [p for p in read_products()
+             if p.get("brand") == brand
+             and ('listing/%s.html' % p["slug"]) not in body]
+    if not items:
+        return body
+    anchor = '<div class="row ">'
+    i = body.find(anchor)
+    if i == -1:
+        return body
+    cards = "".join(brand_card(p) for p in items)
+    return body[:i + len(anchor)] + cards + body[i + len(anchor):]
+
+
 def insert_product_cards(body):
-    """Add every saved product into both tabs of the listings page."""
-    items = read_products()
+    """Add every saved product into both tabs of the listings page.
+
+    Skips anything the page already links to. The pristine copy used to hold
+    no products at all, so a plain insert was safe; once the pristine copies
+    were resynced to the committed pages it did hold them, and every rebuild
+    quietly listed all ten products twice. Checking first makes this
+    idempotent whatever the pristine copy happens to contain.
+    """
+    items = [p for p in read_products()
+             if ('listing/%s.html' % p["slug"]) not in body]
     if not items:
         return body
     grid_html = "".join(product_cards(p)[0] for p in items)
@@ -916,6 +979,9 @@ def add_product(data):
     short = (data.get("short") or "").strip()
     full = (data.get("full") or "").strip() or short
     category = (data.get("category") or "").strip() or "Uncategorised"
+    brand = (data.get("brand") or "").strip()
+    if brand and brand not in BRAND_PAGES:
+        raise ValueError("Unknown brand: %s" % brand)
     sizes = [s.strip() for s in (data.get("sizes") or "").split(",") if s.strip()]
 
     items = read_products()
@@ -941,14 +1007,22 @@ def add_product(data):
     cover(flatten(src), 555, 586).save(os.path.join(SITE, rel), quality=88, method=6)
 
     p = {"slug": slug, "name": name, "short": short, "full": full,
-         "category": category, "sizes": sizes, "image": rel}
+         "category": category, "brand": brand, "sizes": sizes, "image": rel}
     items.append(p)
     write_products(items)
 
     build_product_page(p)
-    backup_page("listings.html")
-    rebuild_pages(["listings.html"])
-    return "Added “%s”." % name
+    pages = ["listings.html"]
+    if brand:
+        pages.append(BRAND_PAGES[brand])
+    for page in pages:
+        backup_page(page)
+    rebuild_pages(pages)
+
+    where = "Our Products"
+    if brand:
+        where += " and the %s page" % brand
+    return "Added “%s” to %s." % (name, where)
 
 
 def delete_product(slug):
@@ -966,7 +1040,10 @@ def delete_product(slug):
                  os.path.join(SITE, gone.get("image", ""))):
         if path and os.path.exists(path) and os.path.isfile(path):
             os.remove(path)
-    rebuild_pages(["listings.html"])
+    pages = ["listings.html"]
+    if gone.get("brand") in BRAND_PAGES:
+        pages.append(BRAND_PAGES[gone["brand"]])
+    rebuild_pages(pages)
     return "Removed “%s”." % gone["name"]
 
 
@@ -1530,7 +1607,8 @@ def render_add_product():
         '<tr><td><img src="/%s"></td><td><strong>%s</strong><br><span>%s</span></td>'
         '<td>%s</td><td><a href="/listing/%s.html" target="_blank">view</a></td>'
         '<td><button class="del" data-slug="%s">Remove</button></td></tr>'
-        % (_esc(p["image"]), _esc(p["name"]), _esc(p.get("category", "")),
+        % (_esc(p["image"]), _esc(p["name"]),
+           _esc(" · ".join(x for x in (p.get("brand", ""), p.get("category", "")) if x)),
            _esc(", ".join(p.get("sizes", [])) or "—"), _esc(p["slug"]), _esc(p["slug"]))
         for p in items) or '<tr><td colspan="5" class="none">No products added yet.</td></tr>'
 
@@ -1577,8 +1655,14 @@ def render_add_product():
    <div>
     <label>Product name</label>
     <input type="text" id="name" placeholder="e.g. Chicken Stock Powder">
-    <label>Category</label>
-    <input type="text" id="category" placeholder="e.g. MIXED SPICES">
+    <label>Brand <span class="hint">(also lists it on that brand's own page)</span></label>
+    <select id="brand">
+     <option value="">None — Our Products only</option>
+     <option value="Enna">Enna</option>
+     <option value="Flavora Cafe">Flavora Cafe</option>
+    </select>
+    <label>Category <span class="hint">(drives the filters, e.g. Soups)</span></label>
+    <input type="text" id="category" placeholder="e.g. Soups, Instant Coffee">
     <label>Sizes available <span class="hint">(comma separated)</span></label>
     <input type="text" id="sizes" placeholder="e.g. 100g, 250g, 1kg">
     <label>Product photo</label>
@@ -1614,6 +1698,7 @@ document.getElementById('image').addEventListener('change',function(e){
 function say(t,k){var s=document.getElementById('status');s.textContent=t;s.className=k||'';}
 document.getElementById('save').addEventListener('click',function(){
   var body={name:document.getElementById('name').value,
+            brand:document.getElementById('brand').value,
             category:document.getElementById('category').value,
             sizes:document.getElementById('sizes').value,
             short:document.getElementById('short').value,

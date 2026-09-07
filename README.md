@@ -62,7 +62,9 @@ original. Fix a translation here rather than editing the `-ar.html` pages by
 hand.
 
 **/_add-product.html** — adds a product. Creates its page, its card on Our
-Products, and its Arabic version.
+Products, and its Arabic version. Pick **Enna** or **Flavora Cafe** from the
+Brand list and it is listed on that brand's own page as well; leave it as
+*None* and it appears under Our Products only.
 
 **/_add-news.html** — adds a news item. Creates the article page, puts a card
 at the top of Blog & Events, and makes the Arabic version. Write one paragraph
