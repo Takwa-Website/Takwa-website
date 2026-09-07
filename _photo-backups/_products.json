@@ -111,8 +111,11 @@
     "name": "Mac and Cheese",
     "short": "",
     "full": "",
-    "category": "Uncategorised",
-    "sizes": [],
+    "category": "Food",
+    "brand": "Enna",
+    "sizes": [
+      "24*240g"
+    ],
     "image": "uploads/products/mac-and-cheese.webp"
   }
 ]
