@@ -30,3 +30,6 @@ __pycache__/
 .vscode/
 .DS_Store
 Thumbs.db
+
+# The editing tools password (a scrypt hash, but still local-only).
+.takwa-tools-auth.json

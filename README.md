@@ -35,6 +35,19 @@ Either way the tools are at **http://localhost:8099**. That is the whole site
 running on your own machine — nothing you do there touches the live website
 until someone deploys.
 
+**The first time, it asks you to set a password.** Choose one and confirm it.
+After that it asks for the password each time the tools are started.
+
+The password is stored as a scrypt hash in `.takwa-tools-auth.json`, beside the
+repository and never inside it. It is per-computer, so yours and George's are
+different, and there is no way to recover a forgotten one — delete that file
+and the tools offer to set a new password.
+
+**Nothing outside your own computer can reach the tools.** The server listens
+on 127.0.0.1 only, so the office wifi, a guest on the network and anyone else
+simply cannot connect. The password is there for the case of an unattended
+laptop.
+
 ---
 
 ## The four editing tools

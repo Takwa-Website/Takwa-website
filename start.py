@@ -1933,6 +1933,110 @@ def with_publish_bar(html):
     return html.replace("</body>", PUBLISH_BAR + "\n</body>", 1)
 
 
+# -------------------------------------------------------------------- lock
+#
+# The tools write files and can push to GitHub, so anyone who reaches them can
+# change the website. Two things keep that from happening:
+#
+#   * the server binds to 127.0.0.1, so nothing outside this computer can
+#     connect at all -- not the office wifi, not a guest on the network
+#   * a password, so an unattended laptop is not an open door
+#
+# The password is stored as a scrypt hash beside the repository, never in it.
+# Sessions live in memory only, so closing the tools ends every session.
+
+AUTH_FILE = os.path.join(ROOT, ".takwa-tools-auth.json")
+SESSIONS = set()
+
+
+def read_auth():
+    if os.path.exists(AUTH_FILE):
+        try:
+            with open(AUTH_FILE, encoding="utf-8") as fh:
+                d = json.load(fh)
+            if d.get("salt") and d.get("hash"):
+                return d
+        except Exception:
+            pass
+    return None
+
+
+def hash_password(password, salt):
+    # scrypt rather than a plain digest: it is deliberately slow and
+    # memory-hard, so guessing at the file is not worth doing
+    return hashlib.scrypt(password.encode("utf-8"), salt=bytes.fromhex(salt),
+                          n=16384, r=8, p=1, dklen=32).hex()
+
+
+def set_password(password):
+    password = (password or "").strip()
+    if len(password) < 6:
+        raise ValueError("Please choose at least 6 characters.")
+    salt = os.urandom(16).hex()
+    with open(AUTH_FILE, "w", encoding="utf-8") as fh:
+        json.dump({"salt": salt, "hash": hash_password(password, salt)}, fh)
+    try:
+        os.chmod(AUTH_FILE, 0o600)
+    except Exception:
+        pass                      # Windows does not do POSIX modes
+    return True
+
+
+def check_password(password):
+    auth = read_auth()
+    if not auth:
+        return False
+    import hmac
+    return hmac.compare_digest(hash_password(password or "", auth["salt"]),
+                               auth["hash"])
+
+
+def new_session():
+    token = os.urandom(24).hex()
+    SESSIONS.add(token)
+    return token
+
+
+LOCK_PAGE = """<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Takwa — @@TITLE@@</title><style>
+ *{box-sizing:border-box}
+ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#f6f7f6;
+   font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:#1e1e1e}
+ form{background:#fff;border:1px solid #e2e2dc;border-radius:12px;padding:30px 32px;
+   width:min(400px,92vw);box-shadow:0 2px 18px rgba(0,0,0,.05)}
+ h1{margin:0 0 6px;font-size:20px}
+ p{margin:0 0 20px;color:#777;font-size:13.5px}
+ input{width:100%;border:1px solid #cfcfc7;border-radius:7px;padding:11px 12px;font:15px inherit}
+ button{margin-top:16px;width:100%;border:none;border-radius:7px;background:#4c9932;color:#fff;
+   padding:12px;font:600 15px inherit;cursor:pointer}
+ button:hover{background:#3d7a28}
+ .err{color:#b3261e;font-size:13px;margin-top:12px;min-height:1px}
+</style></head><body>
+<form method="POST" action="/_unlock">
+ <h1>@@HEAD@@</h1>
+ <p>@@SUB@@</p>
+ <input type="password" name="password" placeholder="Password" autofocus required>
+ @@SECOND@@
+ <button type="submit">@@BUTTON@@</button>
+ <div class="err">@@ERR@@</div>
+</form></body></html>"""
+
+
+def render_lock(error="", setup=False):
+    return (LOCK_PAGE
+            .replace("@@TITLE@@", "Set a password" if setup else "Locked")
+            .replace("@@HEAD@@", "Set a password" if setup else "Takwa Website Editor")
+            .replace("@@SUB@@",
+                     "Choose a password for the editing tools on this computer."
+                     if setup else "Enter the password to continue.")
+            .replace("@@SECOND@@",
+                     '<input type="password" name="confirm" placeholder="Type it again" '
+                     'required style="margin-top:10px">' if setup else "")
+            .replace("@@BUTTON@@", "Save and continue" if setup else "Unlock")
+            .replace("@@ERR@@", _esc(error)))
+
+
 def render_add_news():
     items = read_news()
     rows = "".join(
@@ -2075,8 +2179,43 @@ class Handler(SimpleHTTPRequestHandler):
         self.send_header("Cache-Control", "no-store, must-revalidate")
         super().end_headers()
 
+    # ------------------------------------------------------------ the lock
+    def _session_ok(self):
+        cookie = self.headers.get("Cookie", "")
+        for part in cookie.split(";"):
+            k, _, v = part.strip().partition("=")
+            if k == "tk_session" and v in SESSIONS:
+                return True
+        return False
+
+    def _send_html(self, body, code=200, cookie=None):
+        raw = body.encode("utf-8", "replace")
+        self.send_response(code)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Content-Length", str(len(raw)))
+        self.send_header("Cache-Control", "no-store")
+        if cookie:
+            # no Secure flag: this is plain http on localhost by design
+            self.send_header("Set-Cookie",
+                             "tk_session=%s; Path=/; HttpOnly; SameSite=Strict" % cookie)
+        self.end_headers()
+        self.wfile.write(raw)
+
+    def _locked(self):
+        """True if this request must not proceed. Renders the page itself."""
+        if self._session_ok():
+            return False
+        if read_auth() is None:
+            self._send_html(render_lock(setup=True))
+        else:
+            self._send_html(render_lock())
+        return True
+
     def do_GET(self):
         path = urllib.parse.urlparse(self.path).path
+
+        if path != "/_unlock" and self._locked():
+            return
 
         if path == "/_state":
             # what the page needs to show current state without being regenerated
@@ -2225,6 +2364,33 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_POST(self):
         parsed = urllib.parse.urlparse(self.path)
+
+        if parsed.path == "/_unlock":
+            length = int(self.headers.get("Content-Length") or 0)
+            form = urllib.parse.parse_qs(self.rfile.read(length).decode("utf-8", "replace"))
+            password = (form.get("password") or [""])[0]
+            confirm = (form.get("confirm") or [None])[0]
+
+            if read_auth() is None:                       # first run
+                if confirm is not None and password != confirm:
+                    return self._send_html(render_lock("Those did not match.", setup=True))
+                try:
+                    set_password(password)
+                except ValueError as exc:
+                    return self._send_html(render_lock(str(exc), setup=True))
+            elif not check_password(password):
+                return self._send_html(render_lock("That password is not right."))
+
+            self.send_response(303)
+            self.send_header("Location", "/_photo-index.html")
+            self.send_header("Set-Cookie",
+                             "tk_session=%s; Path=/; HttpOnly; SameSite=Strict" % new_session())
+            self.send_header("Content-Length", "0")
+            self.end_headers()
+            return
+
+        if self._locked():
+            return
         query = urllib.parse.parse_qs(parsed.query)
         slot = (query.get("slot") or [""])[0]
 
@@ -2344,7 +2510,7 @@ if __name__ == "__main__":
     if os.path.exists(gen):
         os.system('python3 "%s" > /dev/null 2>&1' % gen)
 
-    server = ThreadingHTTPServer(("0.0.0.0", PORT), Handler)
+    server = ThreadingHTTPServer(("127.0.0.1", PORT), Handler)
     print("\n  Takwa website is running.\n")
     print("  Edit photos here:   http://localhost:%d/_photo-index.html" % PORT)
     print("  Edit text here:     http://localhost:%d/_text-index.html" % PORT)
@@ -2352,8 +2518,8 @@ if __name__ == "__main__":
     print("  Photo proposal:     http://localhost:%d/_photo-proposal.html" % PORT)
     print("  Add a product:      http://localhost:%d/_add-product.html" % PORT)
     print("  Add news:           http://localhost:%d/_add-news.html" % PORT)
-    print("  From another device: http://%s:%d/_photo-index.html" % (lan_ip(), PORT))
-    print("                   or: http://%s:%d/_text-index.html" % (lan_ip(), PORT))
+    print("\n  This computer only — nothing on the network can reach it,")
+    print("  and it asks for a password.")
     print("\n  See the site itself: http://localhost:%d/\n" % PORT)
     print("  Press Ctrl+C to stop.\n")
     try:
