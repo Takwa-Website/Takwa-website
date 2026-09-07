@@ -1831,6 +1831,36 @@ def git_changes():
     return {"ok": True, "files": files}
 
 
+def git_revert():
+    """Throw away everything not yet published.
+
+    Two steps, because they undo different things: reset restores files that
+    were changed, clean removes files that were created -- a new product page
+    and its photo are new files, so a reset alone would leave them behind and
+    the product would still be half-there.
+
+    Ignored files are untouched, so this cannot delete the saved password.
+    Published work is untouched too: this only rewinds to the last commit.
+    """
+    changes = git_changes()
+    if not changes["ok"]:
+        raise ValueError(changes["message"])
+    if not changes["files"]:
+        raise ValueError("Nothing has changed, so there is nothing to undo.")
+    n = len(changes["files"])
+
+    ok, out = _git(["reset", "--hard", "HEAD"])
+    if not ok:
+        raise ValueError("Could not undo the changes.\n\n" + out)
+    ok, out = _git(["clean", "-fd"])
+    if not ok:
+        raise ValueError("Undid the edits, but could not remove new files."
+                         "\n\n" + out)
+
+    return "Undid %d change%s. The website is back to how it was at the last " \
+           "publish." % (n, "" if n == 1 else "s")
+
+
 def git_identity():
     """Who git thinks is making the changes.
 
@@ -1938,6 +1968,9 @@ PUBLISH_BAR = """
  #tk-pub .go{background:#73ED7C;color:#12300f}
  #tk-pub .go:disabled{background:#5b6b57;color:#b9c7b5;cursor:default}
  #tk-pub .ghost{background:transparent;color:#cfe3ca;border:1px solid #4a6144}
+ #tk-pub .undo{background:transparent;color:#ffb4a8;border:1px solid #6b423c}
+ #tk-pub .undo:hover:not(:disabled){background:#3a221f}
+ #tk-pub .undo:disabled{color:#6b7a67;border-color:#3d4a3a;cursor:default}
  #tk-pub .msg{font-size:13px;opacity:.95}
  #tk-pub .msg.err{color:#ffb4a8}#tk-pub .msg.ok{color:#a8f0a4}
  #tk-list{position:fixed;left:0;right:0;bottom:52px;z-index:99998;max-height:44vh;overflow:auto;
@@ -1952,21 +1985,24 @@ PUBLISH_BAR = """
   <span class="grow"><b id="tk-count">Checking…</b>
     <span class="msg" id="tk-msg"></span></span>
   <button class="ghost" id="tk-see">See what changed</button>
+  <button class="undo" id="tk-undo" disabled>Undo all</button>
   <button class="go" id="tk-go" disabled>Publish</button>
 </div>
 <script>
 (function(){
  var count=document.getElementById('tk-count'), msg=document.getElementById('tk-msg'),
      go=document.getElementById('tk-go'), see=document.getElementById('tk-see'),
+     undo=document.getElementById('tk-undo'),
      list=document.getElementById('tk-list'), files=[];
  function say(t,k){ msg.textContent=t?(' — '+t):''; msg.className='msg'+(k?' '+k:''); }
  function refresh(){
    fetch('/_changes').then(function(r){return r.json();}).then(function(j){
      files=j.files||[];
      if(!j.ok){ count.textContent='Cannot check'; say(j.message||'','err'); return; }
-     if(!files.length){ count.textContent='Nothing to publish'; go.disabled=true; return; }
+     if(!files.length){ count.textContent='Nothing to publish';
+                        go.disabled=true; undo.disabled=true; return; }
      count.textContent=files.length+' change'+(files.length===1?'':'s')+' ready';
-     go.disabled=false;
+     go.disabled=false; undo.disabled=false;
    }).catch(function(){ count.textContent='Cannot check'; });
  }
  see.addEventListener('click',function(){
@@ -1990,6 +2026,21 @@ PUBLISH_BAR = """
                             return true; });
    });
  }
+ undo.addEventListener('click',function(){
+   if(!files.length) return;
+   var what=files.map(function(f){return '  \u2022 '+f.what;}).join('\n');
+   if(!confirm('Undo everything since your last publish?\n\n'+what+
+               '\n\nThis cannot be undone. Anything already published is safe.')) return;
+   if(prompt('To be sure, type  undo  and press OK.')!=='undo') return;
+   undo.disabled=true; go.disabled=true; list.style.display='none'; say('Undoing\u2026');
+   fetch('/_revert',{method:'POST'})
+    .then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j};});})
+    .then(function(res){
+       if(!res.ok||!res.j.ok) throw new Error(res.j.message||'Failed');
+       say(res.j.message,'ok');
+       setTimeout(function(){location.reload();},1400);
+    }).catch(function(e){ alert(e.message); say('Not undone','err'); refresh(); });
+ });
  go.addEventListener('click',function(){
    var what=prompt('Briefly, what did you change?\\n\\n(This is just a note so it can be found later.)','Website update');
    if(what===null) return;
@@ -2484,6 +2535,9 @@ class Handler(SimpleHTTPRequestHandler):
                 b = self._json_body()
                 return self._json(200, {"ok": True,
                     "message": set_git_identity(b.get("name", ""), b.get("email", ""))})
+
+            if parsed.path == "/_revert":
+                return self._json(200, {"ok": True, "message": git_revert()})
 
             if parsed.path == "/_publish":
                 body = self._json_body()
