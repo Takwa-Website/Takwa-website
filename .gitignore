@@ -33,3 +33,13 @@ Thumbs.db
 
 # The editing tools password (a scrypt hash, but still local-only).
 .takwa-tools-auth.json
+
+# Internal planning and infrastructure notes — kept on the owner's laptop, never
+# in the repo. They contain no passwords or keys, but they map the operation
+# (Cloudflare, the registrar, SharePoint IDs, server paths) and the public has
+# no reason to see it.
+STATE-OF-EVERYTHING.md
+HANDOVER-PLAN.md
+IT-REQUEST.md
+SHAREPOINT-INTEGRATION.md
+photo-proposal/PROPOSAL.md
