@@ -84,3 +84,35 @@ Redirect 301 /blog/stylish-and-elegant-old-man-in-a-car-salon-ar.html /blog/flav
     AddOutputFilterByType DEFLATE application/json application/xml
     AddOutputFilterByType DEFLATE image/svg+xml
 </IfModule>
+
+# --- turn off directory listing ---------------------------------------------
+# Without this, a folder with no index.html shows Apache's auto-generated
+# "Index of /uploads" -- letting anyone walk the whole tree and enumerate every
+# file, including unused and draft assets. The files are public, but the map of
+# them should not be.
+Options -Indexes
+
+# --- security headers -------------------------------------------------------
+# None were set. These are the low-risk, high-value ones. A Content-Security-
+# Policy is deliberately left out here: the site loads Google Fonts, Facebook
+# and LinkedIn, and a wrong CSP silently breaks the page -- it needs testing
+# against the real site rather than being pasted in blind.
+<IfModule mod_headers.c>
+    # tell browsers to stick to HTTPS for a year (the redirect already forces
+    # it; this stops the first plain-http request even being made)
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+    # do not let the site be framed by another origin (clickjacking)
+    Header always set X-Frame-Options "SAMEORIGIN"
+    # do not let the browser second-guess a file's declared type
+    Header always set X-Content-Type-Options "nosniff"
+    # do not leak the full URL to other sites in the Referer header
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    # switch off powerful APIs the site never uses
+    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=()"
+</IfModule>
+
+# --- stop announcing the server version -------------------------------------
+<IfModule mod_headers.c>
+    Header always unset X-Powered-By
+</IfModule>
+ServerSignature Off

@@ -34,6 +34,40 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+/* ---------------------------------------------------------- rate limit -----
+   The form has no CAPTCHA, so without this one script could post thousands of
+   valid-looking applications in a minute and bury the real ones. This caps a
+   single IP to a handful of submissions per hour.
+
+   The counter lives in the system temp directory, one small file per IP. It is
+   best-effort, not a fortress: it is per-server and resets if temp is cleared.
+   That is the right weight for a careers form -- enough to stop casual flooding
+   without a database or a dependency. */
+(function () {
+    $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+    $max = 6;                 // submissions allowed
+    $window = 3600;           // per this many seconds
+    $file = sys_get_temp_dir() . '/takwa_rl_' . md5($ip);
+
+    $now = time();
+    $hits = [];
+    if (is_readable($file)) {
+        $hits = array_filter(
+            array_map('intval', explode(',', (string) file_get_contents($file))),
+            function ($t) use ($now, $window) { return $t > $now - $window; }
+        );
+    }
+    if (count($hits) >= $max) {
+        http_response_code(429);
+        echo json_encode(['ok' => false,
+            'message' => 'Too many submissions from this connection. '
+                       . 'Please try again later, or email info@takwafoods.com.']);
+        exit;
+    }
+    $hits[] = $now;
+    @file_put_contents($file, implode(',', $hits), LOCK_EX);
+})();
+
 /* ------------------------------------------------------------- the fields --
    Whitelist, not a free-for-all. Repeating groups are expanded by index so
    edu1_institution through edu3_grade are accepted but edu9_ is not. */
