@@ -78,8 +78,7 @@
     "full": "Exceptionally pure, premium coffee that tastes incredible on its own or with any creamer. Pure and strong. Premium coffee, crafted for our taste.",
     "category": "Instant Coffee",
     "sizes": [
-      "50g",
-      "50x2g"
+      "50g"
     ],
     "image": "uploads/products/pure-coffee.webp",
     "brand": "Flavora Cafe"
@@ -90,15 +89,17 @@
     "short": "A high-quality, non-dairy creamer made with coconut oil for a smooth, rich finish.",
     "full": "A high-quality, non-dairy creamer made with coconut oil for a smooth, rich finish. Premium coffee, crafted for our taste.",
     "category": "Creamer",
-    "sizes": [],
+    "sizes": [
+      "24*240g"
+    ],
     "image": "uploads/products/coffee-creamer.webp",
     "brand": "Flavora Cafe"
   },
   {
     "slug": "espresso-capsules",
-    "name": "Espresso Capsules",
-    "short": "One hundred percent Arabica, sealed in nitrogen for maximum freshness.",
-    "full": "One hundred percent Arabica, sealed in a nitrogen environment for maximum freshness. Available as a Brazilian blend at a higher roast, and a Colombian at a medium roast. Premium coffee, crafted for our taste.",
+    "name": "BRASIL espresso capsules",
+    "short": "BRASIL capsules - 100% Arabica, higher roast, nitrogen-sealed for maximum freshness. 10 capsules.",
+    "full": "Flavors Cafe BRASIL espresso capsules are made from 100% Arabica beans, sealed in a nitrogen environment for maximum freshness. This Brazilian blend, roasted at a higher level, delivers a bold and rich cup with a distinctive character. Compatible with Nespresso machines, each box contains 10 capsules.",
     "category": "Espresso Capsules",
     "sizes": [
       "10 capsules"
@@ -109,13 +110,61 @@
   {
     "slug": "mac-and-cheese",
     "name": "Mac and Cheese",
-    "short": "Quick-cook macaroni with its own natural cheese sauce sachet — ready in about six minutes. Halal certified and made in Syria.",
-    "full": "Enna Mac and Cheese is a quick-prepare macaroni meal with its own cheese sauce sachet. Empty the pasta into a pot of boiling water and cook over medium heat for about six minutes until tender. Drain, keeping a little of the water so the pasta stays moist, then return it to the pot, add the powder sachet and stir until it is fully dissolved and evenly coated. For a richer texture and taste, add a small piece of butter.\n\nIt is made with macaroni, whole milk powder and natural cheese powder. Each 120 g serving provides 438 kcal and 14.66 g of protein. Halal certified and made in Syria.\n\nContains gluten and milk. May contain soya and celery. Store in a cool, dry place.",
+    "short": "A Natural Protein-Rich Meal",
+    "full": "Quick, Natural & Delicious: Protein-Packed Pasta Made Right\nA Wholesome Meal in Minutes\n\nCraving something quick without compromising on quality? Our pasta is made from the finest premium wheat, paired with a rich, natural cheese powder packed with protein and essential minerals giving you a meal that's as nourishing as it is satisfying, ready in just minutes.",
     "category": "Food",
     "brand": "Enna",
     "sizes": [
       "24*240g"
     ],
     "image": "uploads/products/mac-and-cheese.webp"
+  },
+  {
+    "slug": "colombia-espresso-capsules",
+    "name": "COLOMBIA espresso capsules",
+    "short": "COLOMBIA capsules: 100% Arabica, medium roast, nitrogen-sealed for maximum freshness. 10 capsules.",
+    "full": "Flavors Cafe COLOMBIA espresso capsules are made from 100% Arabica beans, sealed in a nitrogen environment for maximum freshness. This Colombian blend, roasted at a medium level, delivers a balanced cup with bright acidity and refreshing fruity notes. Compatible with Nespresso machines, each box contains 10 capsules.",
+    "category": "Espresso Capsules",
+    "brand": "Flavora Cafe",
+    "sizes": [
+      "10 capsules"
+    ],
+    "image": "uploads/products/colombia-espresso-capsules.webp"
+  },
+  {
+    "slug": "intenso-espresso-capsules",
+    "name": "INTENSO espresso capsules",
+    "short": "INTENSO espresso capsules: bold, dark flavor for intense espresso lovers. Coming soon.",
+    "full": "Flavors Cafe INTENSO espresso capsules are designed for those who love strong, dark coffee, delivering an intense flavor and rich bitterness for a real energy boost. Perfect for starting an active day or staying focused during work. Compatible with Nespresso machines, each box contains 10 high-quality capsules with a consistently bold taste.",
+    "category": "Espresso Capsules",
+    "brand": "Flavora Cafe",
+    "sizes": [
+      "10 capsules"
+    ],
+    "image": "uploads/products/intenso-espresso-capsules.webp"
+  },
+  {
+    "slug": "aura-espresso-capsules",
+    "name": "AURA espresso capsules",
+    "short": "AURA espresso capsules: a premium smooth blend with rich crema and silky texture. 10 capsules.",
+    "full": "Flavors Cafe AURA espresso capsules are a premium blend crafted for lovers of smooth, well-balanced coffee, offering a rich flavor, silky texture, and thick crema. An elegant espresso experience perfect for special moments, compatible with Nespresso machines for fast brewing. Each box contains 10 capsules with consistent quality and an unforgettable taste.",
+    "category": "Espresso Capsules",
+    "brand": "Flavora Cafe",
+    "sizes": [
+      "10 capsules"
+    ],
+    "image": "uploads/products/aura-espresso-capsules.webp"
+  },
+  {
+    "slug": "flavors-cafe-instant-coffee-50g",
+    "name": "Flavors Cafe Instant Coffee (50g)",
+    "short": "Rich, flavorful instant coffee by Flavors Café, 50gو quick to prepare, authentic in taste, irresistible in aroma.",
+    "full": "Flavors Café Instant Coffee (50g) is crafted from premium, carefully selected coffee beans to deliver a rich flavor and smooth, creamy texture in every sip. Perfect for coffee lovers who want a quick brew without sacrificing authentic taste, it dissolves effortlessly in hot water or milk for a delicious cup in seconds. With its distinctive aroma and balanced flavor profile. a gentle bitterness paired with natural sweetness; it's the perfect companion for your morning routine or work break. The compact, easy-to-store packaging makes it ideal for home, office, or travel.",
+    "category": "Instant Coffee",
+    "brand": "Flavora Cafe",
+    "sizes": [
+      "50g"
+    ],
+    "image": "uploads/products/flavors-cafe-instant-coffee-50g.webp"
   }
 ]
