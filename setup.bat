@@ -46,6 +46,13 @@ git config --global pull.rebase true          >nul 2>&1
 git config --global core.editor "true"        >nul 2>&1
 git config --global merge.ours.driver true    >nul 2>&1
 
+REM Make pushing survive a slow or unstable connection (Syria -> GitHub).
+REM Fixes RPC failed / HTTP 408 / sideband-packet disconnects.
+git config --global http.version HTTP/1.1        >nul 2>&1
+git config --global http.postBuffer 524288000    >nul 2>&1
+git config --global http.lowSpeedLimit 0          >nul 2>&1
+git config --global http.lowSpeedTime 999999      >nul 2>&1
+
 REM --- 2. Python ------------------------------------------------------------
 REM "where python" is not a real test: Windows ships a stub at that name that
 REM only opens the Microsoft Store. Ask for a version instead.
