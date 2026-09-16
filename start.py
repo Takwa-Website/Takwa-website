@@ -1083,6 +1083,9 @@ def edit_product(data):
     p["category"] = (data.get("category") or "").strip() or "Uncategorised"
     p["brand"] = brand
     p["sizes"] = [x.strip() for x in (data.get("sizes") or "").split(",") if x.strip()]
+    p["name_ar"] = (data.get("name_ar") or "").strip()
+    p["short_ar"] = (data.get("short_ar") or "").strip()
+    p["full_ar"] = (data.get("full_ar") or "").strip()
 
     # a photo is optional on an edit: no new file means keep the current one
     img_data = data.get("image") or ""
@@ -1119,6 +1122,8 @@ def edit_product(data):
         write_html(path, body)
 
     rebuild_pages(pages)
+    register_arabic([(name, p["name_ar"]), (short, p["short_ar"]),
+                     (p["full"], p["full_ar"])])
     return "Updated \u201c%s\u201d." % name
 
 
@@ -1823,6 +1828,9 @@ def render_add_product():
  #status{margin-top:14px;font-size:13px;min-height:1px}
  #status.ok{color:#2f6b1e}#status.err{color:#b3261e}#status.busy{color:#777}
  #preview{max-width:150px;border-radius:8px;margin-top:10px;display:none}
+ .ar-box{margin-top:18px;padding:14px 16px;background:#f6f8fb;border:1px solid #dce3ec;border-radius:8px}
+ .ar-head{margin:0 0 4px;font-weight:700;font-size:14px;color:#2c4a6b}
+ #name_ar,#short_ar,#full_ar{font-size:15px}
 </style></head><body>
 <header><h1>Add a Product</h1>
 <p>Creates the product's own page and adds it to Our Products automatically.</p></header>
@@ -1852,7 +1860,17 @@ def render_add_product():
     <label>Short description <span class="hint">(shown on the product card)</span></label>
     <textarea id="short" rows="3" placeholder="One or two lines."></textarea>
     <label>Full description <span class="hint">(shown on the product's page)</span></label>
-    <textarea id="full" rows="8" placeholder="The longer description."></textarea>
+    <textarea id="full" rows="6" placeholder="The longer description."></textarea>
+
+    <div class="ar-box">
+     <p class="ar-head">Arabic <span class="hint">(leave blank to keep English on the Arabic page)</span></p>
+     <label>Arabic name</label>
+     <input type="text" id="name_ar" dir="rtl" placeholder="الاسم بالعربي">
+     <label>Arabic short description</label>
+     <textarea id="short_ar" dir="rtl" rows="3"></textarea>
+     <label>Arabic full description</label>
+     <textarea id="full_ar" dir="rtl" rows="6"></textarea>
+    </div>
    </div>
   </div>
   <button class="save" id="save">Add product</button>
@@ -1890,6 +1908,9 @@ function setMode(p){
   document.getElementById('sizes').value    = p ? (p.sizes||[]).join(', ') : '';
   document.getElementById('short').value    = p ? (p.short||'') : '';
   document.getElementById('full').value     = p ? (p.full||'') : '';
+  document.getElementById('name_ar').value  = p ? (p.name_ar||'') : '';
+  document.getElementById('short_ar').value = p ? (p.short_ar||'') : '';
+  document.getElementById('full_ar').value  = p ? (p.full_ar||'') : '';
   imgData='';
   var pv=document.getElementById('preview');
   if(p){ pv.src='/'+p.image; pv.style.display='block'; }
@@ -1912,6 +1933,9 @@ document.getElementById('save').addEventListener('click',function(){
             sizes:document.getElementById('sizes').value,
             short:document.getElementById('short').value,
             full:document.getElementById('full').value,
+            name_ar:document.getElementById('name_ar').value,
+            short_ar:document.getElementById('short_ar').value,
+            full_ar:document.getElementById('full_ar').value,
             image:imgData};
   if(!body.name.trim()){say('Give the product a name first.','err');return;}
   if(!editing && !imgData){say('Choose a product photo first.','err');return;}
