@@ -2001,7 +2001,21 @@ def git_changes():
             continue
         path = record[3:]
         files.append({"path": path, "what": describe_change(path)})
-    return {"ok": True, "files": files}
+
+    # Commits that were made but never reached GitHub -- the case after a push
+    # that failed on a bad connection. The working tree is clean, so the loop
+    # above finds nothing, yet there is finished work waiting to go up. Without
+    # this the Publish button greys out and the work is stranded.
+    ahead = 0
+    a = subprocess.run(["git", "rev-list", "--count", "@{upstream}..HEAD"],
+                       cwd=ROOT, capture_output=True, text=True,
+                       env=dict(os.environ, GIT_OPTIONAL_LOCKS="0"))
+    if a.returncode == 0:
+        try:
+            ahead = int(a.stdout.strip())
+        except ValueError:
+            ahead = 0
+    return {"ok": True, "files": files, "ahead": ahead}
 
 
 def git_revert():
@@ -2069,7 +2083,7 @@ def git_publish(message):
     changes = git_changes()
     if not changes["ok"]:
         raise ValueError(changes["message"])
-    if not changes["files"]:
+    if not changes["files"] and not changes.get("ahead"):
         raise ValueError("Nothing has changed, so there is nothing to publish.")
 
     message = (message or "").strip() or "Website update"
@@ -2179,7 +2193,12 @@ PUBLISH_BAR = r"""
    fetch('/_changes',{signal:stop.signal})
     .then(function(r){ clearTimeout(timer); return r.json(); }).then(function(j){
      files=j.files||[];
+     var ahead=j.ahead||0;
      if(!j.ok){ count.textContent='Cannot check'; say(j.message||'','err'); return; }
+     if(!files.length && ahead>0){
+        count.textContent='Ready to send to GitHub';
+        say('saved here, not yet uploaded');
+        go.disabled=false; undo.disabled=true; return; }
      if(!files.length){ count.textContent='Nothing to publish';
                         go.disabled=true; undo.disabled=true; return; }
      count.textContent=files.length+' change'+(files.length===1?'':'s')+' ready';
