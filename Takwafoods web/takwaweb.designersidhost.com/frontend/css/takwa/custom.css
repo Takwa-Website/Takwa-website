@@ -5990,6 +5990,10 @@ background-size: auto;
     padding: 30px;
     text-align: center;
     font-size: 52px;
+    /* Unitless so it scales with the font. Without it the banner inherited a
+       fixed 25.6px line-height that was fine for small text but half the size
+       of the 52px heading, so a two-line title overlapped itself. */
+    line-height: 1.3;
     background-image: linear-gradient(45deg, #69B22F, #306C29);
     color: white;
     font-weight: 600;
