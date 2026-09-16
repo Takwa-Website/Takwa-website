@@ -1338,6 +1338,9 @@ def add_news(data):
     if not summary:
         raise ValueError("Write a short summary — it is what shows on the listing.")
     text = (data.get("body") or "").strip() or summary
+    title_ar = (data.get("title_ar") or "").strip()
+    summary_ar = (data.get("summary_ar") or "").strip()
+    body_ar = (data.get("body_ar") or "").strip()
     date = (data.get("date") or "").strip()
 
     items = read_news()
@@ -1363,13 +1366,22 @@ def add_news(data):
     cover(flatten(src), 1026, 618).save(os.path.join(SITE, rel), quality=88, method=6)
 
     n = {"slug": slug, "title": title, "summary": summary,
-         "body": text, "date": date, "image": rel}
+         "body": text, "date": date, "image": rel,
+         "title_ar": title_ar, "summary_ar": summary_ar, "body_ar": body_ar}
     items.append(n)
     write_news(items)
 
     build_news_page(n)
     backup_page("blogs.html")
     rebuild_pages(["blogs.html"])
+
+    # the article body is one paragraph per line, so the Arabic is paired to the
+    # English line by line -- write the same number of lines in Arabic
+    pairs = [(title, title_ar), (summary, summary_ar)]
+    en_lines = [l.strip() for l in text.splitlines() if l.strip()]
+    ar_lines = [l.strip() for l in body_ar.splitlines() if l.strip()]
+    pairs += list(zip(en_lines, ar_lines))
+    register_arabic(pairs)
     return "Published “%s”." % title
 
 
@@ -2524,6 +2536,9 @@ def render_add_news():
  #status{margin-top:14px;font-size:13px;min-height:1px}
  #status.ok{color:#2f6b1e}#status.err{color:#b3261e}#status.busy{color:#777}
  #preview{max-width:230px;border-radius:8px;margin-top:10px;display:none}
+ .ar-box{margin-top:18px;padding:14px 16px;background:#f6f8fb;border:1px solid #dce3ec;border-radius:8px}
+ .ar-head{margin:0 0 4px;font-weight:700;font-size:14px;color:#2c4a6b}
+ #title_ar,#summary_ar,#body_ar{font-size:15px}
  .note{background:#f4f8f2;border-left:3px solid #4c9932;padding:11px 14px;
        font-size:13px;color:#4a5a45;margin:0 0 20px;border-radius:0 6px 6px 0}
 </style></head><body>
@@ -2550,7 +2565,17 @@ def render_add_news():
     <label>Summary <span class="hint">(one or two lines, shown on the listing)</span></label>
     <textarea id="summary" rows="3"></textarea>
     <label>Article <span class="hint">(one paragraph per line)</span></label>
-    <textarea id="body" rows="11" placeholder="Leave a blank line between paragraphs if you like — each line becomes its own paragraph."></textarea>
+    <textarea id="body" rows="8" placeholder="Leave a blank line between paragraphs if you like — each line becomes its own paragraph."></textarea>
+
+    <div class="ar-box">
+     <p class="ar-head">Arabic <span class="hint">(leave blank to keep English on the Arabic page)</span></p>
+     <label>Arabic headline</label>
+     <input type="text" id="title_ar" dir="rtl" placeholder="العنوان بالعربي">
+     <label>Arabic summary</label>
+     <textarea id="summary_ar" dir="rtl" rows="3"></textarea>
+     <label>Arabic article <span class="hint">(same number of lines as the English)</span></label>
+     <textarea id="body_ar" dir="rtl" rows="8"></textarea>
+    </div>
    </div>
   </div>
   <button class="save" id="save">Publish news item</button>
@@ -2578,6 +2603,9 @@ document.getElementById('save').addEventListener('click',function(){
             date:document.getElementById('date').value,
             summary:document.getElementById('summary').value,
             body:document.getElementById('body').value,
+            title_ar:document.getElementById('title_ar').value,
+            summary_ar:document.getElementById('summary_ar').value,
+            body_ar:document.getElementById('body_ar').value,
             image:imgData};
   if(!body.title.trim()){say('Give the news item a headline first.','err');return;}
   if(!body.summary.trim()){say('Write a short summary — it is what shows on the listing.','err');return;}
