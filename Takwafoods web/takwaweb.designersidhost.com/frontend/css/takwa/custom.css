@@ -9056,3 +9056,14 @@ summary:focus-visible,
 body, input, textarea, select, button {
     font-family: "Tajawal", "Segoe UI", Tahoma, sans-serif;
 }
+
+/* Food-safety standards note — keeps the ISO/HACCP/Halal list from reading as
+   completed certifications. Matches the "in progress" wording of the paragraph
+   above it. */
+.standards-note {
+    margin-top: 12px;
+    font-size: 13px;
+    font-style: italic;
+    color: #6b7a76;
+}
+[dir="rtl"] .standards-note { text-align: right; }
