@@ -360,8 +360,8 @@ LANG_TOGGLE = re.compile(r'(<a class="[^"]*lang-toggle"[^>]*?href=")[^"]*(")')
 
 
 # The button itself carries a bare text node -- "English" -- between the globe
-# and the chevron. It names the language you are reading, so on an Arabic page
-# it has to say العربية, and its link has to lead back to English.
+# and the chevron. It names the language you switch to: an English page shows
+# العربية, an Arabic page shows English.
 TOGGLE_LABEL = re.compile(
     r'(<a class="[^"]*lang-toggle".*?</span>)\s*(?:English|العربية)\s*(<span class="btn-arrow">)',
     re.S)
@@ -377,8 +377,11 @@ def rewrite_language_switcher(body, english_page, arabic_page, depth, is_arabic=
     body = DROPDOWN_ITEM.sub(
         lambda m: m.group(1) + targets[m.group(3)] + m.group(2), body)
 
-    # the toggle shows the current language and leads to the other one
-    label = "العربية" if is_arabic else "English"
+    # the toggle names the language you switch TO and leads there: an English
+    # page offers العربية, an Arabic page offers English. (It used to name the
+    # current language, which read as a link labelled "English" that opened
+    # Arabic.)
+    label = "English" if is_arabic else "العربية"
     goes_to = targets["English"] if is_arabic else targets["Arabic"]
     body = LANG_TOGGLE.sub(lambda m: m.group(1) + goes_to + m.group(2), body)
     return TOGGLE_LABEL.sub(lambda m: m.group(1) + " " + label + " " + m.group(2), body)
