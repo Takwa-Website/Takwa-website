@@ -1122,12 +1122,35 @@ def edit_product(data):
     return "Updated \u201c%s\u201d." % name
 
 
+def register_arabic(pairs):
+    """Store English->Arabic pairs as translation overrides so the Arabic pages
+    show them. Empty Arabic is skipped, which leaves the English text in place
+    exactly as before. set_translation reloads the table and regenerates every
+    Arabic page, so the translations appear on the next rebuild with no extra
+    step. Called after the English pages are built, so the Arabic rebuild reads
+    the finished English."""
+    did = False
+    for en, ar in pairs:
+        en = (en or "").strip()
+        ar = (ar or "").strip()
+        if en and ar:
+            try:
+                set_translation(en, ar)
+                did = True
+            except Exception:
+                pass
+    return did
+
+
 def add_product(data):
     name = (data.get("name") or "").strip()
     if not name:
         raise ValueError("The product needs a name.")
     short = (data.get("short") or "").strip()
     full = (data.get("full") or "").strip() or short
+    name_ar = (data.get("name_ar") or "").strip()
+    short_ar = (data.get("short_ar") or "").strip()
+    full_ar = (data.get("full_ar") or "").strip()
     category = (data.get("category") or "").strip() or "Uncategorised"
     brand = (data.get("brand") or "").strip()
     if brand and brand not in BRAND_PAGES:
@@ -1157,7 +1180,8 @@ def add_product(data):
     cover(flatten(src), 555, 586).save(os.path.join(SITE, rel), quality=88, method=6)
 
     p = {"slug": slug, "name": name, "short": short, "full": full,
-         "category": category, "brand": brand, "sizes": sizes, "image": rel}
+         "category": category, "brand": brand, "sizes": sizes, "image": rel,
+         "name_ar": name_ar, "short_ar": short_ar, "full_ar": full_ar}
     items.append(p)
     write_products(items)
 
@@ -1168,6 +1192,7 @@ def add_product(data):
     for page in pages:
         backup_page(page)
     rebuild_pages(pages)
+    register_arabic([(name, name_ar), (short, short_ar), (full, full_ar)])
 
     where = "Our Products"
     if brand:
