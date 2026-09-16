@@ -1014,8 +1014,17 @@ def _card_blocks(html, slug):
     return sorted(found, reverse=True)
 
 
-def rewrite_cards(html, slug, name, short):
-    """Update the visible name and description on this product's cards."""
+def rewrite_cards(html, slug, name, short, brand=None, category=None):
+    """Update a product's cards in place: visible name and description, and --
+    on the Our Products page -- the filter tags too.
+
+    data-brand / data-category / data-search drive the brand and category
+    checkboxes. When a product's brand changes (Mac and Cheese went from no
+    brand to Enna), the visible text was updated but these tags were left at
+    their old values, so the product never matched its own brand filter. The
+    brand-page cards have no data- attributes, so those substitutions are
+    simply no-ops there.
+    """
     for start, end in _card_blocks(html, slug):
         block = html[start:end]
         block = re.sub(r'(<h5 class="Prodctname">).*?(</h5>)',
@@ -1027,6 +1036,14 @@ def rewrite_cards(html, slug, name, short):
         block = re.sub(r'(<p class="short-desc"[^>]*>).*?(</p>)',
                        lambda m: m.group(1) + _esc(short) + m.group(2),
                        block, flags=re.S)
+        if brand is not None:
+            hay = _esc(" ".join([name, brand or "", category or "", short]).lower())
+            block = re.sub(r'data-brand="[^"]*"',
+                           'data-brand="%s"' % _esc(brand or ""), block)
+            block = re.sub(r'data-category="[^"]*"',
+                           'data-category="%s"' % _esc(category or ""), block)
+            block = re.sub(r'data-search="[^"]*"',
+                           'data-search="%s"' % hay, block)
         html = html[:start] + block + html[end:]
     return html
 
@@ -1098,7 +1115,7 @@ def edit_product(data):
         if page != "listings.html" and page != owner:
             body = remove_cards(body, slug)     # moved away from this brand
         else:
-            body = rewrite_cards(body, slug, name, short)
+            body = rewrite_cards(body, slug, name, short, p["brand"], p["category"])
         write_html(path, body)
 
     rebuild_pages(pages)
