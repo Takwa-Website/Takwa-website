@@ -1378,6 +1378,10 @@ def add_news(data):
     # the article body is one paragraph per line, so the Arabic is paired to the
     # English line by line -- write the same number of lines in Arabic
     pairs = [(title, title_ar), (summary, summary_ar)]
+    if title_ar:
+        # the browser-tab title is "Headline | Takwa Foods"; translate the whole
+        # string so the Arabic tab is not half English
+        pairs.append((title + " | Takwa Foods", title_ar + " | تقوى للأغذية"))
     en_lines = [l.strip() for l in text.splitlines() if l.strip()]
     ar_lines = [l.strip() for l in body_ar.splitlines() if l.strip()]
     pairs += list(zip(en_lines, ar_lines))
