@@ -9028,3 +9028,27 @@ summary:focus-visible,
         background: rgba(108, 182, 47, 0.22) !important;
     }
 }
+
+/* ==========================================================================
+   Tajawal everywhere
+   --------------------------------------------------------------------------
+   The whole site draws its text from three variables -- --default-font,
+   --DMSans and --roboto. Pointing all three at Tajawal sets every element,
+   English and Arabic, in one typeface. Loaded last, so it overrides the
+   theme's DM Sans / Roboto / Fustat definitions above.
+
+   Tajawal ships Latin glyphs too, so English reads correctly in it. It has no
+   600 weight -- the fallback stack covers the few places the theme asks for
+   one. The Arabic pages set the same family through rtl.css, so both sides
+   match.
+   ========================================================================== */
+:root {
+    --default-font: "Tajawal", "Segoe UI", Tahoma, sans-serif;
+    --DMSans:       "Tajawal", "Segoe UI", Tahoma, sans-serif;
+    --roboto:       "Tajawal", "Segoe UI", Tahoma, sans-serif;
+}
+
+/* a few spots in the theme hard-code the family instead of using a variable */
+body, input, textarea, select, button {
+    font-family: "Tajawal", "Segoe UI", Tahoma, sans-serif;
+}
