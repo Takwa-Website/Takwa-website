@@ -115,3 +115,10 @@ icon again to get back to them. To stop them properly, run
 
 Nothing you do in these tools can break the live website. The worst case is
 that your work stays on your computer until someone helps you send it.
+
+## Open positions
+- Open **Open positions** (localhost:8099/_add-position.html) in the editor.
+- Fill title, location, type, short + full description; tick **Show on the site** to publish (untick = draft).
+- Fill the Arabic boxes too, or the Arabic page shows English. Full description: same number of lines in both.
+- It appears on the Careers page with its own page; applicants use the normal apply form (goes to hr@).
+- Edit or Remove any role from the list below the form. Press **Publish** when done.
