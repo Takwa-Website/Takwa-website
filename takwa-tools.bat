@@ -51,7 +51,7 @@ REM --- already running? ------------------------------------------------------
 netstat -aon | findstr ":8099" | findstr "LISTENING" >nul 2>&1
 if not errorlevel 1 (
     echo   Tools are already running.
-    start "" http://localhost:8099/_photo-index.html
+    start "" http://localhost:8099/_home.html
     timeout /t 3 /nobreak >nul
     exit /b 0
 )
@@ -75,14 +75,16 @@ pause
 exit /b 1
 
 :ready
-start "" http://localhost:8099/_photo-index.html
+start "" http://localhost:8099/_home.html
 echo.
 echo   Running at http://localhost:8099
 echo.
+echo     Menu:         http://localhost:8099/_home.html
 echo     Photos:       http://localhost:8099/_photo-index.html
 echo     Arabic text:  http://localhost:8099/_text-index-ar.html
 echo     Add product:  http://localhost:8099/_add-product.html
 echo     Add news:     http://localhost:8099/_add-news.html
+echo     Positions:    http://localhost:8099/_add-position.html
 echo.
 echo   To stop, run takwa-tools-stop.bat
 echo.

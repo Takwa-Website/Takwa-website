@@ -2498,6 +2498,58 @@ def render_lock(error="", setup=False):
             .replace("@@ERR@@", _esc(error)))
 
 
+# --------------------------------------------------------------------- home
+# The launcher used to open the photo tool directly, whose only cross-link was
+# "Arabic text ->". Products, news and positions were reachable only by typing
+# their URL, so the editor looked like it had "nothing to pick from". This is
+# the menu: one page that lists every tool. The launcher opens it, and the
+# unlock redirect lands here too.
+HOME_TOOLS = [
+    ("/_photo-index.html", "Photos",
+     "Every image on the site. Swap one and it changes everywhere it is used."),
+    ("/_text-index-ar.html", "Arabic text",
+     "Every Arabic phrase beside its English original."),
+    ("/_add-product.html", "Products",
+     "Add, edit or remove a product, with its brand, sizes and Arabic version."),
+    ("/_add-news.html", "News",
+     "Add a Blog & Events article; it goes to the top and gets an Arabic version."),
+    ("/_add-position.html", "Open positions",
+     "Add, edit or remove a job on the Careers page, with its Arabic version."),
+]
+
+
+def render_home():
+    cards = "".join(
+        '<a class="tool" href="%s"><h2>%s</h2><p>%s</p>'
+        '<span class="go">Open &rarr;</span></a>' % (href, name, desc)
+        for href, name, desc in HOME_TOOLS)
+    return """<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Takwa Website Editor</title>
+<style>
+ *{box-sizing:border-box}
+ body{margin:0;font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+      background:#fafaf8;color:#1e1e1e}
+ header{background:#4c9932;color:#fff;padding:26px 32px}
+ header h1{margin:0 0 6px;font-size:24px}header p{margin:0;opacity:.93;font-size:14px}
+ .wrap{margin:24px 32px 80px;max-width:1000px}
+ .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px}
+ .tool{display:block;text-decoration:none;color:inherit;background:#fff;
+       border:1px solid #e2e2dc;border-radius:10px;padding:20px 22px;transition:.12s}
+ .tool:hover{border-color:#4c9932;box-shadow:0 3px 14px rgba(0,0,0,.06)}
+ .tool h2{font-size:18px;margin:0 0 8px;color:#2f6b1f}
+ .tool p{margin:0 0 14px;font-size:13.5px;color:#666}
+ .go{font-size:13px;font-weight:600;color:#4c9932}
+ .site{display:inline-block;margin-top:26px;font-size:13.5px;color:#4c9932}
+</style></head><body>
+<header><h1>Takwa Website Editor</h1>
+<p>Pick a tool. Nothing you do here touches takwafoods.com until you Publish and George deploys.</p></header>
+<div class="wrap">
+ <div class="grid">%s</div>
+ <a class="site" href="/index.html" target="_blank">See the live site &rarr;</a>
+</div></body></html>""" % cards
+
+
 # ----------------------------------------------------------------- positions
 POSITIONS_JSON = os.path.join(BACKUPS, "_positions.json")
 # underscore keeps it out of all_pages, the sitemap, the deploy and Arabic build
@@ -3054,6 +3106,16 @@ class Handler(SimpleHTTPRequestHandler):
         if path != "/_unlock" and self._locked():
             return
 
+        if path in ("/", "/_home.html"):
+            body = with_publish_bar(render_home()).encode("utf-8")
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+            self.wfile.write(body)
+            return
+
         if path == "/_state":
             # what the page needs to show current state without being regenerated
             return self._json(200, {"ok": True, "removed": sorted(read_manifest().keys())})
@@ -3228,7 +3290,7 @@ class Handler(SimpleHTTPRequestHandler):
                 return self._send_html(render_lock("That password is not right."))
 
             self.send_response(303)
-            self.send_header("Location", "/_photo-index.html")
+            self.send_header("Location", "/_home.html")
             self.send_header("Set-Cookie",
                              "tk_session=%s; Path=/; HttpOnly; SameSite=Strict" % new_session())
             self.send_header("Content-Length", "0")
@@ -3375,6 +3437,7 @@ if __name__ == "__main__":
 
     server = ThreadingHTTPServer(("127.0.0.1", PORT), Handler)
     print("\n  Takwa website is running.\n")
+    print("  Open the editor:    http://localhost:%d/_home.html" % PORT)
     print("  Edit photos here:   http://localhost:%d/_photo-index.html" % PORT)
     print("  Edit text here:     http://localhost:%d/_text-index.html" % PORT)
     print("  Edit Arabic text:   http://localhost:%d/_text-index-ar.html" % PORT)
@@ -3384,7 +3447,7 @@ if __name__ == "__main__":
     print("  Open positions:     http://localhost:%d/_add-position.html" % PORT)
     print("\n  This computer only — nothing on the network can reach it,")
     print("  and it asks for a password.")
-    print("\n  See the site itself: http://localhost:%d/\n" % PORT)
+    print("\n  See the site itself: http://localhost:%d/index.html\n" % PORT)
     print("  Press Ctrl+C to stop.\n")
     try:
         server.serve_forever()

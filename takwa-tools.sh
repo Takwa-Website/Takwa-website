@@ -14,7 +14,7 @@ set -u
 PORT=8099
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LOG="$HERE/.takwa-tools.log"
-HOME_PAGE="http://localhost:$PORT/_photo-index.html"
+HOME_PAGE="http://localhost:$PORT/_home.html"
 
 note() { printf '%s\n' "$*"; }
 
