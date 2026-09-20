@@ -54,7 +54,9 @@ def every_html():
     out = []
     for dirpath, _dirs, files in os.walk(SITE):
         for f in files:
-            if f.lower().endswith(".html") and not f.startswith("_photo-index"):
+            # underscore = internal tool page or template (e.g.
+            # career/_position-template.html); never a real site page
+            if f.lower().endswith(".html") and not f.startswith("_"):
                 out.append(os.path.relpath(os.path.join(dirpath, f), SITE))
     return sorted(out)
 
@@ -109,7 +111,9 @@ def discover_pages():
     for path in sorted(glob.glob(os.path.join(SITE, "**", "*.html"), recursive=True)):
         rel = os.path.relpath(path, SITE).replace(os.sep, "/")
         base = os.path.basename(rel)
-        if base.startswith(("_photo-index", "blogs?", "language-switcher")):
+        # underscore-prefixed files are internal tool pages and templates
+        # (career/_position-template.html leaked "Vacancy — @@TITLE@@" before)
+        if base.startswith(("_", "blogs?", "language-switcher")):
             continue
         if rel.endswith("-ar.html"):
             continue
