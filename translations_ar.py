@@ -20,6 +20,7 @@ AR = {
     "Home": "الرئيسية",
     "Home Page": "الصفحة الرئيسية",
     "About Us": "من نحن",
+    "Skip to main content": "تخطّ إلى المحتوى الرئيسي",
     "Our Products": "منتجاتنا",
     "Our Brands": "علاماتنا التجارية",
     "Flavora Cafe": "فلافورا كافيه",
@@ -608,7 +609,6 @@ AR = {
     "Other Flavors": "نكهات أخرى",
     "Download Product Specs PDF": "حمّل مواصفات المنتج (PDF)",
     "About us": "من نحن",
-    "About Us1": "من نحن",
 
     "Creamy and rich, made with real mushrooms grown in Syria and dried in our own facility. Wholesome, natural, and satisfying. Real ingredients, dried in-house.":
         "كريمية وغنية، محضّرة من فطر حقيقي مزروع في سوريا ومجفّف في منشأتنا. مغذية وطبيعية ومُشبعة. مكوّنات حقيقية، مجفّفة لدينا.",

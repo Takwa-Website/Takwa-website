@@ -18,6 +18,11 @@
     </IfModule>
 </FilesMatch>
 
+# --- missing pages -----------------------------------------------------------
+# Without this Apache answers a bare default page. 404.html is bilingual and
+# self-contained (absolute paths, no shared scripts) so it works from any URL.
+ErrorDocument 404 /404.html
+
 # --- article URLs renamed from the purchased template's car slugs ---
 # Kept so links already shared or indexed under the old paths still land.
 Redirect 301 /blog/car-on-highway-directional-road-signs.html /blog/quality-begins-with-every-test.html

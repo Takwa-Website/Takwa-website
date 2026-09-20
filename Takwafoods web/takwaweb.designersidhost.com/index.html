@@ -142,6 +142,7 @@
 </head>
 
 <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
         <header class="main-header" id="mainHeader">
         <div class="header-sticky">
             <nav class="navbar navbar-expand-lg">
@@ -243,6 +244,7 @@
 
 
     <!-- header part end -->
+    <main id="main-content">
 
 
 
@@ -251,7 +253,7 @@
         <!-- Video Start -->
         <div class="hero-bg-video">
 
-                  <video autoplay muted loop id="myVideo" preload="metadata" poster="uploads/home/video-bg-image-2025-06-15-04-18-44-5078.webp"><source src="uploads/home/home2-intro-video-2025-07-31-06-02-41-6907.mp4" type="video/mp4"></video>
+                  <video autoplay muted loop playsinline id="myVideo" preload="metadata" poster="uploads/home/video-bg-image-2025-06-15-04-18-44-5078.webp"><source src="uploads/home/home2-intro-video-2025-07-31-06-02-41-6907.mp4" type="video/mp4"></video>
          
         </div>
         <!-- Video End -->
@@ -885,7 +887,8 @@
 
 
 
-         <!-- Footer Start -->
+         </main>
+    <!-- Footer Start -->
      <footer class="main-footer bg-section">
         <div class="container">
              <div class="row section-row align-items-center">
@@ -909,7 +912,9 @@
 
                         <!-- Contact Us Form Start -->
                         <form id="contactForm" action="https://api.web3forms.com/submit" data-contact-form method="POST" data-toggle="validator" class="wow fadeInUp" data-wow-delay="0.4s">
-                           <input type="hidden" name="access_key" value="f1d677a1-5d5f-415a-86c8-3dd90adedebb">                            <div class="row">
+                           <input type="hidden" name="access_key" value="f1d677a1-5d5f-415a-86c8-3dd90adedebb">
+                            <!-- Web3Forms honeypot: hidden from people, bots fill it, submissions with it set are dropped -->
+                            <input type="checkbox" name="botcheck" class="hidden" style="display:none" tabindex="-1" aria-hidden="true" autocomplete="off">                            <div class="row">
                                 <div class="form-group col-md-6 mb-4">
                                     <input type="text" name="name" value="" class="form-control darkinput" id="fname" placeholder="Full Name" required>
                                     <div class="help-block with-errors"></div>
@@ -1130,173 +1135,26 @@
         <!-- Main Custom js file -->
         <script src="frontend/assets/js/takwa/function.js"></script>
 
-
     <script>
-            </script>
-
-    
-
-    
-    <script>
-        "use strict";
-
-        let currencyPosition = "before_price";
-        let currencyIcon = "$";
-
-        function calculateMonthlyPayment(loanAmount, interestRate, loanTermYears) {
-            let monthlyInterestRate = (interestRate / 100) / 12;
-            let totalPayments = loanTermYears * 12;
-
-            let monthlyPayment = loanAmount * (monthlyInterestRate * Math.pow(1 + monthlyInterestRate, totalPayments))
-                / (Math.pow(1 + monthlyInterestRate, totalPayments) - 1);
-
-            return monthlyPayment;
-        }
-
-        function calculateTotalInterest(loanAmount, interestRate, loanTermYears) {
-            let totalPayments = loanTermYears * 12;
-            let totalInterest = (calculateMonthlyPayment(loanAmount, interestRate, loanTermYears) * totalPayments) - loanAmount;
-
-            return totalInterest;
-        }
-
-        function calculateTotalPayment(loanAmount, interestRate, loanTermYears) {
-            let totalPayments = loanTermYears * 12;
-            let totalPayment = calculateMonthlyPayment(loanAmount, interestRate, loanTermYears) * totalPayments;
-
-            return totalPayment;
-        }
-
-        $("#calculate_btn").on("click", function (e) {
-            e.preventDefault();
-
-            let loanAmount = $("#loan_amount").val();
-            let interestRate = $("#interest_rate").val();
-            let loanTermYears = $("#total_year").val();
-
-            if (!loanAmount) {
-                toastr.error("Please fill out the form")
-                return;
-            }
-
-            if (!interestRate) {
-                toastr.error("Please fill out the form")
-                return;
-            }
-
-            if (!loanTermYears) {
-                toastr.error("Please fill out the form")
-                return;
-            }
-
-            let finalPayment = calculateMonthlyPayment(loanAmount, interestRate, loanTermYears)
-            finalPayment = finalPayment.toFixed(2)
-            finalPayment = finalPayment.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-
-
-            let totalInterest = calculateTotalInterest(loanAmount, interestRate, loanTermYears);
-            totalInterest = totalInterest.toFixed(2);
-            totalInterest = totalInterest.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-
-            let totalPayment = calculateTotalPayment(loanAmount, interestRate, loanTermYears);
-            totalPayment = totalPayment.toFixed(2);
-            totalPayment = totalPayment.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-
-
-            let appendCurrency = '';
-            let appendInterestCurrency = '';
-            let appendTotalCurrency = '';
-
-            if (currencyPosition == 'before_price') {
-                appendCurrency = `${currencyIcon}${finalPayment}`
-                appendInterestCurrency = `${currencyIcon}${totalInterest}`
-                appendTotalCurrency = `${currencyIcon}${totalPayment}`
-            } else if (currencyPosition == 'before_price_with_space') {
-                appendCurrency = `${currencyIcon} ${finalPayment}`
-                appendInterestCurrency = `${currencyIcon} ${totalInterest}`
-                appendTotalCurrency = `${currencyIcon} ${totalPayment}`
-            } else if (currencyPosition == 'after_price') {
-                appendCurrency = `${finalPayment}${currencyIcon}`
-                appendInterestCurrency = `${totalInterest}${currencyIcon}`
-                appendTotalCurrency = `${totalPayment}${currencyIcon}`
-            } else if (currencyPosition == 'after_price_with_space') {
-                appendCurrency = `${finalPayment} ${currencyIcon}`
-                appendInterestCurrency = `${totalInterest} ${currencyIcon}`
-                appendTotalCurrency = `${totalPayment} ${currencyIcon}`
-            }
-
-            $("#monthly_payment").html(appendCurrency);
-            $("#total_interest").html(appendInterestCurrency);
-            $("#total_payment").html(appendTotalCurrency);
-        })
-
-        $("#loan_amount").on("keyup", function (e) {
-            let enteredValue = e.target.value;
-            let numericValue = enteredValue.replace(/[^0-9.]/g, '');
-            $(this).val(numericValue);
-        })
-
-        $("#interest_rate").on("keyup", function (e) {
-            let enteredValue = e.target.value;
-            let numericValue = enteredValue.replace(/[^0-9.]/g, '');
-            $(this).val(numericValue);
-        })
-
-        $("#total_year").on("keyup", function (e) {
-            let enteredValue = e.target.value;
-            let numericValue = enteredValue.replace(/[^0-9.]/g, '');
-            $(this).val(numericValue);
-        })
-
-        $("#reset_btn").on("click", function () {
-            $("#loan_amount").val('');
-            $("#interest_rate").val('');
-            $("#total_year").val('');
-
-            let appendCurrency = '';
-
-            if (currencyPosition == 'before_price') {
-                appendCurrency = `${currencyIcon}0.00`
-            } else if (currencyPosition == 'before_price_with_space') {
-                appendCurrency = `${currencyIcon} 0.00`
-            } else if (currencyPosition == 'after_price') {
-                appendCurrency = `0.00${currencyIcon}`
-            } else if (currencyPosition == 'after_price_with_space') {
-                appendCurrency = `0.00 ${currencyIcon}`
-            }
-
-            $("#monthly_payment").html(appendCurrency);
-            $("#total_interest").html(appendCurrency);
-            $("#total_payment").html(appendCurrency);
-
-        })
-
-    </script>
-
-    <script>
-        (function($) {
-            "use strict"
-            $(document).ready(function () {
-                $('.cookie_consent_close_btn').on('click', function(){
-                    $('.cookie_consent_modal').addClass('d-none');
+        /* Cookie notice. The wishlist "please login first" handler that used to
+           sit here belonged to the car-dealership template; this site has no
+           login. The stored key was renamed from the template's too. */
+        (function ($) {
+            "use strict";
+            var KEY = "takwa-cookie-consent";
+            $(function () {
+                $(".cookie_consent_close_btn").on("click", function () {
+                    $(".cookie_consent_modal").addClass("d-none");
                 });
-
-                $('.cookie_consent_accept_btn').on('click',function() {
-                    localStorage.setItem('car-listo-cookie','1');
-                    $('.cookie_consent_modal').addClass('d-none');
+                $(".cookie_consent_accept_btn").on("click", function () {
+                    try { localStorage.setItem(KEY, "1"); } catch (e) {}
+                    $(".cookie_consent_modal").addClass("d-none");
                 });
-
-                $('.before_auth_wishlist').on("click", function(){
-                    toastr.error("Please login first")
-                });
-
+                var seen = false;
+                try { seen = localStorage.getItem(KEY) === "1"; } catch (e) {}
+                if (!seen) { $(".cookie_consent_modal").removeClass("d-none"); }
             });
         })(jQuery);
-
-        if (localStorage.getItem('car-listo-cookie') != '1') {
-            $('.cookie_consent_modal').removeClass('d-none');
-        }
-
     </script>
         <script>
         const toggleBtn = document.querySelector('.lang-toggle');

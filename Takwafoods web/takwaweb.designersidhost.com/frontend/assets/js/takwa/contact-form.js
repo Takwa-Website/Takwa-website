@@ -43,7 +43,7 @@
             eRequired: "This field is required.",
             eName: "Please enter your full name.",
             eEmail: "Enter a valid email address, like name@company.com",
-            ePhone10: "Please enter exactly 10 digits, like 0912345678.",
+            ePhoneRange: "Please enter 7 to 15 digits, with an optional + country code, like +963 912 345 678.",
             ePhoneChars: "Numbers only — you may start with + for a country code.",
             eShort: "Please write a little more.",
             eMessage: "Please tell us a bit more — at least 10 characters."
@@ -58,7 +58,7 @@
             eRequired: "هذا الحقل مطلوب.",
             eName: "يرجى إدخال اسمكم الكامل.",
             eEmail: "أدخلوا بريداً إلكترونياً صحيحاً، مثل name@company.com",
-            ePhone10: "يرجى إدخال 10 أرقام تماماً، مثل 0912345678.",
+            ePhoneRange: "يرجى إدخال 7 إلى 15 رقماً، مع رمز الدولة اختيارياً، مثل +963 912 345 678.",
             ePhoneChars: "أرقام فقط — يمكنكم البدء بعلامة + لرمز الدولة.",
             eShort: "يرجى كتابة تفاصيل أكثر.",
             eMessage: "يرجى إخبارنا بالمزيد — 10 أحرف على الأقل."
@@ -103,7 +103,11 @@
        the @" is not enough on its own -- it lets "name@gmail." through. */
     var EMAIL = /^[^\s@]+@[^\s@.]+(\.[^\s@.]+)*\.[a-zA-Z]{2,}$/;
 
-    var PHONE_DIGITS = 10;
+    /* E.164 allows up to 15 digits; 7 is the shortest national number in
+       use. The form used to insist on exactly 10, which fitted a Syrian
+       mobile and rejected every international buyer. */
+    var PHONE_MIN = 7;
+    var PHONE_MAX = 15;
 
     function digits(value) {
         return (value || "").replace(/\D/g, "");
@@ -114,14 +118,28 @@
        rather than being rejected after the fact. */
     function tidyPhone(value) {
         var plus = value.charAt(0) === "+" ? "+" : "";
-        return plus + digits(value).slice(0, PHONE_DIGITS);
+        /* keep the separators people type (spaces, dashes, brackets, dots),
+           drop everything else, and stop accepting digits past the E.164 cap */
+        var kept = "", count = 0;
+        var body = value.slice(plus ? 1 : 0);
+        for (var i = 0; i < body.length; i++) {
+            var ch = body.charAt(i);
+            if (/\d/.test(ch)) {
+                if (count >= PHONE_MAX) { break; }
+                count++; kept += ch;
+            } else if (/[\s()\-.]/.test(ch)) {
+                kept += ch;
+            }
+        }
+        return plus + kept;
     }
 
     function checkPhone(value) {
         var raw = (value || "").trim();
         if (!raw) { return "required"; }
         if (/[^\d+\s()\-.]/.test(raw)) { return "chars"; }
-        return digits(raw).length === PHONE_DIGITS ? null : "ten";
+        var n = digits(raw).length;
+        return (n >= PHONE_MIN && n <= PHONE_MAX) ? null : "range";
     }
 
     var RULES = {
@@ -140,7 +158,7 @@
             var why = checkPhone(v);
             if (why === "required") { return t.eRequired; }
             if (why === "chars") { return t.ePhoneChars; }
-            if (why === "ten") { return t.ePhone10; }
+            if (why === "range") { return t.ePhoneRange; }
             return null;
         },
         subject: function (v) {
@@ -200,7 +218,7 @@
         var tel = form.querySelector('[name="phone"]');
         if (tel) {
             tel.setAttribute("inputmode", "tel");
-            tel.setAttribute("maxlength", "16");
+            tel.setAttribute("maxlength", "24");
             tel.addEventListener("input", function () {
                 var tidy = tidyPhone(tel.value);
                 if (tidy !== tel.value) {

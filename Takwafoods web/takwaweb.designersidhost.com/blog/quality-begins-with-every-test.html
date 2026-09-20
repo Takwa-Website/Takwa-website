@@ -97,6 +97,7 @@
 </head>
 
 <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
         <header class="main-header" id="mainHeader">
         <div class="header-sticky">
             <nav class="navbar navbar-expand-lg">
@@ -115,7 +116,7 @@
 
                                         <li class="nav-item "><a class="nav-link" href="../index.html">Home</a></li>
 
-                                        <li class="nav-item "><a class="nav-link" href="../about-us.html">About Us1</a></li>
+                                        <li class="nav-item "><a class="nav-link" href="../about-us.html">About Us</a></li>
 
                                         <li class="nav-item "><a class="nav-link" href="javascript:;">Our Products<i class="fa-solid fa-angle-down"></i> </a>
                                             <ul class="sub-menu">
@@ -198,6 +199,7 @@
 
 
     <!-- header part end -->
+    <main id="main-content">
 
 
 
@@ -260,7 +262,6 @@
                                         <ul>
                                             <li><a aria-label="Takwa Foods on Facebook"  href="https://www.facebook.com/sharer/sharer.php?u=https://takwafoods.com/blog/quality-begins-with-every-test&t=Quality Begins with Every Test" target="_blank"><i class="fa-brands fa-facebook-f"></i></a></li>
                                             <li><a aria-label="Takwa Foods on LinkedIn"  href="https://www.linkedin.com/shareArticle?mini=true&url=https://takwafoods.com/blog/quality-begins-with-every-test&title=Quality Begins with Every Test" target="_blank"><i class="fa-brands fa-linkedin-in"></i></a></li>
-                                            <li><a aria-label="Takwa Foods on Instagram"  href="https://www.instagram.com/?url=https://takwafoods.com/blog/quality-begins-with-every-test" target="_blank"><i class="fa-brands fa-instagram"></i></a></li>
                                             <li><a aria-label="Takwa Foods on X"  href="https://twitter.com/share?text=Quality Begins with Every Test&url=https://takwafoods.com/blog/quality-begins-with-every-test" target="_blank"><i class="fa-brands fa-x-twitter"></i></a></li>
                                         </ul>
                                     </div>
@@ -287,7 +288,8 @@
     
 
 
-         <!-- Footer Start -->
+         </main>
+    <!-- Footer Start -->
      <footer class="main-footer bg-section">
         <div class="container">
              <div class="row section-row align-items-center">
@@ -311,7 +313,9 @@
 
                         <!-- Contact Us Form Start -->
                         <form id="contactForm" action="https://api.web3forms.com/submit" data-contact-form method="POST" data-toggle="validator" class="wow fadeInUp" data-wow-delay="0.4s">
-                           <input type="hidden" name="access_key" value="f1d677a1-5d5f-415a-86c8-3dd90adedebb">                            <div class="row">
+                           <input type="hidden" name="access_key" value="f1d677a1-5d5f-415a-86c8-3dd90adedebb">
+                            <!-- Web3Forms honeypot: hidden from people, bots fill it, submissions with it set are dropped -->
+                            <input type="checkbox" name="botcheck" class="hidden" style="display:none" tabindex="-1" aria-hidden="true" autocomplete="off">                            <div class="row">
                                 <div class="form-group col-md-6 mb-4">
                                     <input type="text" name="name" value="" class="form-control darkinput" id="fname" placeholder="Full Name" required>
                                     <div class="help-block with-errors"></div>
@@ -386,7 +390,7 @@
                         <h3 class="footelinktitle">Explore Takwa</h3>
                       <ul class="footerlinklist">
                         <li><a href="../index.html">Home</a></li>
-                        <li><a href="../about-us.html">About Us1</a></li>
+                        <li><a href="../about-us.html">About Us</a></li>
                         <li><a href="../blogs.html">Our Blogs</a></li>
                       </ul>
                     </div>
@@ -541,29 +545,25 @@
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
     <script>
-        (function($) {
-            "use strict"
-            $(document).ready(function () {
-                $('.cookie_consent_close_btn').on('click', function(){
-                    $('.cookie_consent_modal').addClass('d-none');
+        /* Cookie notice. The wishlist "please login first" handler that used to
+           sit here belonged to the car-dealership template; this site has no
+           login. The stored key was renamed from the template's too. */
+        (function ($) {
+            "use strict";
+            var KEY = "takwa-cookie-consent";
+            $(function () {
+                $(".cookie_consent_close_btn").on("click", function () {
+                    $(".cookie_consent_modal").addClass("d-none");
                 });
-
-                $('.cookie_consent_accept_btn').on('click',function() {
-                    localStorage.setItem('car-listo-cookie','1');
-                    $('.cookie_consent_modal').addClass('d-none');
+                $(".cookie_consent_accept_btn").on("click", function () {
+                    try { localStorage.setItem(KEY, "1"); } catch (e) {}
+                    $(".cookie_consent_modal").addClass("d-none");
                 });
-
-                $('.before_auth_wishlist').on("click", function(){
-                    toastr.error("Please login first")
-                });
-
+                var seen = false;
+                try { seen = localStorage.getItem(KEY) === "1"; } catch (e) {}
+                if (!seen) { $(".cookie_consent_modal").removeClass("d-none"); }
             });
         })(jQuery);
-
-        if (localStorage.getItem('car-listo-cookie') != '1') {
-            $('.cookie_consent_modal').removeClass('d-none');
-        }
-
     </script>
         <script>
         const toggleBtn = document.querySelector('.lang-toggle');
