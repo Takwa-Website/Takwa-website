@@ -60,6 +60,11 @@ Last rebuilt: 20 September 2026.
 - **Start it:** desktop icon **"Takwa Website Editor"** (`~/Desktop`, runs
   `takwa-tools.sh`), or `takwa-tools.sh` (Linux) / `takwa-tools.bat` (Windows).
   URL: `http://localhost:8099`.
+- **Menu:** the launcher opens `/_home.html` (also served at `/`) — the first
+  screen after the password. Five big bilingual buttons (EN / AR): Photos /
+  الصور, Arabic text / النص العربي, Products / المنتجات, News / الأخبار, Open
+  positions / الوظائف الشاغرة. Before this, the launcher opened the photo tool
+  directly and the other tools were reachable only by typing their URL.
 - **What it edits:**
   - `/_photo-index.html` — every image on the site (change / undo / remove / blank).
   - `/_text-index-ar.html` — every Arabic string next to its English original.
@@ -79,8 +84,9 @@ Last rebuilt: 20 September 2026.
 
 ## 4. Duaa's workflow (one screen)
 
-1. Double-click **Takwa Website Editor**. 2. Enter the password. 3. Edit —
-photos, Arabic text, products, news, positions. 4. Press **Publish** (commits +
+1. Double-click **Takwa Website Editor**. 2. Enter the password. 3. Pick a tool
+from the menu (five bilingual buttons) and edit — photos, Arabic text, products,
+news, positions. 4. Press **Publish** (commits +
 pushes, catches up automatically if behind). 5. Text George. 6. George deploys
 from cPanel. To update the tools themselves: run `update.bat`, then stop and
 reopen the editor (`start.py` loads its code once at startup). Full guide:
