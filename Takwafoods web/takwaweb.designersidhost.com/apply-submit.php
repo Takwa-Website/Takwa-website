@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         http_response_code(429);
         echo json_encode(['ok' => false,
             'message' => 'Too many submissions from this connection. '
-                       . 'Please try again later, or email info@takwafoods.com.']);
+                       . 'Please try again later, or email hr@takwafoods.com.']);
         exit;
     }
     $hits[] = $now;
@@ -185,7 +185,7 @@ if ($written === false) {
    The application itself is not emailed -- that would put the personal data
    back into an inbox and undo the point of storing it here. */
 @mail(
-    'info@takwafoods.com',
+    'hr@takwafoods.com',
     'New application: ' . $record['position'] . ', ' . $record['full_name'],
     "A new employment application has been received.\n\n"
     . "Position: " . $record['position'] . "\n"
