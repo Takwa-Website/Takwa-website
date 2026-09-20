@@ -2505,24 +2505,27 @@ def render_lock(error="", setup=False):
 # the menu: one page that lists every tool. The launcher opens it, and the
 # unlock redirect lands here too.
 HOME_TOOLS = [
-    ("/_photo-index.html", "Photos",
+    ("/_photo-index.html", "Photos", "الصور",
      "Every image on the site. Swap one and it changes everywhere it is used."),
-    ("/_text-index-ar.html", "Arabic text",
+    ("/_text-index-ar.html", "Arabic text", "النص العربي",
      "Every Arabic phrase beside its English original."),
-    ("/_add-product.html", "Products",
+    ("/_add-product.html", "Products", "المنتجات",
      "Add, edit or remove a product, with its brand, sizes and Arabic version."),
-    ("/_add-news.html", "News",
+    ("/_add-news.html", "News", "الأخبار",
      "Add a Blog & Events article; it goes to the top and gets an Arabic version."),
-    ("/_add-position.html", "Open positions",
+    ("/_add-position.html", "Open positions", "الوظائف الشاغرة",
      "Add, edit or remove a job on the Careers page, with its Arabic version."),
 ]
 
 
 def render_home():
     cards = "".join(
-        '<a class="tool" href="%s"><h2>%s</h2><p>%s</p>'
-        '<span class="go">Open &rarr;</span></a>' % (href, name, desc)
-        for href, name, desc in HOME_TOOLS)
+        '<a class="tool" href="%s">'
+        '<span class="label"><span class="en">%s</span>'
+        '<span class="ar" lang="ar" dir="rtl">%s</span></span>'
+        '<span class="desc">%s</span>'
+        '<span class="go">Open &rarr;</span></a>' % (href, en, ar, desc)
+        for href, en, ar, desc in HOME_TOOLS)
     return """<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Takwa Website Editor</title>
@@ -2532,15 +2535,18 @@ def render_home():
       background:#fafaf8;color:#1e1e1e}
  header{background:#4c9932;color:#fff;padding:26px 32px}
  header h1{margin:0 0 6px;font-size:24px}header p{margin:0;opacity:.93;font-size:14px}
- .wrap{margin:24px 32px 80px;max-width:1000px}
- .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px}
- .tool{display:block;text-decoration:none;color:inherit;background:#fff;
-       border:1px solid #e2e2dc;border-radius:10px;padding:20px 22px;transition:.12s}
- .tool:hover{border-color:#4c9932;box-shadow:0 3px 14px rgba(0,0,0,.06)}
- .tool h2{font-size:18px;margin:0 0 8px;color:#2f6b1f}
- .tool p{margin:0 0 14px;font-size:13.5px;color:#666}
- .go{font-size:13px;font-weight:600;color:#4c9932}
- .site{display:inline-block;margin-top:26px;font-size:13.5px;color:#4c9932}
+ .wrap{margin:26px 32px 80px;max-width:1000px}
+ .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+ .tool{display:flex;flex-direction:column;justify-content:center;text-decoration:none;
+       color:inherit;background:#fff;border:2px solid #e2e2dc;border-radius:14px;
+       padding:26px 26px;min-height:150px;transition:.12s}
+ .tool:hover{border-color:#4c9932;box-shadow:0 4px 18px rgba(0,0,0,.08);transform:translateY(-1px)}
+ .label{display:flex;align-items:baseline;justify-content:space-between;gap:14px;margin-bottom:10px}
+ .en{font-size:23px;font-weight:700;color:#2f6b1f}
+ .ar{font-size:21px;font-weight:700;color:#4c9932}
+ .desc{font-size:13.5px;color:#666;margin-bottom:14px}
+ .go{font-size:14px;font-weight:700;color:#4c9932}
+ .site{display:inline-block;margin-top:28px;font-size:13.5px;color:#4c9932}
 </style></head><body>
 <header><h1>Takwa Website Editor</h1>
 <p>Pick a tool. Nothing you do here touches takwafoods.com until you Publish and George deploys.</p></header>
