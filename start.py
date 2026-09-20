@@ -2498,6 +2498,207 @@ def render_lock(error="", setup=False):
             .replace("@@ERR@@", _esc(error)))
 
 
+# ----------------------------------------------------------------- positions
+POSITIONS_JSON = os.path.join(BACKUPS, "_positions.json")
+# underscore keeps it out of all_pages, the sitemap, the deploy and Arabic build
+POSITION_TEMPLATE = os.path.join("career", "_position-template.html")
+
+
+def read_positions():
+    if os.path.exists(POSITIONS_JSON):
+        try:
+            with open(POSITIONS_JSON, encoding="utf-8") as fh:
+                return json.load(fh)
+        except Exception:
+            pass
+    return []
+
+
+def write_positions(items):
+    os.makedirs(BACKUPS, exist_ok=True)
+    with open(POSITIONS_JSON, "w", encoding="utf-8") as fh:
+        json.dump(items, fh, indent=2, ensure_ascii=False)
+
+
+def position_row(p):
+    return (
+        '\n                <div class="col-lg-12 ">\n'
+        '                    <div class="row job align-items-center">\n'
+        '                        <div class="col-lg-6 col-sm-6 ">\n'
+        '                            <h6 class="position">%s</h6>\n'
+        '                        </div>\n'
+        '                        <div class="col-lg-3 col-sm-3 text-center">\n'
+        '                            <h6 class="country">%s</h6>\n'
+        '                            <span class="jobtype">%s</span>\n'
+        '                        </div>\n'
+        '                        <div class="col-lg-3 col-sm-3 text-center">\n'
+        '                            <a class="vacancylink" href="career/%s.html" aria-label="View this vacancy"><i class="fa-solid fa-chevron-right"></i></a>\n'
+        '                        </div>\n'
+        '                    </div>\n'
+        '                </div>\n'
+        '                <hr class="separator">\n'
+        % (_esc(p["title"]), _esc(p.get("location", "")), _esc(p.get("type", "")),
+           _esc(p["slug"])))
+
+
+def render_positions_section():
+    """The Open Positions section markup, from the published positions. Empty
+    state when none, matching how the page reads with no openings."""
+    pubs = [p for p in read_positions() if p.get("published")]
+    head = ('<h2 class="wow fadeInUp" data-wow-delay="0.2s">Open <br> '
+            '<span>positions</span></h2>')
+    if not pubs:
+        intro = ('<p class="wow fadeInUp" data-wow-delay="0.4s">There are no open '
+                 'positions at the moment. Check back soon, or send your CV using '
+                 'the form below.</p>')
+        listing = ""
+    else:
+        intro = ('<p class="wow fadeInUp" data-wow-delay="0.4s">Roles we are '
+                 'actively recruiting for right now.</p>')
+        n = len(pubs)
+        rows = "".join(position_row(p) for p in pubs)
+        listing = (
+            '\n    <div class="about-us pb-0">\n'
+            '        <div class="container">\n'
+            '            <div class="row align-items-center">\n'
+            '                <div class="col-lg-12">\n'
+            '                    <h6 class="totalnoofvacancies">%d open position%s</h6>\n'
+            '                </div>\n%s'
+            '            </div>\n'
+            '        </div>\n'
+            '    </div>\n' % (n, "" if n == 1 else "s", rows))
+    return (
+        '<!-- Open Positions Section Start -->\n'
+        '    <div class="about-us pb-0">\n'
+        '        <div class="container">\n'
+        '            <div class="row align-items-center">\n'
+        '                <div class="col-lg-12 text-center">\n'
+        '                    <div class="about-us-content">\n'
+        '                        <div class="section-title">\n'
+        '                            %s\n'
+        '                            %s\n'
+        '                        </div>\n'
+        '                    </div>\n'
+        '                </div>\n'
+        '            </div>\n'
+        '        </div>\n'
+        '    </div>\n%s'
+        '    <!-- Open Positions Section End -->' % (head, intro, listing))
+
+
+def apply_positions_to_careers():
+    path = os.path.join(SITE, "careers.html")
+    body = read_html(path)
+    a = body.find('<!-- Open Positions Section Start -->')
+    b = body.find('<!-- Open Positions Section End -->')
+    if a == -1 or b == -1:
+        return
+    b += len('<!-- Open Positions Section End -->')
+    write_html(path, body[:a] + render_positions_section() + body[b:])
+
+
+def build_position_page(p):
+    tpl = read_html(os.path.join(SITE, POSITION_TEMPLATE))
+    paras = "\n".join("<p>%s</p>" % _esc(l.strip())
+                      for l in (p.get("full") or "").splitlines() if l.strip())
+    out = (tpl.replace("@@TITLE@@", _esc(p["title"]))
+              .replace("@@LOCATION@@", _esc(p.get("location", "")))
+              .replace("@@TYPE@@", _esc(p.get("type", "")))
+              .replace("@@SLUG@@", _esc(p["slug"]))
+              .replace("@@FULL@@", paras))
+    dest = os.path.join(SITE, "career", p["slug"] + ".html")
+    write_html(dest, out)
+    return dest
+
+
+def _position_arabic_pairs(p):
+    pairs = [(p["title"], p.get("title_ar", "")),
+             (p.get("short", ""), p.get("short_ar", ""))]
+    en = [l.strip() for l in (p.get("full") or "").splitlines() if l.strip()]
+    ar = [l.strip() for l in (p.get("full_ar") or "").splitlines() if l.strip()]
+    pairs += list(zip(en, ar))
+    if p.get("title_ar"):
+        pairs.append((p["title"] + " | Takwa Foods",
+                      p["title_ar"] + " | تقوى للأغذية"))
+    return pairs
+
+
+def _publish_position(p):
+    """Build or remove the public detail page, refresh the careers list, and
+    regenerate Arabic. A draft (published False) shows nowhere."""
+    for f in (os.path.join(SITE, "career", p["slug"] + ".html"),
+              os.path.join(SITE, "career", p["slug"] + "-ar.html")):
+        if os.path.exists(f):
+            os.remove(f)
+    if p.get("published"):
+        build_position_page(p)
+    apply_positions_to_careers()
+    did = register_arabic(_position_arabic_pairs(p)) if p.get("published") else False
+    if not did:
+        rebuild_arabic()
+
+
+def _position_from(data, slug):
+    return {"slug": slug,
+            "title": (data.get("title") or "").strip(),
+            "location": (data.get("location") or "").strip(),
+            "type": (data.get("type") or "").strip(),
+            "short": (data.get("short") or "").strip(),
+            "full": (data.get("full") or "").strip(),
+            "published": bool(data.get("published")),
+            "title_ar": (data.get("title_ar") or "").strip(),
+            "short_ar": (data.get("short_ar") or "").strip(),
+            "full_ar": (data.get("full_ar") or "").strip()}
+
+
+def add_position(data):
+    title = (data.get("title") or "").strip()
+    if not title:
+        raise ValueError("The position needs a title.")
+    items = read_positions()
+    slug = slugify(title)
+    if any(x["slug"] == slug for x in items):
+        raise ValueError("A position with that title already exists.")
+    p = _position_from(data, slug)
+    items.append(p)
+    write_positions(items)
+    _publish_position(p)
+    return "Added “%s”%s." % (
+        title, "" if p["published"] else " as a draft (not shown on the site yet)")
+
+
+def edit_position(data):
+    slug = (data.get("slug") or "").strip()
+    items = read_positions()
+    idx = next((i for i, x in enumerate(items) if x["slug"] == slug), -1)
+    if idx == -1:
+        raise ValueError("No such position.")
+    title = (data.get("title") or "").strip()
+    if not title:
+        raise ValueError("The position needs a title.")
+    p = _position_from(data, slug)   # slug stays the same, keeps the URL stable
+    items[idx] = p
+    write_positions(items)
+    _publish_position(p)
+    return "Updated “%s”." % title
+
+
+def delete_position(slug):
+    items = read_positions()
+    keep = [x for x in items if x["slug"] != slug]
+    if len(keep) == len(items):
+        raise ValueError("No such position.")
+    gone = next(x for x in items if x["slug"] == slug)
+    write_positions(keep)
+    for f in (os.path.join(SITE, "career", slug + ".html"),
+              os.path.join(SITE, "career", slug + "-ar.html")):
+        if os.path.exists(f):
+            os.remove(f)
+    apply_positions_to_careers()
+    rebuild_arabic()
+    return "Removed “%s”." % gone["title"]
+
+
 def render_add_news():
     items = read_news()
     rows = "".join(
@@ -2636,6 +2837,165 @@ document.getElementById('list').addEventListener('click',function(e){
 </body></html>""".replace("@@ROWS@@", rows)
 
 
+def render_add_position():
+    items = read_positions()
+    rows = "".join(
+        '<tr data-p=\'%s\'><td><strong>%s</strong><br><span>%s%s</span></td>'
+        '<td>%s</td>'
+        '<td><button class="edit" data-slug="%s">Edit</button> '
+        '<button class="del" data-slug="%s">Remove</button></td></tr>'
+        % (_esc(json.dumps(x)), _esc(x["title"]), _esc(x.get("location", "")),
+           (" · " + _esc(x.get("type", ""))) if x.get("type") else "",
+           ('<span class="live">Live</span>' if x.get("published")
+            else '<span class="draft">Draft</span>'),
+           _esc(x["slug"]), _esc(x["slug"]))
+        for x in items) or '<tr><td colspan="3" class="none">No positions yet.</td></tr>'
+
+    return """<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Takwa — Open Positions</title>
+<style>
+ *{box-sizing:border-box}
+ body{margin:0;font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+      background:#fafaf8;color:#1e1e1e}
+ header{background:#4c9932;color:#fff;padding:26px 32px}
+ header h1{margin:0 0 6px;font-size:24px}header p{margin:0;opacity:.93;font-size:14px}
+ .wrap{margin:24px 32px 60px;max-width:1100px}
+ .card{background:#fff;border:1px solid #e2e2dc;border-radius:10px;padding:22px 24px;margin-bottom:26px}
+ h2{font-size:18px;margin:0 0 16px;border-bottom:2px solid #4c9932;padding-bottom:7px}
+ label{display:block;font-size:13px;font-weight:600;margin:14px 0 5px}
+ .hint{font-weight:400;color:#888}
+ input[type=text],textarea{width:100%;border:1px solid #cfcfc7;border-radius:6px;
+      padding:9px 11px;font:14px inherit}
+ textarea{resize:vertical}
+ .row2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+ .pub{display:flex;align-items:center;gap:8px;margin-top:14px;font-size:14px;font-weight:600}
+ .pub input{width:auto}
+ button{border:none;border-radius:6px;padding:10px 20px;font-size:13.5px;font-weight:600;cursor:pointer}
+ .save{background:#4c9932;color:#fff;margin-top:20px}
+ .save:hover{background:#3d7a28}
+ .edit{background:#fff;border:1px solid #c3d6bc;color:#3d7a28;padding:6px 12px;font-size:12px;margin-right:4px}
+ .del{background:#fff;border:1px solid #e0c0bc;color:#a33b2c;padding:6px 12px;font-size:12px}
+ table{width:100%;border-collapse:collapse;font-size:13.5px}
+ td{border-top:1px solid #eee;padding:9px 8px;vertical-align:middle}
+ td span{color:#888;font-size:12px}
+ .live{color:#2f6b1e;border:1px solid #bcd8b4;border-radius:20px;padding:2px 10px;font-weight:600}
+ .draft{color:#8a6d3b;border:1px solid #e6d5a8;border-radius:20px;padding:2px 10px;font-weight:600}
+ .none{color:#999;text-align:center;padding:22px}
+ #status{margin-top:14px;font-size:13px;min-height:1px}
+ #status.ok{color:#2f6b1e}#status.err{color:#b3261e}#status.busy{color:#777}
+ .ar-box{margin-top:18px;padding:14px 16px;background:#f6f8fb;border:1px solid #dce3ec;border-radius:8px}
+ .ar-head{margin:0 0 4px;font-weight:700;font-size:14px;color:#2c4a6b}
+ #title_ar,#short_ar,#full_ar{font-size:15px}
+ .note{background:#f4f8f2;border-left:3px solid #4c9932;padding:11px 14px;
+       font-size:13px;color:#4a5a45;margin:0 0 20px;border-radius:0 6px 6px 0}
+</style></head><body>
+<header><h1>Open Positions</h1>
+<p>Roles shown on the Careers page. Applicants apply through the existing form (goes to hr@).</p></header>
+<div class="wrap">
+
+ <p class="note">Untick "Show on the site" to keep a role as a draft. The Arabic
+ version is generated; fill the Arabic boxes or it shows English on the Arabic page.</p>
+
+ <div class="card">
+  <h2 id="formTitle">New position</h2>
+  <div class="row2">
+   <div>
+    <label>Job title</label>
+    <input type="text" id="title" placeholder="e.g. Production Line Operator">
+    <label>Location</label>
+    <input type="text" id="location" placeholder="e.g. Al Kiswa, Damascus">
+    <label>Employment type</label>
+    <input type="text" id="type" placeholder="e.g. Full time">
+    <label class="pub"><input type="checkbox" id="published" checked> Show on the site</label>
+   </div>
+   <div>
+    <label>Short description <span class="hint">(shown in the list)</span></label>
+    <textarea id="short" rows="3"></textarea>
+    <label>Full description <span class="hint">(one paragraph per line)</span></label>
+    <textarea id="full" rows="7"></textarea>
+   </div>
+  </div>
+
+  <div class="ar-box">
+   <p class="ar-head">Arabic <span class="hint">(leave blank to keep English on the Arabic page)</span></p>
+   <div class="row2">
+    <div>
+     <label>Arabic title</label>
+     <input type="text" id="title_ar" dir="rtl">
+     <label>Arabic short description</label>
+     <textarea id="short_ar" dir="rtl" rows="3"></textarea>
+    </div>
+    <div>
+     <label>Arabic full description <span class="hint">(same number of lines)</span></label>
+     <textarea id="full_ar" dir="rtl" rows="6"></textarea>
+    </div>
+   </div>
+  </div>
+
+  <button class="save" id="save">Add position</button>
+  <button class="del" id="cancel" style="display:none;margin-left:8px">Cancel editing</button>
+  <p id="status"></p>
+ </div>
+
+ <div class="card">
+  <h2>Positions</h2>
+  <table><tbody id="list">@@ROWS@@</tbody></table>
+ </div>
+</div>
+
+<script>
+function say(t,k){var s=document.getElementById('status');s.textContent=t;s.className=k||'';}
+var editing=null;
+function val(id){return document.getElementById(id).value;}
+function setMode(p){
+  editing = p ? p.slug : null;
+  document.getElementById('formTitle').textContent = p ? ('Editing: '+p.title) : 'New position';
+  document.getElementById('save').textContent = p ? 'Save changes' : 'Add position';
+  document.getElementById('cancel').style.display = p ? 'inline-block' : 'none';
+  document.getElementById('title').value    = p ? p.title : '';
+  document.getElementById('location').value = p ? (p.location||'') : '';
+  document.getElementById('type').value     = p ? (p.type||'') : '';
+  document.getElementById('short').value    = p ? (p.short||'') : '';
+  document.getElementById('full').value     = p ? (p.full||'') : '';
+  document.getElementById('published').checked = p ? !!p.published : true;
+  document.getElementById('title_ar').value = p ? (p.title_ar||'') : '';
+  document.getElementById('short_ar').value = p ? (p.short_ar||'') : '';
+  document.getElementById('full_ar').value  = p ? (p.full_ar||'') : '';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+document.getElementById('list').addEventListener('click',function(e){
+  var ed=e.target.closest('.edit');
+  if(ed){ var tr=ed.closest('tr'); setMode(JSON.parse(tr.getAttribute('data-p'))); return; }
+  var b=e.target.closest('.del'); if(!b) return;
+  if(!confirm('Remove this position? Its page will be deleted.')) return;
+  fetch('/_delete_position?slug='+encodeURIComponent(b.dataset.slug),{method:'POST'})
+   .then(function(r){return r.json();})
+   .then(function(j){ say(j.message||'Removed','ok'); setTimeout(function(){location.reload();},700); })
+   .catch(function(){ say('Could not remove it.','err'); });
+});
+document.getElementById('cancel').addEventListener('click',function(){ setMode(null); });
+document.getElementById('save').addEventListener('click',function(){
+  var body={title:val('title'),location:val('location'),type:val('type'),
+            short:val('short'),full:val('full'),
+            published:document.getElementById('published').checked,
+            title_ar:val('title_ar'),short_ar:val('short_ar'),full_ar:val('full_ar')};
+  if(!body.title.trim()){say('Give the position a title first.','err');return;}
+  if(editing){ body.slug=editing; }
+  say(editing?'Saving...':'Adding...','busy');
+  fetch(editing?'/_edit_position':'/_add_position',
+        {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})
+   .then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j};});})
+   .then(function(res){
+      if(!res.ok||!res.j.ok) throw new Error(res.j.message||'Failed');
+      say(res.j.message+' Reloading...','ok');
+      setTimeout(function(){location.reload();},900);
+   }).catch(function(e){say(e.message,'err');});
+});
+</script>
+</body></html>""".replace("@@ROWS@@", rows)
+
+
 class Handler(SimpleHTTPRequestHandler):
     def __init__(self, *a, **kw):
         super().__init__(*a, directory=SITE, **kw)
@@ -2730,6 +3090,15 @@ class Handler(SimpleHTTPRequestHandler):
 
         if path == "/_add-product.html":
             body = with_publish_bar(render_add_product()).encode("utf-8")
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+            return
+
+        if path == "/_add-position.html":
+            body = with_publish_bar(render_add_position()).encode("utf-8")
             self.send_response(200)
             self.send_header("Content-Type", "text/html; charset=utf-8")
             self.send_header("Content-Length", str(len(body)))
@@ -2899,6 +3268,16 @@ class Handler(SimpleHTTPRequestHandler):
             if parsed.path == "/_add_product":
                 return self._json(200, {"ok": True, "message": add_product(self._json_body())})
 
+            if parsed.path == "/_add_position":
+                return self._json(200, {"ok": True, "message": add_position(self._json_body())})
+
+            if parsed.path == "/_edit_position":
+                return self._json(200, {"ok": True, "message": edit_position(self._json_body())})
+
+            if parsed.path == "/_delete_position":
+                slug = (query.get("slug") or [""])[0]
+                return self._json(200, {"ok": True, "message": delete_position(slug)})
+
             if parsed.path == "/_delete_product":
                 slug = (query.get("slug") or [""])[0]
                 return self._json(200, {"ok": True, "message": delete_product(slug)})
@@ -3002,6 +3381,7 @@ if __name__ == "__main__":
     print("  Photo proposal:     http://localhost:%d/_photo-proposal.html" % PORT)
     print("  Add a product:      http://localhost:%d/_add-product.html" % PORT)
     print("  Add news:           http://localhost:%d/_add-news.html" % PORT)
+    print("  Open positions:     http://localhost:%d/_add-position.html" % PORT)
     print("\n  This computer only — nothing on the network can reach it,")
     print("  and it asks for a password.")
     print("\n  See the site itself: http://localhost:%d/\n" % PORT)
