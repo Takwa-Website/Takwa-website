@@ -96,7 +96,7 @@
        that long is abandoned rather than finished. */
     var panels  = [].slice.call(form.querySelectorAll(".step"));
     var crumbs  = [].slice.call(form.querySelectorAll(".stepper-item"));
-    var bar     = form.querySelector(".apply-progress-bar");
+    var bar     = form.querySelector(".progress-bar");
     var backBtn = form.querySelector("[data-back]");
     var nextBtn = form.querySelector("[data-next]");
     var sendBtn = form.querySelector("[data-send]");
@@ -109,10 +109,13 @@
             c.classList.toggle("on", n === at);
             c.classList.toggle("done", n < at);
         });
-        bar.style.width = ((at + 1) / panels.length * 100) + "%";
-        backBtn.hidden = at === 0;
-        nextBtn.hidden = at === panels.length - 1;
-        sendBtn.hidden = at !== panels.length - 1;
+        /* every one of these is optional chrome: a missing progress bar or nav
+           button must never throw here, because this runs before the submit
+           handler is attached -- a throw would leave the form unable to send */
+        if (bar) { bar.style.width = ((at + 1) / panels.length * 100) + "%"; }
+        if (backBtn) { backBtn.hidden = at === 0; }
+        if (nextBtn) { nextBtn.hidden = at === panels.length - 1; }
+        if (sendBtn) { sendBtn.hidden = at !== panels.length - 1; }
         if (scroll !== false) {
             form.scrollIntoView({ block: "start", behavior: "smooth" });
         }
@@ -128,14 +131,18 @@
         return null;
     }
 
-    nextBtn.addEventListener("click", function () {
-        var bad = panelInvalid(at);
-        if (bad) { say("Please complete the highlighted field.", "error"); reveal(bad); return; }
-        say("");
-        show(at + 1);
-    });
+    if (nextBtn) {
+        nextBtn.addEventListener("click", function () {
+            var bad = panelInvalid(at);
+            if (bad) { say("Please complete the highlighted field.", "error"); reveal(bad); return; }
+            say("");
+            show(at + 1);
+        });
+    }
 
-    backBtn.addEventListener("click", function () { say(""); show(at - 1); });
+    if (backBtn) {
+        backBtn.addEventListener("click", function () { say(""); show(at - 1); });
+    }
 
     crumbs.forEach(function (c) {
         c.addEventListener("click", function () { show(+c.dataset.go); });

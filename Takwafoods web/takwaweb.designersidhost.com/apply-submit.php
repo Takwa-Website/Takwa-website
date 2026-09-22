@@ -185,7 +185,7 @@ if ($written === false) {
    The application itself is not emailed -- that would put the personal data
    back into an inbox and undo the point of storing it here. */
 @mail(
-    'hr@takwafoods.com',
+    'HR@takwafoods.com, GYoussef@takwafoods.com',
     'New application: ' . $record['position'] . ', ' . $record['full_name'],
     "A new employment application has been received.\n\n"
     . "Position: " . $record['position'] . "\n"
