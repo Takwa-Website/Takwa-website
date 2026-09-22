@@ -28,7 +28,11 @@
        deliver to, it is not a secret and cannot be used to read anything. */
     var ACCESS_KEY = "f1d677a1-5d5f-415a-86c8-3dd90adedebb";
 
-    var ENDPOINT = "https://api.web3forms.com/submit";
+    /* Posts to a handler on this host (contact-submit.php), which emails each
+       message to HR@, GYoussef@ and info@. Root-relative so the footer form
+       works the same from /blog/ or /listing/ as from the site root. Replaces
+       the Web3Forms route, which could reach only its one registered inbox. */
+    var ENDPOINT = "/contact-submit.php";
 
     /* The site is bilingual, so messages follow whichever version the
        visitor is reading. */
