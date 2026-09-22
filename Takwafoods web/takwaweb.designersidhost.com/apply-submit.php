@@ -183,15 +183,23 @@ if ($written === false) {
 
 /* a short note to the office so nobody has to poll the admin page.
    The application itself is not emailed -- that would put the personal data
-   back into an inbox and undo the point of storing it here. */
-@mail(
-    'HR@takwafoods.com, GYoussef@takwafoods.com',
+   back into an inbox and undo the point of storing it here.
+
+   Sent via authenticated M365 SMTP (see mailer.php); plain mail() from the
+   web host is dropped by M365 as own-domain spoofing. A failed notification
+   is logged but does NOT fail the request: the application is already saved
+   safely on disk, so the applicant is correctly told it was received. */
+require_once __DIR__ . '/mailer.php';
+$notify = takwa_send_mail(
+    ['HR@takwafoods.com', 'GYoussef@takwafoods.com'],
     'New application: ' . $record['position'] . ', ' . $record['full_name'],
     "A new employment application has been received.\n\n"
     . "Position: " . $record['position'] . "\n"
     . "Applicant: " . $record['full_name'] . "\n\n"
-    . "Read it here: https://takwafoods.com/admin/\n",
-    'From: no-reply@takwafoods.com'
+    . "Read it here: https://takwafoods.com/admin/\n"
 );
+if (!$notify['ok']) {
+    error_log('takwa apply notification failed: ' . $notify['error']);
+}
 
 echo json_encode(['ok' => true, 'message' => 'Application received.']);

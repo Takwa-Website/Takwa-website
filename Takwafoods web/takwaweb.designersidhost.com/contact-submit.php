@@ -110,13 +110,15 @@ $body = "New message from the takwafoods.com contact form.\n\n"
 /* Reply-To is the visitor so a reply goes straight back to them; From is a
    no-reply on our own domain so the message passes SPF/DKIM for takwafoods.com
    rather than being sent "as" a stranger's address (which fails and bounces). */
-$headers = "From: no-reply@takwafoods.com\r\n"
-         . 'Reply-To: ' . str_replace(["\r", "\n"], '', $email) . "\r\n"
-         . "Content-Type: text/plain; charset=utf-8\r\n";
+/* Sent via authenticated M365 SMTP (see mailer.php). Unlike the application
+   form, the email IS the delivery here -- there is no on-disk record -- so a
+   failed send must be surfaced to the visitor, not hidden behind a green
+   message, and logged for George. */
+require_once __DIR__ . '/mailer.php';
+$result = takwa_send_mail(RECIPIENTS, 'Website contact: ' . $name, $body, $email);
 
-$sent = @mail(RECIPIENTS, 'Website contact: ' . $name, $body, $headers);
-
-if (!$sent) {
+if (!$result['ok']) {
+    error_log('takwa contact send failed: ' . $result['error']);
     http_response_code(500);
     echo json_encode(['success' => false,
         'message' => 'Could not send your message. Please email info@takwafoods.com.']);
