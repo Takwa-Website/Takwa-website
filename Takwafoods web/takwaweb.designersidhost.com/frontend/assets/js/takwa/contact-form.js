@@ -1,37 +1,21 @@
 /* ==========================================================================
-   Contact form delivery via Web3Forms.
+   Contact form delivery.
 
    Every "Get in Touch" form on the site -- the one on the contact page and
    the copy in the footer of every other page -- used to POST to
    takwaweb.designersidhost.com/store-contact-message. That endpoint belonged
-   to the old Laravel CMS and is gone: on takwafoods.com it returns 404, so
+   to the old Laravel CMS and is gone: on takwafoods.com it returned 404, so
    every message a visitor sent was lost without either side being told.
 
-   This script takes those forms over and posts them to Web3Forms instead,
-   which emails them straight to the address the access key is registered to.
-   No backend and no database, which suits a static site on cPanel.
-
-   TO SWITCH IT ON: put the Web3Forms access key in ACCESS_KEY below.
-   Get one free at https://web3forms.com -- enter the address the messages
-   should arrive at and they email the key straight back.
-
-   Until that key is filled in, the form deliberately refuses to send and
-   tells the visitor to phone or email instead. That is on purpose: showing
-   somebody "Message sent!" when nothing was sent is worse than telling them
-   the truth.
+   This script takes those forms over and posts them to contact-submit.php on
+   this host, which emails each message to HR@, GYoussef@ and info@ via
+   authenticated SMTP. It replaces the earlier Web3Forms route, which could
+   deliver to only its one registered inbox. The endpoint is root-relative so
+   the footer form works the same from /blog/ or /listing/ as from the root.
    ========================================================================== */
 (function () {
     "use strict";
 
-    /* Registered to info@takwafoods.com as "Takwa Foods Website".
-       Access keys are public by design -- this one identifies the inbox to
-       deliver to, it is not a secret and cannot be used to read anything. */
-    var ACCESS_KEY = "f1d677a1-5d5f-415a-86c8-3dd90adedebb";
-
-    /* Posts to a handler on this host (contact-submit.php), which emails each
-       message to HR@, GYoussef@ and info@. Root-relative so the footer form
-       works the same from /blog/ or /listing/ as from the site root. Replaces
-       the Web3Forms route, which could reach only its one registered inbox. */
     var ENDPOINT = "/contact-submit.php";
 
     /* The site is bilingual, so messages follow whichever version the
@@ -248,11 +232,6 @@
                 return;
             }
 
-            if (!ACCESS_KEY) {
-                say(form, t.offline, false);
-                return;
-            }
-
             var button = form.querySelector('button[type="submit"], .btn-default');
             var label = button ? button.textContent : null;
             if (button) {
@@ -261,12 +240,11 @@
             }
             say(form, t.sending, true);
 
-            var data = { access_key: ACCESS_KEY };
+            var data = {};
             new FormData(form).forEach(function (value, key) {
                 /* _token is a leftover Laravel CSRF field and means nothing now */
                 if (key !== "_token") { data[key] = value; }
             });
-            data.from_name = "Takwa Foods website";
             if (!data.subject) { data.subject = "New message from takwafoods.com"; }
 
             fetch(ENDPOINT, {

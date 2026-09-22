@@ -68,13 +68,17 @@ function takwa_send_mail($to, string $subject, string $body, ?string $replyTo = 
     $pass      = (string) ($cfg['password'] ?? '');
     $fromEmail = (string) ($cfg['from_email'] ?? $user);
     $fromName  = (string) ($cfg['from_name'] ?? 'Takwa Foods');
+    /* 'starttls' (port 587, the default) or 'ssl' / 'tls' (implicit TLS, port
+       465). M365 uses STARTTLS; a cPanel mailbox usually offers either. */
+    $enc = strtolower((string) ($cfg['encryption'] ?? 'starttls'));
+    $implicitTls = ($enc === 'ssl' || $enc === 'tls');
 
     if ($user === '' || $pass === '' || $fromEmail === '') {
         return ['ok' => false, 'error' => 'mail config incomplete (username, password, from_email)'];
     }
 
     $errno = 0; $errstr = '';
-    $fp = @fsockopen($host, $port, $errno, $errstr, 20);
+    $fp = @fsockopen(($implicitTls ? 'ssl://' : '') . $host, $port, $errno, $errstr, 20);
     if (!$fp) {
         return ['ok' => false, 'error' => "connect failed: $errstr ($errno)"];
     }
