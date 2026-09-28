@@ -45,3 +45,6 @@ SHAREPOINT-INTEGRATION.md
 photo-proposal/PROPOSAL.md
 takwa-mail-config.php
 mail-config.php
+
+# runtime logs (the editor writes .takwa-tools.log)
+*.log

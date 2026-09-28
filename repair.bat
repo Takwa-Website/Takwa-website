@@ -1,8 +1,25 @@
 @echo off
 setlocal
+REM ---------------------------------------------------------------------------
+REM Takwa Website Editor - clear a stuck update.
+REM
+REM Finds the website copy the same way as setup.bat: this file's own folder
+REM first, then C:\TakwaWebsite, %LOCALAPPDATA%\TakwaWebsite, and finally the
+REM old Documents\Takwa-Website location from earlier setups.
+REM
+REM The safety backup goes NEXT TO the website folder, never into Documents:
+REM on business PCs Documents is synced by OneDrive, which would upload a full
+REM copy of the site (and its git history) to the cloud.
+REM ---------------------------------------------------------------------------
 title Takwa Website Editor - Repair
 color 0E
-set "DEST=%USERPROFILE%\Documents\Takwa-Website"
+
+set "HERE=%~dp0"
+set "DEST="
+if exist "%HERE%start.py" set "DEST=%HERE:~0,-1%"
+if not defined DEST if exist "C:\TakwaWebsite\start.py" set "DEST=C:\TakwaWebsite"
+if not defined DEST if exist "%LOCALAPPDATA%\TakwaWebsite\start.py" set "DEST=%LOCALAPPDATA%\TakwaWebsite"
+if not defined DEST if exist "%USERPROFILE%\Documents\Takwa-Website\start.py" set "DEST=%USERPROFILE%\Documents\Takwa-Website"
 
 echo.
 echo   ============================================
@@ -13,29 +30,20 @@ echo   This clears a stuck update and returns you to the latest published
 echo   version. Your ENTIRE folder is copied to a backup first, so nothing
 echo   can be lost -- if you had unpublished edits, they will be in the backup.
 echo.
+if not defined DEST goto :no_site
+echo   Website copy:  %DEST%
+echo.
 pause
 
-cd /d "%DEST%" 2>nul
-if errorlevel 1 (
-    echo   [X] Could not find %DEST%
-    pause
-    exit /b 1
-)
+cd /d "%DEST%"
 
-REM 1. Full safety backup, timestamped, next to the site folder.
-for /f "tokens=1-4 delims=/-. " %%a in ("%DATE%") do set "D=%%d%%c%%b"
-set "T=%TIME::=%"
-set "T=%T: =0%"
-set "BK=%USERPROFILE%\Documents\Takwa-backup-%RANDOM%"
+REM 1. Full safety backup, next to the site folder.
+set "BK=%DEST%-backup-%RANDOM%"
 echo.
 echo   [..] Backing up the whole folder to:
 echo        %BK%
 xcopy "%DEST%" "%BK%\" /E /I /H /Q >nul
-if errorlevel 1 (
-    echo   [X] Backup failed - stopping so nothing is risked.
-    pause
-    exit /b 1
-)
+if errorlevel 1 goto :backup_failed
 echo   [ok] Backup done
 
 REM 2. Cancel any half-finished merge or rebase (ignore if none in progress).
@@ -60,4 +68,26 @@ echo   folder shown above -- re-do them in the tools and press Publish.
 echo.
 echo   NEXT: close this window, run takwa-tools-stop.bat, then open the editor.
 echo.
+echo   [DONE] Repair finished successfully.
+echo.
 pause
+exit /b 0
+
+:backup_failed
+echo   [X] Backup failed - stopping so nothing is risked.
+echo.
+echo   [STOPPED] Nothing was changed.
+pause
+exit /b 1
+
+:no_site
+echo   [X] Cannot find the website on this computer. Looked in:
+echo         this file's own folder
+echo         C:\TakwaWebsite
+echo         %LOCALAPPDATA%\TakwaWebsite
+echo         %USERPROFILE%\Documents\Takwa-Website
+echo       Run setup.bat first.
+echo.
+echo   [STOPPED] Nothing was changed.
+pause
+exit /b 1

@@ -21,19 +21,33 @@ Publish.
 
 **https://www.python.org/downloads/**
 
-Click the big yellow **Download Python** button.
+Click the yellow **Download** button and run the file it downloads. Accept the
+defaults. You may get one of two installers — both work:
 
-**On the first screen of the installer, tick "Add python.exe to PATH"** before
-clicking Install. It is a small box at the bottom and it is easy to miss — if
-setup later says Python is not installed, this box is why. You can fix it by
-running the installer again and ticking it.
+- **"Python install manager"** (the usual one now): if it asks whether to
+  install Python or finish setting up, answer **Yes**.
+- **The classic installer**: on the first screen, tick **"Add python.exe to
+  PATH"** before clicking **Install Now**.
+
+If you skip a step here, don't worry — `setup.bat` checks Python properly and
+tells you exactly what's missing.
 
 ### 3. Run the setup file
 
-Double-click **`setup.bat`** — the file George sent you.
+Double-click **`setup.bat`** — the file George sent you. It can sit anywhere,
+including a OneDrive Desktop or a folder with spaces in its name.
 
-It downloads the website, checks both programs, and puts a **Takwa Website
-Editor** icon on your desktop. It takes a minute or two.
+If Windows shows **"Windows protected your PC"**, click **More info → Run
+anyway** (it does this for any file that came from the internet).
+
+It checks both programs, downloads the website into **`C:\TakwaWebsite`**, and
+puts a **Takwa Website Editor** icon on your desktop. On a slow connection the
+download can take several minutes — the window shows progress, so leave it
+open. It finishes with **`[DONE] Setup finished successfully.`** If it stops
+early it says **`[STOPPED]`** and why.
+
+The website is kept in `C:\TakwaWebsite` on purpose, not in Documents or on
+the Desktop: those are synced by OneDrive, which can damage it.
 
 You only ever do this once.
 
@@ -99,7 +113,7 @@ like clutter. They are not. Leave them alone.
 
 **If you close the browser, the tools keep running.** Double-click the desktop
 icon again to get back to them. To stop them properly, run
-`takwa-tools-stop.bat` in the website folder.
+`takwa-tools-stop.bat` in the website folder (`C:\TakwaWebsite`).
 
 ---
 
@@ -107,7 +121,9 @@ icon again to get back to them. To stop them properly, run
 
 | What you see | What it means |
 |---|---|
-| "Python is not installed" | The PATH box was not ticked. Run the Python installer again and tick it. |
+| "Python is not installed" | Follow the steps setup.bat prints: install Python from python.org, then run setup.bat again. |
+| "Windows protected your PC" | Click **More info → Run anyway**. |
+| Setup window seems stuck | Look at the last line: `[..]` means it is still working (downloads can be slow). If nothing changes for 10 minutes, send George a photo of the window. |
 | "Git is not installed" | Install Git from the link above, then run setup again. |
 | "GitHub would not accept it" | Sign in to GitHub when prompted, then press Publish again. Your work is safe on your computer. |
 | "Someone else changed the website" | George changed something too. Your work is safe — message him rather than pressing Publish again. |

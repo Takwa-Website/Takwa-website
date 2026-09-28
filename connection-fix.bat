@@ -44,4 +44,6 @@ echo.
 echo   NEXT: open the editor and press Publish again.
 echo         Your work is still saved on this computer -- nothing was lost.
 echo.
+echo   [DONE] Connection settings applied.
+echo.
 pause
