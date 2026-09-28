@@ -47,10 +47,9 @@ Last rebuilt: 20 September 2026.
 - **Migration:** a plan exists to move off cPanel to GoDaddy (static site + Odoo
   on a VPS, email staying on M365, only DNS moving). **Not executed.**
 - **Sensitive specifics** (Cloudflare account owner, registrar unlock route,
-  migration steps, ownership map): in `STATE-OF-EVERYTHING.md` (gitignored,
-  beside this repo on George's laptop), the ownership plan, and the
-  cPanel-to-GoDaddy runbook (both in George's private Takwa notes). Kept out of
-  this public repo on purpose.
+  migration steps, ownership map): in `STATE-OF-EVERYTHING.md`, the ownership
+  plan, and the cPanel-to-GoDaddy runbook — all in George's private Takwa notes,
+  outside this folder. Kept out of this public repo on purpose.
 - **Internal company documents never go in this folder.** This folder *is* the
   public repo: anything dropped here is one Publish away from GitHub. Internal
   Takwa documents (interview guides, HR files, plans) live in George's separate
@@ -100,8 +99,9 @@ reopen the editor (`start.py` loads its code once at startup). Full guide:
 ## 5. Decisions made (with dates where known)
 
 - Deploy stays a **manual cPanel click** — standing.
-- Repo is **public**; planning/infra docs are **gitignored** (`STATE-OF-EVERYTHING`,
-  `HANDOVER-PLAN`, `IT-REQUEST`, `SHAREPOINT-INTEGRATION`) — Sep 2026.
+- Repo is **public**; planning/infra docs stay out of it — `STATE-OF-EVERYTHING`
+  now lives in George's private Takwa notes; `HANDOVER-PLAN`, `IT-REQUEST`,
+  `SHAREPOINT-INTEGRATION` are gitignored if present — Sep 2026.
 - Application data kept on the **own server** (`apply-submit.php` writes each
   application outside the web root; read via password-gated `/admin/`). The
   contact form uses Web3Forms — Sep 2026.
