@@ -47,9 +47,14 @@ Last rebuilt: 20 September 2026.
 - **Migration:** a plan exists to move off cPanel to GoDaddy (static site + Odoo
   on a VPS, email staying on M365, only DNS moving). **Not executed.**
 - **Sensitive specifics** (Cloudflare account owner, registrar unlock route,
-  migration steps, ownership map): see `STATE-OF-EVERYTHING.md` (vault),
-  `~/claude/takwafoods-ownership-plan.md`, and `~/cpanel-to-godaddy-runbook.md`.
-  Kept out of this public repo on purpose.
+  migration steps, ownership map): in `STATE-OF-EVERYTHING.md` (gitignored,
+  beside this repo on George's laptop), the ownership plan, and the
+  cPanel-to-GoDaddy runbook (both in George's private Takwa notes). Kept out of
+  this public repo on purpose.
+- **Internal company documents never go in this folder.** This folder *is* the
+  public repo: anything dropped here is one Publish away from GitHub. Internal
+  Takwa documents (interview guides, HR files, plans) live in George's separate
+  Takwa notes vault, not here.
 
 ## 3. Takwa Website Editor (Duaa's tool)
 
